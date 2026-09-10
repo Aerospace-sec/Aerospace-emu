@@ -58,6 +58,7 @@ GET /api/chain?scenario=normal
 
 `sim/twin/chain.py` 将下列语义阶段关联为一条因果链：
 
+
 ```text
 5G UE → N6 → 跨域网关 → RS-422 串行桥 → ARINC 429 → 虚拟 LRU → PX4 虚拟 HIL
 ```
@@ -70,6 +71,28 @@ GET /api/chain?scenario=normal
 - 对应的 `EvidenceRecord`、模型引用和 SHA-256 摘要。
 
 负向场景在跨域网关拒绝后必须阻断下游事件，并保持 `physical_output=false`。所有当前证据标记为 `virtual_model`，不得表述为真实飞机已被攻破或真实飞行后果。
+
+## 一键运行全部仿真
+
+使用统一编排器运行 ARINC 429、RS-232/RS-422、5G-ATG、民航平台、虚拟硬件、跨模型事件链和报告渲染：
+
+```bash
+python3 scripts/run_all_simulations.py --profile quick
+```
+
+`quick` 使用本地运动学模型和 10 秒民航平台仿真，适合日常开发；需要完整 180 秒民航平台时使用：
+
+```bash
+python3 scripts/run_all_simulations.py --profile full
+```
+
+每个阶段的 stdout/stderr 和总清单写入 `artifacts/one-click/manifest.json`。清单记录命令、返回码、耗时和失败阶段；任一阶段失败时编排器返回非零码，避免把部分结果误报为完整仿真。可先查看执行计划：
+
+```bash
+python3 scripts/run_all_simulations.py --profile quick --dry-run
+```
+
+全部模型仍是本地、确定性、simulation-only 实验，不打开真实网络、串口、无线设备或航空器接口。
 
 ## 团队 Git 管理规则
 
