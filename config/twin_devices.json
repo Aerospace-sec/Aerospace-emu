@@ -1,0 +1,21 @@
+{
+  "stale_after_ms": 5000,
+  "devices": [
+    {"device_id":"ATG-UE-001","name":"Synthetic ATG UE","device_class":"5g_ue","domain":"aircraft","model_ref":"sim.atg5g_lab","visual_ref":"ue","interfaces":[{"interface_id":"nr0","kind":"radio","protocol_profile":"synthetic-5g"}],"capabilities":["read_state"]},
+    {"device_id":"ATG-GNB-01","name":"Synthetic ATG gNB","device_class":"5g_gnb","domain":"air_ground","model_ref":"sim.atg5g_lab","visual_ref":"gnb","interfaces":[{"interface_id":"nr0","kind":"radio","protocol_profile":"synthetic-5g"},{"interface_id":"n3","kind":"packet","protocol_profile":"n3"}],"capabilities":["read_state"]},
+    {"device_id":"ATG-CORE-01","name":"Synthetic ATG Core","device_class":"5g_core","domain":"ground","model_ref":"sim.atg5g_lab","visual_ref":"core","interfaces":[{"interface_id":"n3","kind":"packet","protocol_profile":"n3"},{"interface_id":"n6","kind":"packet","protocol_profile":"n6"}],"capabilities":["read_state"]},
+    {"device_id":"N6-GROUND-APP","name":"Synthetic N6 Application","device_class":"ground_application","domain":"ground","model_ref":"sim.atg5g_lab","visual_ref":"server","interfaces":[{"interface_id":"n6","kind":"packet","protocol_profile":"n6"}],"capabilities":["read_state"]},
+    {"device_id":"RS422-AVIONICS-LRU","name":"Synthetic RS-422 LRU","device_class":"serial_lru","domain":"aircraft","model_ref":"sim.serial_lab","visual_ref":"lru","interfaces":[{"interface_id":"rs422","kind":"serial","protocol_profile":"rs-422"}],"capabilities":["read_state"]},
+    {"device_id":"RS232-GSE-MAINT","name":"Synthetic RS-232 Maintenance","device_class":"maintenance_terminal","domain":"ground","model_ref":"sim.serial_lab","visual_ref":"terminal","interfaces":[{"interface_id":"rs232","kind":"serial","protocol_profile":"rs-232"}],"capabilities":["read_state"]},
+    {"device_id":"V429-LAB-2T4R","name":"Virtual ARINC 429 Card","device_class":"arinc429_card","domain":"aircraft","model_ref":"sim.virtual_hardware","visual_ref":"arinc-card","interfaces":[{"interface_id":"ch-a","kind":"bus","protocol_profile":"arinc-429"},{"interface_id":"ch-b","kind":"bus","protocol_profile":"arinc-429"}],"capabilities":["read_state"]},
+    {"device_id":"SYNTHETIC_AIR_DATA_LRU","name":"Synthetic Air Data LRU","device_class":"arinc429_lru","domain":"aircraft","model_ref":"sim.virtual_hardware","visual_ref":"lru","interfaces":[{"interface_id":"arinc-in","kind":"bus","protocol_profile":"arinc-429"}],"capabilities":["read_state"]},
+    {"device_id":"PX4-FMU-VIRTUAL","name":"Virtual PX4 FMU","device_class":"px4_fmu","domain":"aircraft","model_ref":"sim.virtual_hardware","visual_ref":"fmu","interfaces":[{"interface_id":"hil","kind":"hil","protocol_profile":"px4-hil"}],"capabilities":["read_state"]}
+  ],
+  "connections": [
+    {"connection_id":"ue-gnb","source_device":"ATG-UE-001","source_interface":"nr0","target_device":"ATG-GNB-01","target_interface":"nr0","protocol":"synthetic-5g"},
+    {"connection_id":"gnb-core","source_device":"ATG-GNB-01","source_interface":"n3","target_device":"ATG-CORE-01","target_interface":"n3","protocol":"n3"},
+    {"connection_id":"core-app","source_device":"ATG-CORE-01","source_interface":"n6","target_device":"N6-GROUND-APP","target_interface":"n6","protocol":"n6"},
+    {"connection_id":"card-lru","source_device":"V429-LAB-2T4R","source_interface":"ch-a","target_device":"SYNTHETIC_AIR_DATA_LRU","target_interface":"arinc-in","protocol":"arinc-429"},
+    {"connection_id":"lru-fmu","source_device":"SYNTHETIC_AIR_DATA_LRU","source_interface":"arinc-in","target_device":"PX4-FMU-VIRTUAL","target_interface":"hil","protocol":"synthetic-hil"}
+  ]
+}

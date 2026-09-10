@@ -114,3 +114,17 @@ python3 scripts/render_report.py
 ```
 
 输出 [`artifacts/chain3_ground_network_attack_chain.html`](artifacts/chain3_ground_network_attack_chain.html)。报告仅使用本地合成模型和既有证据，不连接真实航空器、机场生产网、空管网或公共移动网络。
+
+## 可扩展设备孪生平台
+
+项目现在提供本地、只读、simulation-only 的设备孪生入口。设备身份、端口、连接、观测状态、期望状态、状态新鲜度和事件来源彼此分离；新增设备通过 `config/twin_devices.json` 注册，并由适配器映射现有仿真模型，不需要修改核心注册表或 HTTP API。
+
+启动本地浏览器服务：
+
+```bash
+python3 scripts/run_twin_server.py --database artifacts/twin-runtime/twin.sqlite3 --port 8765
+```
+
+打开 `http://127.0.0.1:8765/`，或访问只读接口：`/api/health`、`/api/devices`、`/api/topology` 和 `/api/events?after=0`。页面会显示 `VIRTUAL_MODEL`、`simulation_only`、`fresh/stale/unknown` 和期望/观测漂移。实验场景可通过 `--scenario injection|replay|tamper|flood|rate_mismatch` 选择。
+
+该服务不打开真实网络、串口、ARINC 429 或无线设备，也不提供真实设备写入端点。仿真事件和虚拟硬件结果不能表述为真实航空器已被攻击或真实飞行后果。

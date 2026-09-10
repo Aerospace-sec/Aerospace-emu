@@ -207,3 +207,13 @@ claims, scenario conclusions, local evidence and audit steps;
 re-runs the model, compares the fresh result with the archived JSON, resolves
 JSON paths and source anchors, runs the focused tests, and writes a SHA-256
 provenance manifest to `artifacts/5g_atg_provenance.json`.
+
+## Device twin registry
+
+The local browser twin is defined by `config/twin_devices.json` and loaded by
+`sim/twin/registry.py`. It exposes the existing synthetic UE, gNB/core/N6,
+serial, ARINC 429, and virtual PX4 models through a common topology and state
+schema. `scripts/run_twin_server.py` serves read-only local HTTP APIs and a
+topology page; all observations are marked `virtual_model` and
+`simulation_only`. This layer never opens a real device or offers a write
+endpoint.

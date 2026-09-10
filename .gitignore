@@ -7,3 +7,5 @@ env/
 node_modules/
 .DS_Store
 *.log
+artifacts/*.sqlite3
+artifacts/twin-runtime/
