@@ -1,0 +1,64 @@
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install test dependencies
+        run: python -m pip install --upgrade pip pytest
+      - name: Run tests
+        run: python -m pytest -q
+      - name: Run cross-model chain smoke checks
+        run: |
+          python scripts/run_cross_model_chain.py --scenario normal --output /tmp/chain-normal.json
+          python scripts/run_cross_model_chain.py --scenario injection --output /tmp/chain-injection.json
+      - name: Check whitespace
+        run: git diff --check
+
+  evidence:
+    name: Build reproducible evidence bundle
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install --upgrade pip pytest
+      - name: Generate chain evidence
+        run: |
+          mkdir -p ci-artifacts
+          python scripts/run_cross_model_chain.py --scenario normal --output ci-artifacts/cross_model_chain_normal.json
+          python scripts/run_cross_model_chain.py --scenario injection --output ci-artifacts/cross_model_chain_injection.json
+          python -m pytest -q --junitxml=ci-artifacts/pytest.xml
+      - name: Upload evidence bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: aerospace-emu-evidence-${{ github.sha }}
+          path: ci-artifacts/
+          if-no-files-found: error

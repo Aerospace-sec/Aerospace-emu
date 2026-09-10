@@ -1,143 +1,157 @@
-# ARINC 429 总线脆弱性分析与仿真验证
+# 航空协议安全锦标赛
 
-本目录包含一套面向民用航空机载航电场景的本地逻辑仿真、JSBSim 飞行动力学适配器和中文分析报告。默认 ARINC 429 实验不连接真实设备；另提供 PX4 SITL + JSBSim 的回环软件联仿入口。测试标签 `0o203` 是合成标签，不代表任何具体机型的真实标签分配。
+团队项目：航空协议安全分析、风险链路建模、缓解方案和本地数字仿真验证。
 
-## 快速复现
+本仓库服务于“航空协议安全锦标赛”初赛。题目要求覆盖三类工作：协议/接口脆弱性分析、跨域跨协议风险链路、脆弱性缓解与全生命周期安全管控。当前仓库优先使用合成数据、本地模型和可复现实验；不连接真实航空器、机场生产网、空管网、公共频谱或未经授权的真实设备。
 
-```bash
-python3 -m pytest -q
-python3 scripts/run_experiments.py
-python3 scripts/run_civil_platform.py --engine auto --attack injection
-```
+## 题目映射
 
-前两条命令会更新：
+| 比赛方向 | 当前仓库内容 | 证据入口 |
+| --- | --- | --- |
+| 类型一：ARINC 429 | 32 位字、奇偶校验、注入/重放/篡改/洪泛、受控网关 | `sim/arinc429_lab.py`、`report/arinc429_security_report.md` |
+| 类型一：RS-422/RS-232 | 合成串行帧、CRC、认证、新鲜度、维护边界和速率失配 | `sim/serial_lab.py`、`report/serial_interface_security_report.md` |
+| 类型一：5G-ATG | UE、ATG gNB、专属核心网、N3/N6、OAM和跨域边界 | `sim/atg5g_lab.py`、`report/5g_atg_security_report.md` |
+| 类型二：地面网络接入型链路 | 地面网络 → 5GC/OAM → N6 → 串行/A429 → 航电消费者 | `report/chain3_ground_network_attack_chain.md` |
+| 类型三：缓解与管控 | 受控入口、来源认证、新鲜度、语义策略、限速、隔离和证据追溯 | `sim/`、`report/`、`sim/twin/chain.py` |
+| 平台化验证 | 设备注册、拓扑、状态过期、统一时钟、事件因果链和证据摘要 | `config/twin_devices.json`、`web/`、`sim/twin/` |
 
-- `artifacts/results.json`：含环境信息、模型 SHA-256 和全部结构化结果；
-- `artifacts/experiment_log.md`：便于归档的实验记录。
+题目文件的正式副本不提交到仓库；以比赛组委会发布版本为准。新增题目必须先建立题目编号、责任人、分析报告、实验入口、证据文件和测试，再合并到 `main`。
 
-正式分析见 [`report/arinc429_security_report.md`](report/arinc429_security_report.md)。
-
-## 组合民航仿真平台
-
-[`platform/README.md`](platform/README.md) 记录了基于 JSBSim/FlightGear、BlueSky/OpenAP、ARINC 429 和 PX4 HIL 接口的组合方案。当前可直接运行的是确定性的民航运动学模型、ARINC 429 安全网关和攻击事件记录；如果本机安装 JSBSim，`--engine auto` 会尝试使用 JSBSim，否则会明确记录运动学后备引擎。PX4 联仿由独立脚本显式启动，不会被普通 ARINC 429 实验隐式连接。
-
-平台输出 [`artifacts/civil_platform_results.json`](artifacts/civil_platform_results.json) 包含飞行阶段、合成航电标签、原生接收端与安全网关判定，以及未授权注入、重放和重算奇偶篡改的前后对照。真实 JSBSim 接入记录见 [`artifacts/civil_platform_jsbsim_30s.md`](artifacts/civil_platform_jsbsim_30s.md)。
-
-PX4 + JSBSim 软件联仿可用以下命令复现：
+## 快速开始
 
 ```bash
-python3 scripts/run_px4_jsbsim_hil.py \
-  --duration-s 8 \
-  --output artifacts/px4_jsbsim_hil_results.json
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install --upgrade pip pytest
+python -m pytest -q
 ```
 
-本机已验证 `HIL_SENSOR=2000`、`HIL_GPS=400`、`HIL_ACTUATOR_CONTROLS=799`，PX4 返回码为 `0`。证据见 [`artifacts/px4_jsbsim_hil_results.json`](artifacts/px4_jsbsim_hil_results.json) 和 [`artifacts/px4_jsbsim_hil_results.md`](artifacts/px4_jsbsim_hil_results.md)。该结果属于外部 HIL 风格软件联仿，不等同于真实飞控板 HITL、ARINC 429 物理波形测试或适航验证。
-
-### 虚拟硬件联仿
-
-虚拟硬件层把实体接口抽象为明确的软件模型：`V429-LAB-2T4R` 虚拟
-ARINC 429 卡、使用合成 ICD 的 `SYNTHETIC_AIR_DATA_LRU` 和默认不解锁的
-`PX4-FMU-VIRTUAL` HIL 端点。运行 2 秒 JSBSim 737 正常场景：
+运行已有实验：
 
 ```bash
-PYTHONPATH=/tmp/civil_aviation_jsbsim_deps \
-python3 scripts/run_virtual_hardware_lab.py \
-  --engine jsbsim --duration-s 2 --step-ms 20 --attack none \
-  --output artifacts/virtual_hardware_lab_results.json
+python scripts/run_atg5g_experiments.py
+python scripts/run_serial_experiments.py
+python scripts/run_experiments.py
+python scripts/run_virtual_hardware_lab.py --engine kinematic --attack none
+python scripts/run_cross_model_chain.py --scenario normal
 ```
 
-攻击复测可将 `--attack` 改为 `injection`、`replay`、`tamper`、`flood` 或
-`rate_mismatch`。本次证据见 [`artifacts/virtual_hardware_lab_results.md`](artifacts/virtual_hardware_lab_results.md)、
-[`artifacts/virtual_hardware_lab_injection.json`](artifacts/virtual_hardware_lab_injection.json)、
-[`artifacts/virtual_hardware_lab_replay.json`](artifacts/virtual_hardware_lab_replay.json)、
-[`artifacts/virtual_hardware_lab_tamper.json`](artifacts/virtual_hardware_lab_tamper.json)、
-[`artifacts/virtual_hardware_lab_rate_mismatch.json`](artifacts/virtual_hardware_lab_rate_mismatch.json)
-和 [`artifacts/virtual_hardware_lab_flood.json`](artifacts/virtual_hardware_lab_flood.json)。
-这是数字接口/状态机仿真，不是实体卡、实体飞控板、真实 LRU 或物理波形验证。
-
-## 仿真边界
-
-`sim/arinc429_lab.py`实现 32 位字字段、奇偶校验、原生接收端、带来源认证/新鲜度/语义/限速控制的受控入口，以及 12.5 kbps/100 kbps 的线速排队估算。网关中的 HMAC-SHA-256 只用于可复现实验；实际机载系统必须依据项目安全架构、密钥管理和适航审定基础选择经批准的密码方案。
-
-实验验证的是协议和接收逻辑的安全属性，不是电气波形、EMI、线缆终端、具体 LRU、具体 ICD 或飞控软件的适航验证。报告中对这些边界均有标注。
-
-## 第6题：RS-422/RS-232 串行接口
-
-正式分析见 [`report/serial_interface_security_report.md`](report/serial_interface_security_report.md)。运行本地数字串行实验：
+启动本地设备孪生浏览器：
 
 ```bash
-python3 scripts/run_serial_experiments.py
+python scripts/run_twin_server.py \
+  --database artifacts/twin-runtime/twin.sqlite3 \
+  --port 8765
 ```
 
-证据见 [`artifacts/serial_interface_results.json`](artifacts/serial_interface_results.json)
-和 [`artifacts/serial_interface_experiment_log.md`](artifacts/serial_interface_experiment_log.md)。实验覆盖 RS-422 双差分对全双工航电链路、RS-232 GSE 维护链路、明文监听、合法 CRC 注入、重算 CRC 篡改、重放、维护命令、波特率失配和突发占线。帧格式和命令码是合成项目 ICD；本实验不打开真实串口，不替代真实电平、波形、EMI、LRU 或适航验证。
+打开 `http://127.0.0.1:8765/`。只读 API：
 
-## 第5题：5G-ATG航空地空宽带通信系统
-
-正式分析见 [`report/5g_atg_security_report.md`](report/5g_atg_security_report.md)。运行5G-ATG全链路数字安全状态实验：
-
-```bash
-python3 scripts/run_atg5g_experiments.py
-python3 -m pytest -q tests/test_atg5g_lab.py
+```text
+GET /api/health
+GET /api/devices
+GET /api/topology
+GET /api/events?after=0
+GET /api/chain?scenario=normal
 ```
 
-证据见 [`artifacts/5g_atg_results.json`](artifacts/5g_atg_results.json) 和
-[`artifacts/5g_atg_experiment_log.md`](artifacts/5g_atg_experiment_log.md)。模型覆盖合成机载5G UE、ATG NR gNB、AMF/SMF/UPF专属核心网、N6地面应用、客舱/航电边界和OAM管理边界，验证正常注册、数字化干扰、恶意小区前置可见性、信令风暴、用户面篡改/重放、TEID/QFI会话伪造、客舱到航电注入和OAM路由变更。
+## 统一事件链和证据
 
-该实验是本地数字架构与安全状态仿真：不发射RF、不创建真实小区、不运行真实gNB/5GC、不捕获真实IMSI/SUPI、不连接飞机或运营商专网。它证明模型中的协议状态、路由绑定和边界策略，不替代真实射频屏蔽台架、实体UE/gNB/5GC、机载ICD、适航安全评估或运行批准。
+`sim/twin/chain.py` 将下列语义阶段关联为一条因果链：
 
-### 第5题证据追溯与反向核验
-
-报告引用、量化数据、场景结论和实验过程的映射见
-[`report/5g_atg_traceability_matrix.md`](report/5g_atg_traceability_matrix.md)，机器登记表见
-[`report/5g_atg_traceability.json`](report/5g_atg_traceability.json)。运行：
-
-```bash
-python3 scripts/render_atg5g_traceability.py
-python3 scripts/run_atg5g_experiments.py
-python3 scripts/render_report.py
-python3 scripts/verify_atg5g_evidence.py
+```text
+5G UE → N6 → 跨域网关 → RS-422 串行桥 → ARINC 429 → 虚拟 LRU → PX4 虚拟 HIL
 ```
 
-验证器会重新运行模型、深比较归档 JSON、解析证据路径和代码锚点、重跑第5题测试，并输出
-[`artifacts/5g_atg_provenance.json`](artifacts/5g_atg_provenance.json) 和
-[`artifacts/5g_atg_verification.log`](artifacts/5g_atg_verification.log)。
+每个事件必须包含：
 
-## 链路三：地面网络接入型
+- `event_id`、`sequence`、统一 `timestamp_ms`；
+- `source_device`、`target_device`、`parent_event_id`；
+- `status` 和结构化 `payload`；
+- 对应的 `EvidenceRecord`、模型引用和 SHA-256 摘要。
 
-链路三报告见 [`report/chain3_ground_network_attack_chain.md`](report/chain3_ground_network_attack_chain.md)，包含地面保障网络/供应商跳板/5GC OAM/串口服务器到 N6、跨域网关、串行/A429 和机载消费者的编号化攻击链、信任边界、权限变化、检测点、风险量化、敏感性分析、证据等级和待实装验证条件。
+负向场景在跨域网关拒绝后必须阻断下游事件，并保持 `physical_output=false`。所有当前证据标记为 `virtual_model`，不得表述为真实飞机已被攻破或真实飞行后果。
 
-生成可打印 HTML：
+## 团队 Git 管理规则
 
-```bash
-python3 scripts/render_report.py
+### 分支
+
+- `main`：可提交、可复现、可交付版本；禁止直接推送。
+- `feature/<题目编号>-<短名>`：新题目、模型和功能。
+- `fix/<短名>`：缺陷修复。
+- `report/<题目编号>-<短名>`：报告、证据和可视化更新。
+- `chore/<短名>`：CI、依赖、工程维护。
+
+分支从最新 `main` 创建。一个分支只解决一个可审查主题；不要把个人环境、临时数据库、密钥、真实设备凭据或无关格式化混入提交。
+
+### 提交
+
+采用 Conventional Commits：
+
+```text
+feat(arinc429): add freshness admission evidence
+fix(twin): mark expired observation as stale
+report(q2): add replay impact analysis
+ci: run cross-model regression
+chore: update experiment metadata
 ```
 
-输出 [`artifacts/chain3_ground_network_attack_chain.html`](artifacts/chain3_ground_network_attack_chain.html)。报告仅使用本地合成模型和既有证据，不连接真实航空器、机场生产网、空管网或公共移动网络。
+规则：
 
-## 可扩展设备孪生平台
+1. 标题使用英文动词开头，最多 72 个字符；
+2. 正文说明问题、方案、验证命令和仿真边界；
+3. 一个提交保持一个逻辑变更；
+4. 不提交 `needed.txt`、`.venv/`、缓存、SQLite 运行库、日志、密钥和真实设备数据；
+5. 实验结果必须可由脚本重生成，报告必须链接结构化证据；
+6. 不重写共享 `main` 历史，不使用未经团队同意的强制推送。
 
-项目现在提供本地、只读、simulation-only 的设备孪生入口。设备身份、端口、连接、观测状态、期望状态、状态新鲜度和事件来源彼此分离；新增设备通过 `config/twin_devices.json` 注册，并由适配器映射现有仿真模型，不需要修改核心注册表或 HTTP API。
+### Pull Request
 
-启动本地浏览器服务：
+所有变更通过 PR 合并：
 
-```bash
-python3 scripts/run_twin_server.py --database artifacts/twin-runtime/twin.sqlite3 --port 8765
+1. PR 标题符合 Conventional Commits；
+2. 描述题目编号、变更范围、威胁模型、仿真/真实边界和验证命令；
+3. 至少一名非作者成员审查；涉及安全结论、跨域边界或题目报告时至少两名审查者；
+4. CI 全部通过，作者解决所有阻塞性评论；
+5. 使用 Squash merge，合并后删除短期分支；
+6. 只有维护者可以合并 `main`。
+
+新增队员先阅读 [`CONTRIBUTING.md`](CONTRIBUTING.md)，再从 issue 或题目任务清单领取工作。题目责任分配、审查人和截止时间记录在 issue/PR 中，不写入个人本地文件。
+
+## CI/CD
+
+工作流位于 `.github/workflows/ci.yml`，在 PR、`main` 推送和手动触发时运行：
+
+- Python 3.11、3.12 测试矩阵；
+- `python -m pytest -q`；
+- `python scripts/run_cross_model_chain.py --scenario normal`；
+- `python scripts/run_cross_model_chain.py --scenario injection`；
+- `git diff --check`；
+- `main` 成功后上传可复现的测试和链路证据包。
+
+CI 不连接真实网络、设备、串口或无线接口。部署阶段只发布测试证据和报告归档，不自动向真实航空系统部署代码。任何未来部署目标必须另行经过团队批准、授权测试台架和安全评审。
+
+## 仿真和安全边界
+
+- ARINC 429 奇偶校验、CRC、TEID/QFI、认证成功均不等于来源授权或业务授权；
+- 仿真状态不等于真实设备状态，合成 ICD 不代表任何具体机型；
+- 浏览器仅读取后端状态，不直接连接真实设备；
+- 真实设备接入若获批准，只能通过后端、白名单、审计、配置快照和隔离台架，默认只读；
+- 禁止在本仓库实现面向真实航空系统的任意原始报文发送、公共频谱操作、横向移动或攻击按钮；
+- 报告应同时记录攻击前提、设备/技术/时间成本、检测概率、影响和防御/恢复措施。
+
+## 目录
+
+```text
+config/       设备孪生注册清单
+sim/          协议、飞行模型、虚拟硬件和孪生核心
+web/          本地只读孪生页面与 API
+scripts/      实验、验证、渲染和服务入口
+report/       题目分析、攻击链和证据追溯
+artifacts/    可重生成的实验结果与报告渲染产物
+tests/        协议、平台、事件链和 API 行为测试
+.github/      CI/CD、PR 模板和代码所有者规则
 ```
 
-打开 `http://127.0.0.1:8765/`，或访问只读接口：`/api/health`、`/api/devices`、`/api/topology` 和 `/api/events?after=0`。页面会显示 `VIRTUAL_MODEL`、`simulation_only`、`fresh/stale/unknown` 和期望/观测漂移。实验场景可通过 `--scenario injection|replay|tamper|flood|rate_mismatch` 选择。
+## 许可与资料
 
-该服务不打开真实网络、串口、ARINC 429 或无线设备，也不提供真实设备写入端点。仿真事件和虚拟硬件结果不能表述为真实航空器已被攻击或真实飞行后果。
-
-### 统一跨模型事件链
-
-事件链入口为 `sim/twin/chain.py`，将合成 5G 会话、N6 数据面、跨域网关、RS-422 串行桥、ARINC 429、虚拟 LRU 和 PX4 HIL 反馈串成同一条因果链。每个事件带有单调 `sequence`、统一 `timestamp_ms`、父事件 ID、状态和对应的 SHA-256 `EvidenceRecord`；证据来源固定标记为 `virtual_model`，终端事件始终声明 `physical_output=false`。
-
-运行正常链路或防御性负向验证：
-
-```bash
-python3 scripts/run_cross_model_chain.py --scenario normal
-python3 scripts/run_cross_model_chain.py --scenario injection
-```
-
-服务 API 也提供 `GET /api/chain?scenario=normal`，可读取同样的事件和证据记录。`injection`、`replay`、`tamper` 场景在跨域网关拒绝后阻断所有串行/A429/LRU/PX4下游事件，不产生真实物理输出。
+仅使用团队有权使用的资料、合成数据和授权测试环境。厂商手册、真实 ICD、飞机网络图和比赛内部材料不得在未经许可的情况下提交到公开仓库。

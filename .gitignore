@@ -10,3 +10,4 @@ node_modules/
 artifacts/*.sqlite3
 artifacts/twin-runtime/
 needed.txt
+ci-artifacts/

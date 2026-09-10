@@ -1,0 +1,6 @@
+# Replace `@Aerospace-sec/maintainers` with the actual GitHub team slug before merging.
+* @Aerospace-sec/maintainers
+.github/ @Aerospace-sec/maintainers
+sim/ @Aerospace-sec/maintainers
+web/ @Aerospace-sec/maintainers
+report/ @Aerospace-sec/maintainers
