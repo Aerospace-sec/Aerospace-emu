@@ -9,3 +9,4 @@ node_modules/
 *.log
 artifacts/*.sqlite3
 artifacts/twin-runtime/
+needed.txt
