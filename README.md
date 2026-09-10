@@ -128,3 +128,16 @@ python3 scripts/run_twin_server.py --database artifacts/twin-runtime/twin.sqlite
 打开 `http://127.0.0.1:8765/`，或访问只读接口：`/api/health`、`/api/devices`、`/api/topology` 和 `/api/events?after=0`。页面会显示 `VIRTUAL_MODEL`、`simulation_only`、`fresh/stale/unknown` 和期望/观测漂移。实验场景可通过 `--scenario injection|replay|tamper|flood|rate_mismatch` 选择。
 
 该服务不打开真实网络、串口、ARINC 429 或无线设备，也不提供真实设备写入端点。仿真事件和虚拟硬件结果不能表述为真实航空器已被攻击或真实飞行后果。
+
+### 统一跨模型事件链
+
+事件链入口为 `sim/twin/chain.py`，将合成 5G 会话、N6 数据面、跨域网关、RS-422 串行桥、ARINC 429、虚拟 LRU 和 PX4 HIL 反馈串成同一条因果链。每个事件带有单调 `sequence`、统一 `timestamp_ms`、父事件 ID、状态和对应的 SHA-256 `EvidenceRecord`；证据来源固定标记为 `virtual_model`，终端事件始终声明 `physical_output=false`。
+
+运行正常链路或防御性负向验证：
+
+```bash
+python3 scripts/run_cross_model_chain.py --scenario normal
+python3 scripts/run_cross_model_chain.py --scenario injection
+```
+
+服务 API 也提供 `GET /api/chain?scenario=normal`，可读取同样的事件和证据记录。`injection`、`replay`、`tamper` 场景在跨域网关拒绝后阻断所有串行/A429/LRU/PX4下游事件，不产生真实物理输出。

@@ -8,6 +8,7 @@ from sim.twin.adapters import populate_virtual_registry
 from sim.twin.model import DeviceRegistry, to_json
 from sim.twin.registry import load_registry
 from sim.twin.store import TwinStore
+from sim.twin.chain import run_cross_model_chain
 
 ROOT = Path(__file__).parent
 
@@ -31,6 +32,12 @@ class TwinHandler(BaseHTTPRequestHandler):
             try: cursor = int(parse_qs(parsed.query).get("after", ["0"])[0])
             except ValueError: return self._send(400, {"error":{"code":"invalid_cursor","message":"after must be an integer"}})
             return self._send(200, {"events":self.store.events_since(cursor)})
+        if parsed.path == "/api/chain":
+            scenario = parse_qs(parsed.query).get("scenario", ["normal"])[0]
+            try:
+                return self._send(200, run_cross_model_chain(scenario=scenario))
+            except ValueError as exc:
+                return self._send(400, {"error":{"code":"invalid_scenario","message":str(exc)}})
         if parsed.path == "/":
             return self._send(200, (self.page_root / "index.html").read_text(encoding="utf-8"), "text/html; charset=utf-8")
         if parsed.path in ("/app.js", "/style.css"):
