@@ -1,0 +1,196 @@
+{
+  "actuator_samples": [
+    {
+      "controls_first_8": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flags": 1,
+      "mode": 1,
+      "time_usec": 44000
+    },
+    {
+      "controls_first_8": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flags": 1,
+      "mode": 1,
+      "time_usec": 48000
+    },
+    {
+      "controls_first_8": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flags": 1,
+      "mode": 1,
+      "time_usec": 52000
+    },
+    {
+      "controls_first_8": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flags": 1,
+      "mode": 1,
+      "time_usec": 56000
+    },
+    {
+      "controls_first_8": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flags": 1,
+      "mode": 1,
+      "time_usec": 60000
+    },
+    {
+      "controls_first_8": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flags": 1,
+      "mode": 1,
+      "time_usec": 2996000
+    },
+    {
+      "controls_first_8": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flags": 1,
+      "mode": 1,
+      "time_usec": 3000000
+    },
+    {
+      "controls_first_8": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "flags": 1,
+      "mode": 1,
+      "time_usec": 5996000
+    }
+  ],
+  "artifacts": {
+    "px4_log": "/tmp/px4-jsbsim-hil-37emv7ti/px4.log",
+    "run_directory": "/tmp/px4-jsbsim-hil-37emv7ti"
+  },
+  "connection": {
+    "accepted": true,
+    "peer": "127.0.0.1"
+  },
+  "health": {
+    "closed_cleanly": true,
+    "hil_gps_sent": true,
+    "hil_sensor_sent": true,
+    "px4_actuator_feedback_received": true,
+    "px4_connected": true,
+    "px4_heartbeat_received": true
+  },
+  "limitations": [
+    "PX4 is a POSIX/SITL software build, not a physical flight-control board.",
+    "The PX4 5001 airframe is a fixed-wing controller configuration, not a certified Cessna or transport-aircraft model.",
+    "JSBSim sensors are a research interface adapter; no ARINC 429 electrical waveform or real aircraft ICD is exercised.",
+    "The TCP link is local loopback and is not evidence of an operational aircraft network path."
+  ],
+  "process_returncode": 0,
+  "run": {
+    "bind_address": "127.0.0.1:4560",
+    "duration_s": 8.0,
+    "jsbsim_aircraft": "737",
+    "jsbsim_root": "/tmp/civil_aviation_jsbsim_deps/jsbsim",
+    "kind": "PX4 SITL + JSBSim external HIL-style software co-simulation",
+    "network_scope": "loopback only",
+    "px4_airframe": "5001_xplane_cessna172 (fixed-wing controller configuration only)",
+    "px4_binary": "/tmp/px4-sitl-build-full/bin/px4",
+    "px4_build": "/tmp/px4-sitl-build-full",
+    "sample_hz": 250,
+    "sample_ms": 4
+  },
+  "rx": {
+    "COMMAND_LONG": 1,
+    "HEARTBEAT": 1,
+    "HIL_ACTUATOR_CONTROLS": 801
+  },
+  "states": {
+    "first": {
+      "altitude_ft": 30000.17,
+      "heading_deg": 225.0,
+      "latitude_deg": 47.1916344,
+      "longitude_deg": 122.0,
+      "phase": "cruise",
+      "pitch_deg": 2.28,
+      "roll_deg": -0.0,
+      "timestamp_ms": 0,
+      "true_airspeed_kt": 444.36,
+      "vertical_speed_fpm": -0.0
+    },
+    "last": {
+      "altitude_ft": 30001.2,
+      "heading_deg": 225.02,
+      "latitude_deg": 47.1800283,
+      "longitude_deg": 121.9829671,
+      "phase": "cruise",
+      "pitch_deg": 2.3,
+      "roll_deg": -0.05,
+      "timestamp_ms": 7996,
+      "true_airspeed_kt": 444.33,
+      "vertical_speed_fpm": 16.63
+    }
+  },
+  "status_text": [],
+  "tx": {
+    "HIL_GPS": 400,
+    "HIL_SENSOR": 2000
+  }
+}

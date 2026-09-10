@@ -1,0 +1,96 @@
+{
+  "environment": {
+    "model_sha256": "ea80083df4b7fa1dc8374b9344bf3203b5d4c4a413a3a01b31d7f4b4dd6616be",
+    "platform": "Linux-7.1.9-zen1-2-zen-x86_64-with-glibc2.44",
+    "python": "3.14.7"
+  },
+  "results": {
+    "flood": {
+      "attacker_frames": 64,
+      "deadline_ms": 5.0,
+      "hardened_attacker_frames_rejected": 64,
+      "hardened_deadline_missed": false,
+      "hardened_legitimate_admitted": true,
+      "hardened_legitimate_start_ms": 0.0,
+      "legacy_attacker_frames_accepted": 64,
+      "legacy_deadline_missed": true,
+      "legacy_legitimate_start_ms": 20.48000000000001
+    },
+    "injection": {
+      "hardened": {
+        "accepted": false,
+        "reason": "unauthorized_source"
+      },
+      "legacy": {
+        "accepted": true,
+        "reason": "accepted"
+      }
+    },
+    "model": {
+      "bit_rates_bps": [
+        12500,
+        100000
+      ],
+      "semantic_limit": 10000,
+      "test_label_octal": "0o203",
+      "word_bits": 32
+    },
+    "parity_baseline": {
+      "single_bit_flip_legacy_reason": "parity",
+      "single_bit_flip_parity_ok": false
+    },
+    "parity_recomputed_tamper": {
+      "hardened": {
+        "accepted": false,
+        "reason": "authentication"
+      },
+      "legacy": {
+        "accepted": true,
+        "reason": "accepted"
+      },
+      "parity_valid_after_tamper": true
+    },
+    "passive_observation": {
+      "captured_data": 1000,
+      "captured_label_octal": "0o203",
+      "native_confidentiality": false
+    },
+    "rate_mismatch": {
+      "actual_bit_rate": 12500,
+      "actual_word_duration_ms": 2.56,
+      "expected_bit_rate": 100000,
+      "expected_word_duration_ms": 0.32,
+      "reason": "configured_rate_mismatch",
+      "receiver_valid_word": false
+    },
+    "replay": {
+      "first_secure_delivery": {
+        "accepted": true,
+        "reason": "accepted"
+      },
+      "immediate_replay": {
+        "accepted": false,
+        "reason": "replay"
+      },
+      "legacy": {
+        "accepted": true,
+        "reason": "accepted"
+      },
+      "replayed_raw": "0x000fa083",
+      "stale_replay": {
+        "accepted": false,
+        "reason": "stale"
+      }
+    },
+    "semantic_range": {
+      "hardened": {
+        "accepted": false,
+        "reason": "semantic_range"
+      },
+      "legacy": {
+        "accepted": true,
+        "reason": "accepted"
+      }
+    }
+  }
+}

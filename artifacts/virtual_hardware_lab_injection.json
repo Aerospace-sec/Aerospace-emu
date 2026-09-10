@@ -1,0 +1,3757 @@
+{
+  "attack": {
+    "attack_at_ms": 1000,
+    "event": {
+      "hardened_gateway": {
+        "accepted": false,
+        "reason": "unauthorized_source"
+      },
+      "hardened_physical_output": false,
+      "legacy_lru": {
+        "accepted": true,
+        "reason": "accepted"
+      },
+      "type": "injection",
+      "wire": {
+        "bit_rate_bps": 100000,
+        "end_ms": 1001.8,
+        "fault": null,
+        "observed_raw_word": "0x81e46083",
+        "raw_word": "0x81e46083",
+        "requested_ms": 1000,
+        "rx_channel": 0,
+        "start_ms": 1001.44,
+        "tx_channel": 0,
+        "word_duration_ms": 0.36
+      }
+    },
+    "requested": "injection"
+  },
+  "board": {
+    "actuator_feedback_count": 101,
+    "arm_request_accepted": false,
+    "armed": false,
+    "connected": true,
+    "failsafe_count": 0,
+    "gps_count": 21,
+    "hitl_enabled": true,
+    "profile": {
+      "board_model": "PX4-FMU-VIRTUAL",
+      "firmware": "PX4-HIL-virtual",
+      "gps_timeout_ms": 500,
+      "hitl_enabled": true,
+      "physical_mcu_model": false,
+      "sensor_timeout_ms": 100
+    },
+    "sensor_count": 101,
+    "status": [
+      "HIL_CONNECTED",
+      "ARM_REJECTED_VIRTUAL_BENCH"
+    ]
+  },
+  "card": {
+    "dropped_words": 0,
+    "event_samples": [
+      {
+        "bit_rate_bps": 100000,
+        "end_ms": 0.36,
+        "fault": null,
+        "observed_raw_word": "0x81d4c083",
+        "raw_word": "0x81d4c083",
+        "requested_ms": 0,
+        "rx_channel": 0,
+        "start_ms": 0.0,
+        "tx_channel": 0,
+        "word_duration_ms": 0.36
+      },
+      {
+        "bit_rate_bps": 100000,
+        "end_ms": 0.72,
+        "fault": null,
+        "observed_raw_word": "0x8006f088",
+        "raw_word": "0x8006f088",
+        "requested_ms": 0,
+        "rx_channel": 0,
+        "start_ms": 0.36,
+        "tx_channel": 0,
+        "word_duration_ms": 0.36
+      },
+      {
+        "bit_rate_bps": 100000,
+        "end_ms": 1.08,
+        "fault": null,
+        "observed_raw_word": "0x00038489",
+        "raw_word": "0x00038489",
+        "requested_ms": 0,
+        "rx_channel": 0,
+        "start_ms": 0.72,
+        "tx_channel": 0,
+        "word_duration_ms": 0.36
+      },
+      {
+        "bit_rate_bps": 100000,
+        "end_ms": 1.44,
+        "fault": null,
+        "observed_raw_word": "0x804e208a",
+        "raw_word": "0x804e208a",
+        "requested_ms": 0,
+        "rx_channel": 0,
+        "start_ms": 1.08,
+        "tx_channel": 0,
+        "word_duration_ms": 0.36
+      },
+      {
+        "bit_rate_bps": 100000,
+        "end_ms": 20.36,
+        "fault": null,
+        "observed_raw_word": "0x81d4c083",
+        "raw_word": "0x81d4c083",
+        "requested_ms": 20,
+        "rx_channel": 0,
+        "start_ms": 20.0,
+        "tx_channel": 0,
+        "word_duration_ms": 0.36
+      },
+      {
+        "bit_rate_bps": 100000,
+        "end_ms": 20.72,
+        "fault": null,
+        "observed_raw_word": "0x8006f088",
+        "raw_word": "0x8006f088",
+        "requested_ms": 20,
+        "rx_channel": 0,
+        "start_ms": 20.36,
+        "tx_channel": 0,
+        "word_duration_ms": 0.36
+      },
+      {
+        "bit_rate_bps": 100000,
+        "end_ms": 21.08,
+        "fault": null,
+        "observed_raw_word": "0x00038489",
+        "raw_word": "0x00038489",
+        "requested_ms": 20,
+        "rx_channel": 0,
+        "start_ms": 20.72,
+        "tx_channel": 0,
+        "word_duration_ms": 0.36
+      },
+      {
+        "bit_rate_bps": 100000,
+        "end_ms": 21.44,
+        "fault": null,
+        "observed_raw_word": "0x804e208a",
+        "raw_word": "0x804e208a",
+        "requested_ms": 20,
+        "rx_channel": 0,
+        "start_ms": 21.08,
+        "tx_channel": 0,
+        "word_duration_ms": 0.36
+      }
+    ],
+    "events_total": 405,
+    "normal_wire_events": 404,
+    "overflow_words": 0,
+    "profile": {
+      "bit_rate_bps": 100000,
+      "electrical_model": false,
+      "interword_gap_bits": 4,
+      "loopback": true,
+      "model": "V429-LAB-2T4R",
+      "rx_channels": 4,
+      "tx_channels": 2,
+      "tx_fifo_depth": 64,
+      "word_bits": 32
+    }
+  },
+  "health": {
+    "actuator_feedback_received": true,
+    "closed_cleanly": true,
+    "disarmed_safe_default": true,
+    "hil_gps_received": true,
+    "hil_sensor_received": true,
+    "no_real_io": true,
+    "virtual_card_loopback": true,
+    "virtual_card_ready": true,
+    "virtual_lru_active": true,
+    "virtual_px4_connected": true
+  },
+  "limitations": [
+    "VirtualArinc429Card models digital words and timing only; it does not model voltage, impedance, line termination, EMI, or an actual vendor SDK.",
+    "VirtualLru uses a synthetic project ICD and does not claim any real aircraft label allocation or LRU behavior.",
+    "VirtualPx4Board is a HIL protocol/state model, not a PX4 MCU, sensor driver, PWM, power, or hardware watchdog emulation.",
+    "This result is not evidence of a physical ARINC 429 waveform, real LRU test, flight-control hardware HITL, or airworthiness approval."
+  ],
+  "lru": {
+    "accepted_count": 405,
+    "accepted_labels": [
+      "0o203",
+      "0o210",
+      "0o211",
+      "0o212"
+    ],
+    "expected_bit_rate_bps": 100000,
+    "name": "SYNTHETIC_AIR_DATA_LRU",
+    "rejected_count": 0,
+    "rejection_reasons": {}
+  },
+  "normal": {
+    "frames_emitted": 404,
+    "gateway_rejection_reasons": {},
+    "lru_accepted": 404,
+    "lru_rejected": 0,
+    "secure_frames_admitted": 404,
+    "wire_events": 404
+  },
+  "platform": {
+    "duration_ms": 2000,
+    "engine": {
+      "aircraft": "737",
+      "requested": "jsbsim",
+      "root_dir": "/tmp/civil_aviation_jsbsim_deps/jsbsim",
+      "selected": "jsbsim"
+    },
+    "name": "civil-aviation-virtual-hardware-lab",
+    "scope": "digital hardware model; no physical I/O",
+    "step_ms": 20,
+    "synthetic_icd": true,
+    "version": "0.1"
+  },
+  "trace": [
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 1,
+      "board_sensor_count": 1,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1916344,
+        "longitude_deg": 122.0,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 0,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": -0.0
+      },
+      "timestamp_ms": 0
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 1,
+      "board_sensor_count": 2,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1916054,
+        "longitude_deg": 121.9999574,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": 0.0,
+        "timestamp_ms": 20,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.03
+      },
+      "timestamp_ms": 20
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 1,
+      "board_sensor_count": 3,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1915764,
+        "longitude_deg": 121.9999148,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 40,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.06
+      },
+      "timestamp_ms": 40
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 1,
+      "board_sensor_count": 4,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1915473,
+        "longitude_deg": 121.9998722,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 60,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.1
+      },
+      "timestamp_ms": 60
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 1,
+      "board_sensor_count": 5,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1915183,
+        "longitude_deg": 121.9998296,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 80,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.13
+      },
+      "timestamp_ms": 80
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 2,
+      "board_sensor_count": 6,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1914892,
+        "longitude_deg": 121.999787,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 100,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.16
+      },
+      "timestamp_ms": 100
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 2,
+      "board_sensor_count": 7,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1914602,
+        "longitude_deg": 121.9997444,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 120,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.19
+      },
+      "timestamp_ms": 120
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 2,
+      "board_sensor_count": 8,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1914312,
+        "longitude_deg": 121.9997018,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 140,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.22
+      },
+      "timestamp_ms": 140
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 2,
+      "board_sensor_count": 9,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1914021,
+        "longitude_deg": 121.9996592,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 160,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.26
+      },
+      "timestamp_ms": 160
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 2,
+      "board_sensor_count": 10,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1913731,
+        "longitude_deg": 121.9996166,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 180,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.29
+      },
+      "timestamp_ms": 180
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 3,
+      "board_sensor_count": 11,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1913441,
+        "longitude_deg": 121.999574,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 200,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.32
+      },
+      "timestamp_ms": 200
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 3,
+      "board_sensor_count": 12,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.191315,
+        "longitude_deg": 121.9995314,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 220,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.35
+      },
+      "timestamp_ms": 220
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 3,
+      "board_sensor_count": 13,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.191286,
+        "longitude_deg": 121.9994888,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 240,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.39
+      },
+      "timestamp_ms": 240
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 3,
+      "board_sensor_count": 14,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1912569,
+        "longitude_deg": 121.9994462,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 260,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.42
+      },
+      "timestamp_ms": 260
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 3,
+      "board_sensor_count": 15,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1912279,
+        "longitude_deg": 121.9994036,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 280,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.45
+      },
+      "timestamp_ms": 280
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 4,
+      "board_sensor_count": 16,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1911989,
+        "longitude_deg": 121.999361,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 300,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.48
+      },
+      "timestamp_ms": 300
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 4,
+      "board_sensor_count": 17,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1911698,
+        "longitude_deg": 121.9993184,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 320,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.52
+      },
+      "timestamp_ms": 320
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 4,
+      "board_sensor_count": 18,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1911408,
+        "longitude_deg": 121.9992758,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 340,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.55
+      },
+      "timestamp_ms": 340
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 4,
+      "board_sensor_count": 19,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1911118,
+        "longitude_deg": 121.9992332,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 360,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.58
+      },
+      "timestamp_ms": 360
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 4,
+      "board_sensor_count": 20,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1910827,
+        "longitude_deg": 121.9991906,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 380,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.61
+      },
+      "timestamp_ms": 380
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 5,
+      "board_sensor_count": 21,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1910537,
+        "longitude_deg": 121.999148,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 400,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.64
+      },
+      "timestamp_ms": 400
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 5,
+      "board_sensor_count": 22,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1910247,
+        "longitude_deg": 121.9991054,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 420,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.68
+      },
+      "timestamp_ms": 420
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 5,
+      "board_sensor_count": 23,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1909956,
+        "longitude_deg": 121.9990628,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 440,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.71
+      },
+      "timestamp_ms": 440
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 5,
+      "board_sensor_count": 24,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1909666,
+        "longitude_deg": 121.9990202,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 460,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.74
+      },
+      "timestamp_ms": 460
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 5,
+      "board_sensor_count": 25,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1909375,
+        "longitude_deg": 121.9989776,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 480,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.78
+      },
+      "timestamp_ms": 480
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 6,
+      "board_sensor_count": 26,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1909085,
+        "longitude_deg": 121.998935,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 500,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.81
+      },
+      "timestamp_ms": 500
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 6,
+      "board_sensor_count": 27,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1908795,
+        "longitude_deg": 121.9988924,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 520,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.84
+      },
+      "timestamp_ms": 520
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 6,
+      "board_sensor_count": 28,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1908504,
+        "longitude_deg": 121.9988498,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 540,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.87
+      },
+      "timestamp_ms": 540
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 6,
+      "board_sensor_count": 29,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1908214,
+        "longitude_deg": 121.9988072,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 560,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.91
+      },
+      "timestamp_ms": 560
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 6,
+      "board_sensor_count": 30,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1907924,
+        "longitude_deg": 121.9987646,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 580,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.94
+      },
+      "timestamp_ms": 580
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 7,
+      "board_sensor_count": 31,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1907633,
+        "longitude_deg": 121.998722,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 600,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 0.97
+      },
+      "timestamp_ms": 600
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 7,
+      "board_sensor_count": 32,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1907343,
+        "longitude_deg": 121.9986794,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 620,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.0
+      },
+      "timestamp_ms": 620
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 7,
+      "board_sensor_count": 33,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1907052,
+        "longitude_deg": 121.9986368,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 640,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.04
+      },
+      "timestamp_ms": 640
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 7,
+      "board_sensor_count": 34,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1906762,
+        "longitude_deg": 121.9985942,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 660,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.07
+      },
+      "timestamp_ms": 660
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 7,
+      "board_sensor_count": 35,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1906472,
+        "longitude_deg": 121.9985516,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 680,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.1
+      },
+      "timestamp_ms": 680
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 8,
+      "board_sensor_count": 36,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.17,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1906181,
+        "longitude_deg": 121.998509,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 700,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.14
+      },
+      "timestamp_ms": 700
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 8,
+      "board_sensor_count": 37,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1905891,
+        "longitude_deg": 121.9984664,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 720,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.17
+      },
+      "timestamp_ms": 720
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 8,
+      "board_sensor_count": 38,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1905601,
+        "longitude_deg": 121.9984238,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 740,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.2
+      },
+      "timestamp_ms": 740
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 8,
+      "board_sensor_count": 39,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.190531,
+        "longitude_deg": 121.9983812,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 760,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.24
+      },
+      "timestamp_ms": 760
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 8,
+      "board_sensor_count": 40,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.190502,
+        "longitude_deg": 121.9983386,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 780,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.27
+      },
+      "timestamp_ms": 780
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 9,
+      "board_sensor_count": 41,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.190473,
+        "longitude_deg": 121.998296,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 800,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.3
+      },
+      "timestamp_ms": 800
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 9,
+      "board_sensor_count": 42,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1904439,
+        "longitude_deg": 121.9982534,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 820,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.34
+      },
+      "timestamp_ms": 820
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 9,
+      "board_sensor_count": 43,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1904149,
+        "longitude_deg": 121.9982108,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 840,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.37
+      },
+      "timestamp_ms": 840
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 9,
+      "board_sensor_count": 44,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1903859,
+        "longitude_deg": 121.9981682,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 860,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.4
+      },
+      "timestamp_ms": 860
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 9,
+      "board_sensor_count": 45,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1903568,
+        "longitude_deg": 121.9981256,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 880,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.44
+      },
+      "timestamp_ms": 880
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 10,
+      "board_sensor_count": 46,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1903278,
+        "longitude_deg": 121.998083,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 900,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.47
+      },
+      "timestamp_ms": 900
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 10,
+      "board_sensor_count": 47,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1902987,
+        "longitude_deg": 121.9980404,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 920,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.5
+      },
+      "timestamp_ms": 920
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 10,
+      "board_sensor_count": 48,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1902697,
+        "longitude_deg": 121.9979978,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 940,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.54
+      },
+      "timestamp_ms": 940
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 10,
+      "board_sensor_count": 49,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1902407,
+        "longitude_deg": 121.9979552,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 960,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.57
+      },
+      "timestamp_ms": 960
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 10,
+      "board_sensor_count": 50,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1902116,
+        "longitude_deg": 121.9979126,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 980,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.61
+      },
+      "timestamp_ms": 980
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 11,
+      "board_sensor_count": 51,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1901826,
+        "longitude_deg": 121.99787,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 1000,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.64
+      },
+      "timestamp_ms": 1000
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 11,
+      "board_sensor_count": 52,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1901536,
+        "longitude_deg": 121.9978274,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 1020,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.67
+      },
+      "timestamp_ms": 1020
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 11,
+      "board_sensor_count": 53,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1901245,
+        "longitude_deg": 121.9977848,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 1040,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.71
+      },
+      "timestamp_ms": 1040
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 11,
+      "board_sensor_count": 54,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1900955,
+        "longitude_deg": 121.9977422,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 1060,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.74
+      },
+      "timestamp_ms": 1060
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 11,
+      "board_sensor_count": 55,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1900665,
+        "longitude_deg": 121.9976996,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 1080,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.78
+      },
+      "timestamp_ms": 1080
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 12,
+      "board_sensor_count": 56,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.18,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1900374,
+        "longitude_deg": 121.997657,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.0,
+        "timestamp_ms": 1100,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.81
+      },
+      "timestamp_ms": 1100
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 12,
+      "board_sensor_count": 57,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1900084,
+        "longitude_deg": 121.9976144,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1120,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.85
+      },
+      "timestamp_ms": 1120
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 12,
+      "board_sensor_count": 58,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1899794,
+        "longitude_deg": 121.9975718,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1140,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.88
+      },
+      "timestamp_ms": 1140
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 12,
+      "board_sensor_count": 59,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1899503,
+        "longitude_deg": 121.9975292,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1160,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.92
+      },
+      "timestamp_ms": 1160
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 12,
+      "board_sensor_count": 60,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1899213,
+        "longitude_deg": 121.9974866,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1180,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.95
+      },
+      "timestamp_ms": 1180
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 13,
+      "board_sensor_count": 61,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1898922,
+        "longitude_deg": 121.997444,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1200,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 1.98
+      },
+      "timestamp_ms": 1200
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 13,
+      "board_sensor_count": 62,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1898632,
+        "longitude_deg": 121.9974014,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1220,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.02
+      },
+      "timestamp_ms": 1220
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 13,
+      "board_sensor_count": 63,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1898342,
+        "longitude_deg": 121.9973588,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1240,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.05
+      },
+      "timestamp_ms": 1240
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 13,
+      "board_sensor_count": 64,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1898051,
+        "longitude_deg": 121.9973162,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1260,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.09
+      },
+      "timestamp_ms": 1260
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 13,
+      "board_sensor_count": 65,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1897761,
+        "longitude_deg": 121.9972736,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1280,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.13
+      },
+      "timestamp_ms": 1280
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 14,
+      "board_sensor_count": 66,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1897471,
+        "longitude_deg": 121.997231,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1300,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.16
+      },
+      "timestamp_ms": 1300
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 14,
+      "board_sensor_count": 67,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.189718,
+        "longitude_deg": 121.9971884,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1320,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.2
+      },
+      "timestamp_ms": 1320
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 14,
+      "board_sensor_count": 68,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.189689,
+        "longitude_deg": 121.9971458,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1340,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.23
+      },
+      "timestamp_ms": 1340
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 14,
+      "board_sensor_count": 69,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.18966,
+        "longitude_deg": 121.9971032,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1360,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.27
+      },
+      "timestamp_ms": 1360
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 14,
+      "board_sensor_count": 70,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1896309,
+        "longitude_deg": 121.9970606,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1380,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.3
+      },
+      "timestamp_ms": 1380
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 15,
+      "board_sensor_count": 71,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.19,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1896019,
+        "longitude_deg": 121.997018,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1400,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.34
+      },
+      "timestamp_ms": 1400
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 15,
+      "board_sensor_count": 72,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.2,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1895729,
+        "longitude_deg": 121.9969754,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1420,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.37
+      },
+      "timestamp_ms": 1420
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 15,
+      "board_sensor_count": 73,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.2,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1895438,
+        "longitude_deg": 121.9969328,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1440,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.41
+      },
+      "timestamp_ms": 1440
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 15,
+      "board_sensor_count": 74,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.2,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1895148,
+        "longitude_deg": 121.9968902,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1460,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.45
+      },
+      "timestamp_ms": 1460
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 15,
+      "board_sensor_count": 75,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.2,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1894858,
+        "longitude_deg": 121.9968476,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1480,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.48
+      },
+      "timestamp_ms": 1480
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 16,
+      "board_sensor_count": 76,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.2,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1894567,
+        "longitude_deg": 121.996805,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1500,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.52
+      },
+      "timestamp_ms": 1500
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 16,
+      "board_sensor_count": 77,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.2,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1894277,
+        "longitude_deg": 121.9967624,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1520,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.55
+      },
+      "timestamp_ms": 1520
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 16,
+      "board_sensor_count": 78,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.2,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1893987,
+        "longitude_deg": 121.9967198,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1540,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.59
+      },
+      "timestamp_ms": 1540
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 16,
+      "board_sensor_count": 79,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.2,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1893696,
+        "longitude_deg": 121.9966772,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1560,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.63
+      },
+      "timestamp_ms": 1560
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 16,
+      "board_sensor_count": 80,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.2,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1893406,
+        "longitude_deg": 121.9966346,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1580,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.66
+      },
+      "timestamp_ms": 1580
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 17,
+      "board_sensor_count": 81,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.2,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1893116,
+        "longitude_deg": 121.996592,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1600,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.7
+      },
+      "timestamp_ms": 1600
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 17,
+      "board_sensor_count": 82,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.2,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1892825,
+        "longitude_deg": 121.9965494,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1620,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.73
+      },
+      "timestamp_ms": 1620
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 17,
+      "board_sensor_count": 83,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.21,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1892535,
+        "longitude_deg": 121.9965068,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1640,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.77
+      },
+      "timestamp_ms": 1640
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 17,
+      "board_sensor_count": 84,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.21,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1892245,
+        "longitude_deg": 121.9964642,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1660,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.81
+      },
+      "timestamp_ms": 1660
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 17,
+      "board_sensor_count": 85,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.21,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1891954,
+        "longitude_deg": 121.9964216,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1680,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.84
+      },
+      "timestamp_ms": 1680
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 18,
+      "board_sensor_count": 86,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.21,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1891664,
+        "longitude_deg": 121.996379,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1700,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.88
+      },
+      "timestamp_ms": 1700
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 18,
+      "board_sensor_count": 87,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.21,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1891373,
+        "longitude_deg": 121.9963364,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1720,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.92
+      },
+      "timestamp_ms": 1720
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 18,
+      "board_sensor_count": 88,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.21,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1891083,
+        "longitude_deg": 121.9962938,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1740,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.96
+      },
+      "timestamp_ms": 1740
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 18,
+      "board_sensor_count": 89,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.21,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1890793,
+        "longitude_deg": 121.9962512,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1760,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 2.99
+      },
+      "timestamp_ms": 1760
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 18,
+      "board_sensor_count": 90,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.21,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1890502,
+        "longitude_deg": 121.9962086,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1780,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.03
+      },
+      "timestamp_ms": 1780
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 19,
+      "board_sensor_count": 91,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.21,
+        "heading_deg": 225.0,
+        "latitude_deg": 47.1890212,
+        "longitude_deg": 121.996166,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1800,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.07
+      },
+      "timestamp_ms": 1800
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 19,
+      "board_sensor_count": 92,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.21,
+        "heading_deg": 225.01,
+        "latitude_deg": 47.1889922,
+        "longitude_deg": 121.9961234,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1820,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.1
+      },
+      "timestamp_ms": 1820
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 19,
+      "board_sensor_count": 93,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.21,
+        "heading_deg": 225.01,
+        "latitude_deg": 47.1889631,
+        "longitude_deg": 121.9960808,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1840,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.14
+      },
+      "timestamp_ms": 1840
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 19,
+      "board_sensor_count": 94,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.22,
+        "heading_deg": 225.01,
+        "latitude_deg": 47.1889341,
+        "longitude_deg": 121.9960382,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1860,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.18
+      },
+      "timestamp_ms": 1860
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 19,
+      "board_sensor_count": 95,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.22,
+        "heading_deg": 225.01,
+        "latitude_deg": 47.1889051,
+        "longitude_deg": 121.9959956,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1880,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.22
+      },
+      "timestamp_ms": 1880
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 20,
+      "board_sensor_count": 96,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.22,
+        "heading_deg": 225.01,
+        "latitude_deg": 47.188876,
+        "longitude_deg": 121.995953,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1900,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.25
+      },
+      "timestamp_ms": 1900
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 20,
+      "board_sensor_count": 97,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.22,
+        "heading_deg": 225.01,
+        "latitude_deg": 47.188847,
+        "longitude_deg": 121.9959104,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1920,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.29
+      },
+      "timestamp_ms": 1920
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 20,
+      "board_sensor_count": 98,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.22,
+        "heading_deg": 225.01,
+        "latitude_deg": 47.188818,
+        "longitude_deg": 121.9958678,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1940,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.33
+      },
+      "timestamp_ms": 1940
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 20,
+      "board_sensor_count": 99,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.22,
+        "heading_deg": 225.01,
+        "latitude_deg": 47.1887889,
+        "longitude_deg": 121.9958252,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1960,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.37
+      },
+      "timestamp_ms": 1960
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 20,
+      "board_sensor_count": 100,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.22,
+        "heading_deg": 225.01,
+        "latitude_deg": 47.1887599,
+        "longitude_deg": 121.9957826,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 1980,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.4
+      },
+      "timestamp_ms": 1980
+    },
+    {
+      "actuator_feedback": {
+        "armed": false,
+        "controls_first_8": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "failsafe": false,
+        "reason": "disarmed_zero_output"
+      },
+      "board_gps_count": 21,
+      "board_sensor_count": 101,
+      "normal_lru_accepted": 4,
+      "normal_lru_rejected": 0,
+      "normal_wire_events": 4,
+      "state": {
+        "altitude_ft": 30000.22,
+        "heading_deg": 225.01,
+        "latitude_deg": 47.1887309,
+        "longitude_deg": 121.99574,
+        "phase": "cruise",
+        "pitch_deg": 2.28,
+        "roll_deg": -0.01,
+        "timestamp_ms": 2000,
+        "true_airspeed_kt": 444.36,
+        "vertical_speed_fpm": 3.44
+      },
+      "timestamp_ms": 2000
+    }
+  ]
+}

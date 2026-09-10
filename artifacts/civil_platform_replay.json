@@ -1,0 +1,1852 @@
+{
+  "attack": {
+    "attack_at_ms": 20000,
+    "event": {
+      "hardened": {
+        "accepted": false,
+        "data": 1240,
+        "label_octal": "0o203",
+        "parity_ok": true,
+        "raw_word": "0x80136083",
+        "reason": "replay",
+        "sequence": 77,
+        "source": "air_data_computer"
+      },
+      "legacy": {
+        "accepted": true,
+        "data": 1240,
+        "label_octal": "0o203",
+        "parity_ok": true,
+        "raw_word": "0x80136083",
+        "reason": "accepted",
+        "sequence": 77,
+        "source": "attacker"
+      },
+      "type": "replay"
+    },
+    "requested": "replay"
+  },
+  "engine": {
+    "requested": "kinematic",
+    "selected": "kinematic"
+  },
+  "integrations": {
+    "bluesky_python": false,
+    "flightgear_binary": false,
+    "jsbsim_python": false,
+    "network_opened": false,
+    "px4_source": true,
+    "px4_source_path": "/home/starlight/winECode/PX4-Autopilot",
+    "serial_opened": false
+  },
+  "normal_traffic": {
+    "frames_admitted": 124,
+    "frames_emitted": 124,
+    "frames_rejected": 0
+  },
+  "platform": {
+    "duration_ms": 30000,
+    "labels": [
+      "0o203",
+      "0o210",
+      "0o211",
+      "0o212"
+    ],
+    "name": "civil-aviation-security-lab",
+    "scope": "local research simulation; no real avionics interface",
+    "sensor_source": "air_data_computer",
+    "step_ms": 1000,
+    "version": "0.1"
+  },
+  "trace": [
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 100,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80019083",
+          "reason": "accepted",
+          "sequence": 1,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 120,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x8001e088",
+          "reason": "accepted",
+          "sequence": 2,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 3,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 4,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 100.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.334,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 0.0,
+        "timestamp_ms": 0,
+        "true_airspeed_kt": 120.0,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 160,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x00028083",
+          "reason": "accepted",
+          "sequence": 5,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 122,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x0001e888",
+          "reason": "accepted",
+          "sequence": 6,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 7,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 8,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 160.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3346495,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 0.17,
+        "timestamp_ms": 1000,
+        "true_airspeed_kt": 121.5,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 220,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80037083",
+          "reason": "accepted",
+          "sequence": 9,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 123,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x8001ec88",
+          "reason": "accepted",
+          "sequence": 10,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 11,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 12,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 220.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3353071,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 0.33,
+        "timestamp_ms": 2000,
+        "true_airspeed_kt": 123.0,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 280,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80046083",
+          "reason": "accepted",
+          "sequence": 13,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 124,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x0001f088",
+          "reason": "accepted",
+          "sequence": 14,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 15,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 16,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 280.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3359728,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 0.49,
+        "timestamp_ms": 3000,
+        "true_airspeed_kt": 124.5,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 340,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x00055083",
+          "reason": "accepted",
+          "sequence": 17,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 126,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x8001f888",
+          "reason": "accepted",
+          "sequence": 18,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 19,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 20,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 340.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3366466,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 0.65,
+        "timestamp_ms": 4000,
+        "true_airspeed_kt": 126.0,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 400,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80064083",
+          "reason": "accepted",
+          "sequence": 21,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 128,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x00020088",
+          "reason": "accepted",
+          "sequence": 22,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 23,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 24,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 400.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3373286,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 0.81,
+        "timestamp_ms": 5000,
+        "true_airspeed_kt": 127.5,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 460,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80073083",
+          "reason": "accepted",
+          "sequence": 25,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 129,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80020488",
+          "reason": "accepted",
+          "sequence": 26,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 27,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 28,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 460.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3380186,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 0.96,
+        "timestamp_ms": 6000,
+        "true_airspeed_kt": 129.0,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 520,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x00082083",
+          "reason": "accepted",
+          "sequence": 29,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 130,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80020888",
+          "reason": "accepted",
+          "sequence": 30,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 31,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 32,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 520.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3387168,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.1,
+        "timestamp_ms": 7000,
+        "true_airspeed_kt": 130.5,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 580,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80091083",
+          "reason": "accepted",
+          "sequence": 33,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 132,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80021088",
+          "reason": "accepted",
+          "sequence": 34,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 35,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 36,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 580.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3394231,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.24,
+        "timestamp_ms": 8000,
+        "true_airspeed_kt": 132.0,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 640,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x000a0083",
+          "reason": "accepted",
+          "sequence": 37,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 134,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x00021888",
+          "reason": "accepted",
+          "sequence": 38,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 39,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 40,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 640.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3401375,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.36,
+        "timestamp_ms": 9000,
+        "true_airspeed_kt": 133.5,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 700,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x000af083",
+          "reason": "accepted",
+          "sequence": 41,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 135,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80021c88",
+          "reason": "accepted",
+          "sequence": 42,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 43,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 44,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 700.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3408601,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.48,
+        "timestamp_ms": 10000,
+        "true_airspeed_kt": 135.0,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 760,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x000be083",
+          "reason": "accepted",
+          "sequence": 45,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 136,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80022088",
+          "reason": "accepted",
+          "sequence": 46,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 47,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 48,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 760.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3415907,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.59,
+        "timestamp_ms": 11000,
+        "true_airspeed_kt": 136.5,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 820,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x800cd083",
+          "reason": "accepted",
+          "sequence": 49,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 138,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x00022888",
+          "reason": "accepted",
+          "sequence": 50,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 51,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 52,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 820.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3423295,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.68,
+        "timestamp_ms": 12000,
+        "true_airspeed_kt": 138.0,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 880,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x800dc083",
+          "reason": "accepted",
+          "sequence": 53,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 140,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x00023088",
+          "reason": "accepted",
+          "sequence": 54,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 55,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 56,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 880.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3430764,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.77,
+        "timestamp_ms": 13000,
+        "true_airspeed_kt": 139.5,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 940,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x000eb083",
+          "reason": "accepted",
+          "sequence": 57,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 141,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80023488",
+          "reason": "accepted",
+          "sequence": 58,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 59,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 60,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 940.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3438314,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.84,
+        "timestamp_ms": 14000,
+        "true_airspeed_kt": 141.0,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1000,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x000fa083",
+          "reason": "accepted",
+          "sequence": 61,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 142,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80023888",
+          "reason": "accepted",
+          "sequence": 62,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 63,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 64,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1000.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3445946,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.9,
+        "timestamp_ms": 15000,
+        "true_airspeed_kt": 142.5,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1060,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80109083",
+          "reason": "accepted",
+          "sequence": 65,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 144,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80024088",
+          "reason": "accepted",
+          "sequence": 66,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 67,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 68,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1060.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3453658,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.94,
+        "timestamp_ms": 16000,
+        "true_airspeed_kt": 144.0,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1120,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80118083",
+          "reason": "accepted",
+          "sequence": 69,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 146,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x00024888",
+          "reason": "accepted",
+          "sequence": 70,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 71,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 72,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1120.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3461452,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.98,
+        "timestamp_ms": 17000,
+        "true_airspeed_kt": 145.5,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1180,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80127083",
+          "reason": "accepted",
+          "sequence": 73,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 147,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80024c88",
+          "reason": "accepted",
+          "sequence": 74,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 75,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 76,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1180.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3469327,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 1.99,
+        "timestamp_ms": 18000,
+        "true_airspeed_kt": 147.0,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1240,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80136083",
+          "reason": "accepted",
+          "sequence": 77,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 148,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x00025088",
+          "reason": "accepted",
+          "sequence": 78,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 79,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8600,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x8086608a",
+          "reason": "accepted",
+          "sequence": 80,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1240.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3477283,
+        "phase": "takeoff_climb",
+        "pitch_deg": 8.0,
+        "roll_deg": 2.0,
+        "timestamp_ms": 19000,
+        "true_airspeed_kt": 148.5,
+        "vertical_speed_fpm": 3600.0
+      }
+    },
+    {
+      "attack": {
+        "hardened": {
+          "accepted": false,
+          "data": 1240,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80136083",
+          "reason": "replay",
+          "sequence": 77,
+          "source": "air_data_computer"
+        },
+        "legacy": {
+          "accepted": true,
+          "data": 1240,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80136083",
+          "reason": "accepted",
+          "sequence": 77,
+          "source": "attacker"
+        },
+        "type": "replay"
+      },
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1300,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x00145083",
+          "reason": "accepted",
+          "sequence": 81,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 150,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80025888",
+          "reason": "accepted",
+          "sequence": 82,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 83,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8000,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x007d008a",
+          "reason": "accepted",
+          "sequence": 84,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1300.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.348532,
+        "phase": "climb",
+        "pitch_deg": 6.0,
+        "roll_deg": 1.99,
+        "timestamp_ms": 20000,
+        "true_airspeed_kt": 150.0,
+        "vertical_speed_fpm": 3000.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1350,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80151883",
+          "reason": "accepted",
+          "sequence": 85,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 150,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80025888",
+          "reason": "accepted",
+          "sequence": 86,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 87,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8000,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x007d008a",
+          "reason": "accepted",
+          "sequence": 88,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1350.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3493439,
+        "phase": "climb",
+        "pitch_deg": 6.0,
+        "roll_deg": 1.97,
+        "timestamp_ms": 21000,
+        "true_airspeed_kt": 150.5,
+        "vertical_speed_fpm": 3000.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1400,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x0015e083",
+          "reason": "accepted",
+          "sequence": 89,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 151,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x00025c88",
+          "reason": "accepted",
+          "sequence": 90,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 91,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8000,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x007d008a",
+          "reason": "accepted",
+          "sequence": 92,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1400.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3501584,
+        "phase": "climb",
+        "pitch_deg": 6.0,
+        "roll_deg": 1.93,
+        "timestamp_ms": 22000,
+        "true_airspeed_kt": 151.0,
+        "vertical_speed_fpm": 3000.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1450,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x0016a883",
+          "reason": "accepted",
+          "sequence": 93,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 152,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x00026088",
+          "reason": "accepted",
+          "sequence": 94,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 95,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8000,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x007d008a",
+          "reason": "accepted",
+          "sequence": 96,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1450.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3509757,
+        "phase": "climb",
+        "pitch_deg": 6.0,
+        "roll_deg": 1.88,
+        "timestamp_ms": 23000,
+        "true_airspeed_kt": 151.5,
+        "vertical_speed_fpm": 3000.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1500,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80177083",
+          "reason": "accepted",
+          "sequence": 97,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 152,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x00026088",
+          "reason": "accepted",
+          "sequence": 98,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 99,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8000,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x007d008a",
+          "reason": "accepted",
+          "sequence": 100,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1500.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3517956,
+        "phase": "climb",
+        "pitch_deg": 6.0,
+        "roll_deg": 1.82,
+        "timestamp_ms": 24000,
+        "true_airspeed_kt": 152.0,
+        "vertical_speed_fpm": 3000.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1550,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80183883",
+          "reason": "accepted",
+          "sequence": 101,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 152,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x00026088",
+          "reason": "accepted",
+          "sequence": 102,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 103,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8000,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x007d008a",
+          "reason": "accepted",
+          "sequence": 104,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1550.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3526183,
+        "phase": "climb",
+        "pitch_deg": 6.0,
+        "roll_deg": 1.74,
+        "timestamp_ms": 25000,
+        "true_airspeed_kt": 152.5,
+        "vertical_speed_fpm": 3000.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1600,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x80190083",
+          "reason": "accepted",
+          "sequence": 105,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 153,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80026488",
+          "reason": "accepted",
+          "sequence": 106,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 107,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8000,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x007d008a",
+          "reason": "accepted",
+          "sequence": 108,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1600.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3534437,
+        "phase": "climb",
+        "pitch_deg": 6.0,
+        "roll_deg": 1.66,
+        "timestamp_ms": 26000,
+        "true_airspeed_kt": 153.0,
+        "vertical_speed_fpm": 3000.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1650,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x0019c883",
+          "reason": "accepted",
+          "sequence": 109,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 154,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80026888",
+          "reason": "accepted",
+          "sequence": 110,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 111,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8000,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x007d008a",
+          "reason": "accepted",
+          "sequence": 112,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1650.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3542717,
+        "phase": "climb",
+        "pitch_deg": 6.0,
+        "roll_deg": 1.56,
+        "timestamp_ms": 27000,
+        "true_airspeed_kt": 153.5,
+        "vertical_speed_fpm": 3000.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1700,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x801a9083",
+          "reason": "accepted",
+          "sequence": 113,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 154,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80026888",
+          "reason": "accepted",
+          "sequence": 114,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 115,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8000,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x007d008a",
+          "reason": "accepted",
+          "sequence": 116,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1700.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3551025,
+        "phase": "climb",
+        "pitch_deg": 6.0,
+        "roll_deg": 1.45,
+        "timestamp_ms": 28000,
+        "true_airspeed_kt": 154.0,
+        "vertical_speed_fpm": 3000.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1750,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x801b5883",
+          "reason": "accepted",
+          "sequence": 117,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 154,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x80026888",
+          "reason": "accepted",
+          "sequence": 118,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 119,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8000,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x007d008a",
+          "reason": "accepted",
+          "sequence": 120,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1750.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.355936,
+        "phase": "climb",
+        "pitch_deg": 6.0,
+        "roll_deg": 1.33,
+        "timestamp_ms": 29000,
+        "true_airspeed_kt": 154.5,
+        "vertical_speed_fpm": 3000.0
+      }
+    },
+    {
+      "attack": null,
+      "frames": [
+        {
+          "accepted": true,
+          "data": 1800,
+          "label_octal": "0o203",
+          "parity_ok": true,
+          "raw_word": "0x001c2083",
+          "reason": "accepted",
+          "sequence": 121,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 155,
+          "label_octal": "0o210",
+          "parity_ok": true,
+          "raw_word": "0x00026c88",
+          "reason": "accepted",
+          "sequence": 122,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 90,
+          "label_octal": "0o211",
+          "parity_ok": true,
+          "raw_word": "0x00016889",
+          "reason": "accepted",
+          "sequence": 123,
+          "source": "air_data_computer"
+        },
+        {
+          "accepted": true,
+          "data": 8000,
+          "label_octal": "0o212",
+          "parity_ok": true,
+          "raw_word": "0x007d008a",
+          "reason": "accepted",
+          "sequence": 124,
+          "source": "air_data_computer"
+        }
+      ],
+      "state": {
+        "altitude_ft": 1800.0,
+        "heading_deg": 90.0,
+        "latitude_deg": 31.197,
+        "longitude_deg": 121.3567722,
+        "phase": "climb",
+        "pitch_deg": 6.0,
+        "roll_deg": 1.2,
+        "timestamp_ms": 30000,
+        "true_airspeed_kt": 155.0,
+        "vertical_speed_fpm": 3000.0
+      }
+    }
+  ]
+}

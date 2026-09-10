@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>ARINC 429 总线脆弱性分析报告</title><style>
+@page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+* { box-sizing: border-box; }
+body { color: #17202a; font-family: "Noto Serif CJK SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; font-size: 10.5pt; line-height: 1.65; margin: 0 auto; max-width: 920px; }
+h1 { border-bottom: 2px solid #123b5d; color: #123b5d; font-size: 22pt; line-height: 1.25; margin: 0 0 18px; padding-bottom: 10px; }
+h2 { border-bottom: 1px solid #7c9ab2; color: #123b5d; font-size: 15pt; margin-top: 26px; padding-bottom: 4px; }
+h3 { color: #234e70; font-size: 12.5pt; margin-top: 20px; }
+p { text-align: justify; }
+table { border-collapse: collapse; font-size: 9pt; margin: 12px 0 18px; width: 100%; }
+th { background: #eaf1f6; color: #123b5d; font-weight: 700; }
+th, td { border: 1px solid #b6c4ce; padding: 5px 6px; vertical-align: top; }
+code { background: #eef2f4; border-radius: 2px; padding: 1px 3px; }
+pre { background: #17202a; color: #f2f6f8; overflow-wrap: anywhere; padding: 10px; white-space: pre-wrap; }
+blockquote { border-left: 4px solid #7c9ab2; color: #455a64; margin-left: 0; padding-left: 12px; }
+li { margin-bottom: 4px; }
+hr { border: 0; border-top: 1px solid #c8d1d8; }
+@media print { a { color: inherit; text-decoration: none; } h2, h3 { break-after: avoid; } table { break-inside: avoid; } }
+</style></head>
+<body><h1 id="arinc-429">ARINC 429 总线脆弱性深度分析、场景化验证与加固复测报告</h1>
+<p><strong>题目：</strong> ARINC 429 总线脆弱性深度分析<br>
+<strong>版本：</strong> 1.0<br>
+<strong>日期：</strong> 2026-08-24<br>
+<strong>验证类型：</strong> 本地逻辑仿真；不连接真实航电设备<br>
+<strong>结论性质：</strong> 研究与竞赛验证结论，不构成型号适航批准或运行放行结论</p>
+<h2 id="_1">摘要</h2>
+<p>ARINC 429 的原生 32 位字提供标签、SDI、数据、SSM 和奇偶校验，但没有密码学来源认证、消息新鲜度、保密性或总线级访问控制字段[1]。在民用航空机载架构中，这意味着：只要攻击者已经获得了<strong>能够驱动目标接收通道的物理或逻辑入口</strong>，接收端可能无法区分“合法发射 LRU 发出的、内容被篡改的、已捕获后重放的”字。</p>
+<p>本报告不把“可以构造一个 32 位数”泛化为“飞机必然可被远程控制”。ARINC 429 通道通常是一个发射端向多个接收端的单向链路；攻击必须落在受损发射 LRU、维护/测试适配器、总线桥接器、线束/连接器或其后的系统边界上。实际影响还取决于机型 ICD、标签消费者、冗余/交叉校验、告警与失效降级逻辑。</p>
+<p>本地仿真对一个合成标签 <code>0o203</code> 做了原生接收端与受控安全网关的对照。14 项自动化测试通过，实验记录见 <a href="../artifacts/results.json"><code>artifacts/results.json</code></a> 和 <a href="../artifacts/experiment_log.md"><code>artifacts/experiment_log.md</code></a>。关键结果如下：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th style="text-align: right;">原生接收端</th>
+<th style="text-align: right;">受控网关</th>
+<th>证据含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>未授权来源注入</td>
+<td style="text-align: right;">接受</td>
+<td style="text-align: right;">拒绝：<code>unauthorized_source</code></td>
+<td>原生字不绑定密码学来源</td>
+</tr>
+<tr>
+<td>捕获字重放</td>
+<td style="text-align: right;">接受</td>
+<td style="text-align: right;">拒绝：<code>replay</code>；过期另拒绝：<code>stale</code></td>
+<td>原生字无序号/时间戳</td>
+</tr>
+<tr>
+<td>修改数据并重算奇偶</td>
+<td style="text-align: right;">接受</td>
+<td style="text-align: right;">拒绝：<code>authentication</code></td>
+<td>奇偶校验不是消息认证码</td>
+</tr>
+<tr>
+<td>语义越界</td>
+<td style="text-align: right;">接受</td>
+<td style="text-align: right;">拒绝：<code>semantic_range</code></td>
+<td>原生格式不表达项目物理范围</td>
+</tr>
+<tr>
+<td>64 字连续占线</td>
+<td style="text-align: right;">合法帧从 20.48 ms 后才开始</td>
+<td style="text-align: right;">合法帧 0 ms 开始</td>
+<td>无入口过滤时可造成时延/可用性损失</td>
+</tr>
+<tr>
+<td>100 kbps 接收、12.5 kbps 发送</td>
+<td style="text-align: right;">不锁定有效字</td>
+<td style="text-align: right;">由端口配置/物理监测处理</td>
+<td>速率控制不属于 MAC 网关能力</td>
+</tr>
+<tr>
+<td>被动观测</td>
+<td style="text-align: right;">标签和数据可读</td>
+<td style="text-align: right;">MAC 不提供保密</td>
+<td>需要分区/密码封装或物理防护</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1">1. 场景、系统边界与假设</h2>
+<h3 id="11">1.1 典型民用航空场景</h3>
+<p>分析对象是民用运输类飞机上的机载航电数据传输：大气数据计算机（ADC）、惯性/姿态相关计算单元、飞行管理/显示计算单元、自动飞行相关计算单元或其他 LRU 之间，通过 ARINC 429 通道传递配置规定的参数。一个具体标签是否进入飞行导引、显示、告警、发动机控制或其他安全相关计算，必须以该机型的系统架构图、接口控制文件（ICD）、标签分配表和安全评估为准，本报告不自行假定 <code>0o203</code> 对应空速、姿态或任何真实参数。</p>
+<p>地面保障路径只按以下有条件的架构讨论：维护人员使用经批准的地面保障设备（GSE）或测试适配器，在地面维护模式下接入数据装载/测试边界；该设备或边界可能驱动某个 LRU、桥接器或受控测试端口。并非所有飞机都向 ARINC 429 直接开放此接口，是否存在这条路径必须由机型维护手册、WDM、设备安装图和维护配置确认。</p>
+<h3 id="12">1.2 资产与安全属性</h3>
+<table>
+<thead>
+<tr>
+<th>资产</th>
+<th>需要保护的属性</th>
+<th>航空后果示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标签数据及 SSM</td>
+<td>完整性、真实性</td>
+<td>计算单元使用错误输入、触发错误告警或不正确的模式/降级判断</td>
+</tr>
+<tr>
+<td>标签的到达时序</td>
+<td>可用性、新鲜度</td>
+<td>关键输入超时、使用陈旧值、进入备用源或失效模式</td>
+</tr>
+<tr>
+<td>维护/测试边界</td>
+<td>访问控制、可追责性</td>
+<td>非授权设备成为发射源，改变地面测试或机载配置行为</td>
+</tr>
+<tr>
+<td>总线内容</td>
+<td>机密性</td>
+<td>暴露飞行参数、设备状态或维护信息，并为后续重放提供素材</td>
+</tr>
+</tbody>
+</table>
+<h3 id="13">1.3 威胁主体与前提</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>适航场景中的主体</th>
+<th>必须具备的能力</th>
+<th>本报告是否仿真</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>已被攻陷的发射 LRU 或总线桥接 LRU</td>
+<td>能在目标通道的发送侧产生 ARINC 429 字</td>
+<td>是，抽象为 <code>source</code>/帧输入</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>维护/测试设备或其适配器被误配置、被替换或被攻陷</td>
+<td>已获得维护模式/测试端口，并能把字送到目标接收通道</td>
+<td>是，抽象为未授权来源</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>对线束、连接器、耦合器或机上测试边界有物理接触的人员</td>
+<td>能旁路既有入口或改变物理发送路径</td>
+<td>仅做逻辑结果，未做电气波形</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>被动探测者</td>
+<td>能接触总线或其合法接收路径</td>
+<td>是，验证明文可解析</td>
+</tr>
+</tbody>
+</table>
+<p><strong>排除项：</strong> 本报告没有假定互联网、无线电或客舱网络可以直接驱动 ARINC 429；没有把 CVE 套用到没有给出厂商、型号和版本的 LRU；没有将仿真的接受结果宣称为某一具体机型的飞行控制能力。</p>
+<h2 id="2-arinc-429">2. ARINC 429 协议原理</h2>
+<h3 id="21">2.1 通道和传输组织</h3>
+<p>依据 ARINC 429 Part 1[1]，典型通道为单向传输：一个发射端向一个或多个接收端发送数据，接收端不通过同一数据字向发射端返回握手。正常设计以一个发射端为边界，接收端数量、线缆、端接和具体电气参数由设备安装与机型设计确定。该组织方式的安全含义是：</p>
+<ol>
+<li>接收端通常按字内容和通道配置判断是否接收，不通过密码学方式判断“哪个物理源”发出了字。</li>
+<li>原生协议没有类似共享介质竞争仲裁、消息优先级队列、窗口确认或重放计数器的安全机制。</li>
+<li>“攻击者注入”不能理解为任意设备在空中无线注入；它要求攻击者控制合法发送侧、替换/桥接发送侧，或获得能改变该物理通道的维护/测试入口。</li>
+</ol>
+<h3 id="22-32">2.2 32 位字格式</h3>
+<p>本报告仿真使用以下字段布局。字段编号沿用 ARINC 429 规范语义；代码内部用最低有效位表示字段数值，以便读写和测试，未模拟线上标签位反转及模拟电气波形。</p>
+<table>
+<thead>
+<tr>
+<th>规范字段</th>
+<th style="text-align: right;">位范围</th>
+<th>仿真含义</th>
+<th>安全作用边界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Label</td>
+<td style="text-align: right;">1--8</td>
+<td>8 位标签，报告以八进制展示</td>
+<td>表示数据类型/含义的配置索引，不是密码学来源认证</td>
+</tr>
+<tr>
+<td>SDI</td>
+<td style="text-align: right;">9--10</td>
+<td>2 位源/目的标识语义</td>
+<td>最多提供配置级区分；可被伪造，不是不可伪造身份</td>
+</tr>
+<tr>
+<td>Data</td>
+<td style="text-align: right;">11--29</td>
+<td>19 位数据区</td>
+<td>可表达 BNR、BCD 或离散数据，具体编码由 ICD/标签定义</td>
+</tr>
+<tr>
+<td>SSM</td>
+<td style="text-align: right;">30--31</td>
+<td>符号/状态矩阵</td>
+<td>表示状态/有效性等协议语义，不证明发送者可信</td>
+</tr>
+<tr>
+<td>Parity</td>
+<td style="text-align: right;">32</td>
+<td>奇校验</td>
+<td>发现部分传输错误，不提供认证、授权、保密或新鲜度</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23">2.3 速率与字时长</h3>
+<p>ARINC 429 通道的典型标称速率为 100 kbps 和 12.5 kbps[1]。按 32 bit 纯字长计算，本仿真得到：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">标称速率</th>
+<th style="text-align: right;">32 位字纯传输时长</th>
+<th>适用安全结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">100 kbps</td>
+<td style="text-align: right;">0.32 ms</td>
+<td>连续发送会快速消耗发送侧和接收侧时序预算</td>
+</tr>
+<tr>
+<td style="text-align: right;">12.5 kbps</td>
+<td style="text-align: right;">2.56 ms</td>
+<td>同一字占线时间为高速的 8 倍，可扩大阻塞窗口</td>
+</tr>
+</tbody>
+</table>
+<p>实际线路还涉及字间间隔、时钟容差、接收器同步和电气波形，不能用上述纯字时长替代设备实测。速率配置应视为通道资产：配置为 100 kbps 的接收器收到 12.5 kbps 发送时，通常会失去有效字同步或把采样解释为无效；具体容差需要在目标 LRU 上验证。</p>
+<h2 id="3">3. 原生安全能力与缺口</h2>
+<table>
+<thead>
+<tr>
+<th>安全属性</th>
+<th>原生 32 位字是否提供</th>
+<th>依据和判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>来源认证</td>
+<td>否</td>
+<td>字中没有密码学来源字段；SDI 是配置语义，可复制[1]</td>
+</tr>
+<tr>
+<td>消息完整性</td>
+<td>部分</td>
+<td>奇校验能发现部分比特错误；不能阻止有意篡改并重算奇偶</td>
+</tr>
+<tr>
+<td>防重放</td>
+<td>否</td>
+<td>没有原生序号、时间戳、随机数或确认状态</td>
+</tr>
+<tr>
+<td>语义约束</td>
+<td>否（协议不负责）</td>
+<td>标签确定解释方式；物理范围、变化率和交叉校验属于 ICD/系统逻辑</td>
+</tr>
+<tr>
+<td>保密性</td>
+<td>否</td>
+<td>数据字段可由接触总线的观察者直接解析</td>
+</tr>
+<tr>
+<td>发送侧访问控制</td>
+<td>否</td>
+<td>单发射端是架构约束，不是协议级身份授权</td>
+</tr>
+<tr>
+<td>速率/占线保护</td>
+<td>否</td>
+<td>速率有配置模式，但没有安全限速、仲裁或可信发射配额</td>
+</tr>
+</tbody>
+</table>
+<p>这组结论不是说所有接收机都“裸奔”：工程实现可能额外配置标签白名单、冗余源比较、范围检查、超时和告警。它们属于 LRU、ICD 或系统架构的附加控制，不应被误写成 ARINC 429 原生安全属性。</p>
+<h2 id="4">4. 攻击面与脆弱性条目</h2>
+<h3 id="41-ar-01">4.1 AR-01：缺少来源认证导致合法格式的伪造字被接收</h3>
+<p><strong>协议层级：</strong> ARINC 429 字接收/标签解释层。<br>
+<strong>触发条件：</strong> 攻击者在目标通道的发送侧写入一个标签、SDI、数据和 SSM 均满足接收配置，且第 32 位奇偶校验正确的 32 位字；接收端没有独立的来源认证或通道外的可信源绑定。<br>
+<strong>适配设备：</strong> 消费该标签的 ARINC 429 接收 LRU；在典型机载应用中可能包括 ADC 数据消费者、惯导/姿态数据消费者、FMS/显示/自动飞行相关计算单元，实际适配性必须看具体 ICD。<br>
+<strong>利用前提：</strong> T1/T2/T3 至少获得一个能驱动目标通道的物理/逻辑入口；本条不成立于“只有远程客舱网络权限、没有总线桥接路径”的假设。<br>
+<strong>攻击路径：</strong> 被攻陷发射 LRU 或维护测试边界 → 目标 ARINC 429 TX 侧/桥接器 → 目标 RX 通道 → 接收 LRU 按标签白名单接收。<br>
+<strong>具体影响：</strong> 接收 LRU 看到的是“合法标签 + 合法奇偶”的数据，无法仅靠原生字区分合法源和伪造源。若该标签参与关键飞行参数计算，可能造成错误计算、错误告警、源切换或错误降级；是否能影响飞行控制必须由真实消费者和安全分析证明。<br>
+<strong>危害分级：高。</strong> 在标签进入关键计算且注入路径可在飞行中使用时，后果可能向极高升级；当前仿真没有证明具体飞机的失控后果，因此不直接给出极高结论。<br>
+<strong>仿真证据：</strong> 合成标签 <code>0o203</code>、数据 <code>400000</code> 的帧在 <code>LegacyReceiver</code> 中结果为 <code>accepted</code>；同一帧进入安全网关因 <code>unauthorized_source</code> 被拒绝。<br>
+<strong>来源：</strong> [1]（字段/传输方式）；[2][3]（航空网络安全风险识别和保护方法）；[E1]（本项目复现实验）。</p>
+<p><strong>整改：</strong> 在不可信输入进入安全相关消费者之前设置单一受控入口；绑定通道 ID、来源 ID、标签、序号和 MAC；受控出口只允许网关作为发送源。SDI、标签白名单和物理连接器不能单独作为来源认证。</p>
+<h3 id="42-ar-02">4.2 AR-02：没有新鲜度状态导致捕获字可重放</h3>
+<p><strong>协议层级：</strong> 消息时序/状态层。<br>
+<strong>触发条件：</strong> 攻击者先被动捕获一帧有效字，再在稍后把完全相同的字发送到同一标签消费者；接收端没有序号、时间窗或单调状态。<br>
+<strong>适配设备：</strong> 任何把周期性 ADC、惯导、系统状态或离散量标签当作当前值使用的接收单元。周期性数据尤其容易被“旧值看起来格式正常”掩盖。<br>
+<strong>利用前提：</strong> T4 能读取线路，且 T1/T2/T3 之一随后能把捕获字送回目标通道；如果只有被动读取而无发射能力，本条仅产生信息泄露，不产生重放。<br>
+<strong>攻击路径：</strong> 线束/接收侧被动探测 → 保存 <code>raw_word</code> → 进入发射/桥接侧 → 原样发往目标 RX → 旧值被当作当前值。<br>
+<strong>具体影响：</strong> 接收端可能继续使用陈旧的有效数值，直到应用层超时或冗余比较发现异常。结果包括错误状态保持、源切换延迟、告警延迟和计算偏差；实际后果由数据更新周期、监控门限和系统冗余决定。<br>
+<strong>危害分级：高（关键标签条件性）。</strong> 非关键状态标签可能只有中级运行影响；关键飞行输入的陈旧值可能导致更高安全后果。<br>
+<strong>仿真证据：</strong> 捕获字为 <code>0x000fa083</code>。原生接收端在后移时间、改变 <code>source</code> 后仍接受；安全网关首次接受序号 <code>1</code>，立即重复时返回 <code>replay</code>，在 <code>500 ms</code> 送达时返回 <code>stale</code>。<br>
+<strong>来源：</strong> [1]（原生字字段）；[3][4]（新鲜度、持续适航和监测方法）；[E1]。</p>
+<p><strong>整改：</strong> 网关按“来源 + 标签 + SDI + 通道”维护单调序号，结合受控时间窗；处理重启、掉电、序号回绕、双通道切换和维护模式，不能只在内存中简单保存一个计数器。对关键周期数据还应保留接收超时、更新率和冗余源一致性检查。</p>
+<h3 id="43-ar-03">4.3 AR-03：奇偶校验不是抗篡改认证</h3>
+<p><strong>协议层级：</strong> 字级传输错误检测层。<br>
+<strong>触发条件：</strong> 攻击者修改数据字段后重新计算奇偶位，或同时改变偶数个比特；生成的字仍满足奇校验。<br>
+<strong>适配设备：</strong> 采用标准奇偶校验检查、但没有外部 MAC/签名或应用层交叉校验的接收 LRU。<br>
+<strong>利用前提：</strong> 具备发送侧写入能力，或者能在桥接器中修改字；不需要破解任何密钥，因为原生字没有密钥。<br>
+<strong>攻击路径：</strong> 捕获/生成有效字 → 修改 Data/SSM → 重算 bit 32 → 发送 → RX 通过 parity check。<br>
+<strong>具体影响：</strong> 传输错误检测会给出“无错误”结果，篡改值进入后续范围和控制逻辑；即使某些接收器对状态变化做了检查，也不能把奇偶位当作真实性证据。<br>
+<strong>危害分级：高（关键数据条件性）。</strong> 若只对非关键维护数据使用，则可降为中；若影响关键输入，需按其安全后果评估。<br>
+<strong>仿真证据：</strong> <code>1000</code> 修改为 <code>2000</code> 并重新编码，<code>parity_ok=True</code>；原生接收端接受，带原 MAC 的网关因 <code>authentication</code> 拒绝。单比特翻转基线被原生 parity 拒绝，两个比特翻转则仍可保持奇校验，说明检测能力与认证能力不同。<br>
+<strong>来源：</strong> [1]（奇校验）；[3]（完整性保护方法）；[E1]。</p>
+<p><strong>整改：</strong> 保留奇偶校验作为线路错误检测，同时在安全终止点对原生字、来源、通道、序号和时间戳计算认证标签。不要通过“增加奇偶检查次数”替代密码学完整性保护；密码算法、密钥长度、硬件加速和失效策略需进入项目安全架构与适航审查。</p>
+<h3 id="44-ar-04">4.4 AR-04：标签语法有效但物理语义越界</h3>
+<p><strong>协议层级：</strong> 标签解释和应用数据有效性层。<br>
+<strong>触发条件：</strong> 字的 Label、SDI、SSM 和 parity 都有效，但 Data 超出该机型 ICD 对该标签规定的物理范围，或虽在范围内但违反最大变化率、更新周期、冗余源一致性或状态转换约束。<br>
+<strong>适配设备：</strong> 将标签数据直接送入计算而没有完整语义验证的 ADC 消费者、显示/告警计算单元、FMS 或自动飞行相关消费者。真实适配对象以 ICD 为准。<br>
+<strong>利用前提：</strong> 攻击者可以发送任意有效格式字；目标接收端缺少范围/变化率/交叉源策略。<br>
+<strong>攻击路径：</strong> 选择已有合法标签 → 编码越界 Data 或不合理 SSM → 重算 parity → 发往消费者 → 应用层当作正常数值。<br>
+<strong>具体影响：</strong> 造成错误显示、告警、计算输入或触发非预期降级；如果应用层有饱和、限幅和独立源校验，后果可能被限制。<br>
+<strong>危害分级：高（接入关键计算时）；非关键维护标签可评为中。</strong><br>
+<strong>仿真证据：</strong> 为避免冒充真实机型定义，实验标签 <code>0o203</code> 明确是合成标签；策略规定数据 <code>0..10000</code>，值 <code>10001</code> 原生端接受，网关返回 <code>semantic_range</code>。这证明的是“格式层与项目语义层分离”，不是 <code>0o203</code> 的真实物理范围。<br>
+<strong>来源：</strong> [1]（标签/数据字定义）；机型 ICD/标签分配表（真实落地时的主依据）；[3][5][6]（系统安全和安全评估接口）；[E1]。</p>
+<p><strong>整改：</strong> 由 ICD 生成可审计的标签策略：数据编码、合法范围、变化率、更新周期、SSM 合法转移、冗余源交叉比较和超时动作；异常时采取经安全分析确定的拒绝、冻结、切换备用或告警，不在通用网关中擅自定义飞控限值。</p>
+<h3 id="45-ar-05">4.5 AR-05：连续发送导致总线占用和时延扩散</h3>
+<p><strong>协议层级：</strong> 物理链路可用性与发送调度层。<br>
+<strong>触发条件：</strong> 已获得发送能力的攻击者连续排队发送合法奇偶字；目标接收通道在该时段无法对原生发送流做协议级仲裁。<br>
+<strong>适配设备：</strong> 共享一个接收通道的 ARINC 429 接收 LRU；特别是依赖周期更新和超时门限的计算单元。注意，典型架构要求单一发射端，因此攻击前提通常是发射 LRU 被攻陷、发射侧被替换、或桥接/维护边界失去单发射端约束，而不是简单把第二个发射器并联到线上。<br>
+<strong>攻击路径：</strong> 受损发射端/桥接器 → 连续合法格式字 → RX 输入队列/线路 → 合法周期字等待或丢失 → 超时/降级。<br>
+<strong>具体影响：</strong> 产生输入时延、更新丢失、告警或备用源切换；若持续占用且无独立故障遏制，可能扩大到多个消费者。<br>
+<strong>危害分级：高（时间关键标签条件性）。</strong> 若目标消费者具备快速失效检测和独立冗余，可能为中；需要真实时间预算确认。<br>
+<strong>仿真证据：</strong> 在 100 kbps、64 个攻击字均从 <code>t=0</code> 排队时，每字纯传输 0.32 ms，合法字从 <code>20.48 ms</code> 才开始；设定 5 ms 期限则超时。受控网关拒绝全部 64 个未认证攻击帧，合法帧从 <code>0 ms</code> 开始。12.5 kbps 时同一 64 字队列的理论阻塞为 <code>163.84 ms</code>，进一步说明低速通道的时序预算更紧；该数字不含字间隔。<br>
+<strong>来源：</strong> [1]（单向通道和速率）；[3][5][6]（可用性与安全/安全评估）；[E1]。</p>
+<p><strong>整改：</strong> 用物理单发射端约束、端口/连接器控制、发送授权、总线占用监测和故障隔离共同处理。网关入口限速只能保护“网关之前”的受控路径；若攻击者能直接绕到网关输出侧，必须依靠物理隔离、bus guardian/发送使能控制、冗余链路和接收侧超时/降级。所有新控制都要做故障模式与误拒绝分析。</p>
+<h3 id="46-ar-06100-kbps125-kbps">4.6 AR-06：100 kbps/12.5 kbps 配置失配导致有效数据不可用</h3>
+<p><strong>协议层级：</strong> 物理时序/接口配置层。<br>
+<strong>触发条件：</strong> 接收端按 100 kbps 配置，发送端按 12.5 kbps 发送，或反之；两者相差 8 倍，超出本仿真使用的 2% 锁定容差。<br>
+<strong>适配设备：</strong> 维护更换后的 LRU、错误装载配置的总线接口卡、测试适配器和被桥接的双速率通道。<br>
+<strong>利用前提：</strong> 攻击者能改变发送端速率选择或插入可配置测试发射器；配置错误也可能由维护过程造成。<br>
+<strong>攻击路径：</strong> 维护/配置边界 → 修改速率模式 → TX 与 RX 时钟不匹配 → 接收端无法形成有效 32 位字 → 数据丢失/超时。<br>
+<strong>具体影响：</strong> 主要是可用性损失、超时和备用源切换；不同 LRU 的同步/容差实现可能产生不同表现，不能据仿真统一断言为“必然静默”。<br>
+<strong>危害分级：中。</strong> 若影响单一非关键功能通常为中或低；若同时切断关键输入，应按真实失效后果升级。<br>
+<strong>仿真证据：</strong> 接收配置 <code>100000 bit/s</code>、发送 <code>12500 bit/s</code> 时，纯字时长分别为 <code>0.32 ms</code> 和 <code>2.56 ms</code>，<code>receiver_valid_word=False</code>；同速率配置均锁定。<br>
+<strong>来源：</strong> [1]（双速率及字传输）；机型接口配置文件；[E1]。本条的具体容差仍需目标 LRU 台架验证。</p>
+<p><strong>整改：</strong> 速率作为不可由普通维护会话任意改变的端口配置；启用上电自检、配置签名/版本核对、实际比特定时监测和失配告警；在地面测试程序中覆盖两种标称速率与错误配置，不用软件层 MAC 代替硬件端口控制。</p>
+<h3 id="47-ar-07">4.7 AR-07：明文可观测，捕获内容可辅助后续攻击</h3>
+<p><strong>协议层级：</strong> 线路保密性和维护信息保护层。<br>
+<strong>触发条件：</strong> 攻击者可以在接收端、线束或连接器处被动读取；ARINC 429 字中的标签、数据、SSM 和 parity 可直接解析。<br>
+<strong>适配设备：</strong> 传递飞行参数、设备状态、维护状态或配置相关信息的通道。信息敏感度取决于具体 ICD。<br>
+<strong>利用前提：</strong> T4 的物理接触或合法接收路径观测能力；仅被动观测不等于能够注入。<br>
+<strong>攻击路径：</strong> 线束/测试端口被动探测 → 解析标签和数据 → 建立更新周期和状态模型 → 为重放或社会工程/维护攻击提供素材。<br>
+<strong>具体影响：</strong> 单独看通常是信息泄露和攻击准备，不直接证明飞行控制后果；若数据具有运行或维护敏感性，可能提高后续攻击成功率。<br>
+<strong>危害分级：低（本条单独的安全后果）。</strong> 与主动重放组合时，按 AR-02 重新评估，不重复计分。<br>
+<strong>仿真证据：</strong> 合法字 <code>0x000fa083</code> 可解析为合成标签 <code>0o203</code>、数据 <code>1000</code>；<code>native_confidentiality=False</code>。<br>
+<strong>来源：</strong> [1]（字字段）；[2][3][4]（信息安全过程与持续适航）；[E1]。</p>
+<p><strong>整改：</strong> 优先物理保护线束、连接器和测试端口；在需要保密的跨域边界采用经项目批准的加密/安全封装，并在安全网关终止，不擅自改写原生 32 位接收端协议。需要同时评估延迟、密钥可用性、失效降级和维护可诊断性。</p>
+<h2 id="5">5. 实验环境与可复现性</h2>
+<h3 id="51">5.1 环境组成</h3>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>实现</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>encode_word/decode_word</code></td>
+<td><code>sim/arinc429_lab.py</code></td>
+<td>32 位字段和奇校验</td>
+</tr>
+<tr>
+<td><code>LegacyReceiver</code></td>
+<td>同上</td>
+<td>模拟“奇校验 + 标签白名单”的原生接收端基线</td>
+</tr>
+<tr>
+<td><code>SecureGateway</code></td>
+<td>同上</td>
+<td>模拟系统级安全入口：来源白名单、HMAC、时效、序号、语义和限速</td>
+</tr>
+<tr>
+<td><code>serialize_frames</code></td>
+<td>同上</td>
+<td>计算 12.5/100 kbps 下的纯字排队时延</td>
+</tr>
+<tr>
+<td><code>timing_lock</code></td>
+<td>同上</td>
+<td>双速率失配的保守数字观测，不代表具体 LRU 电气容差</td>
+</tr>
+<tr>
+<td><code>tests/test_arinc429_lab.py</code></td>
+<td>pytest</td>
+<td>正向、负向和前后对照验证</td>
+</tr>
+<tr>
+<td><code>scripts/run_experiments.py</code></td>
+<td>Python</td>
+<td>生成 JSON 和 Markdown 证据记录</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52">5.2 运行命令</h3>
+<p>在报告根目录运行：</p>
+<pre><code class="language-bash">python3 -m pytest -q
+python3 scripts/run_experiments.py
+</code></pre>
+<p>本次记录环境：Python <code>3.14.7</code>，Linux x86_64；模型文件 SHA-256 为 <code>ea80083df4b7fa1dc8374b9344bf3203b5d4c4a413a3a01b31d7f4b4dd6616be</code>。运行脚本会写入 <code>artifacts/results.json</code> 和 <code>artifacts/experiment_log.md</code>，避免人工抄录实验数字。</p>
+<h3 id="53">5.3 实验步骤与结果</h3>
+<h4 id="e-01">E-01：奇偶校验基线</h4>
+<ol>
+<li>编码合成标签 <code>0o203</code>、数据 <code>1000</code>。</li>
+<li>单独翻转一个数据位：原生接收端结果为 <code>parity</code> 拒绝。</li>
+<li>修改数据并重新计算奇偶：奇偶仍有效，原生接收端接受。</li>
+<li>同时翻转两个数据位：奇校验仍可能有效，说明奇偶校验不能覆盖偶数位错误。</li>
+</ol>
+<p><strong>结果：</strong> 奇偶校验可以作为线路传输错误检测，但不能作为抗恶意篡改的认证机制。</p>
+<h4 id="e-02">E-02：未授权来源注入</h4>
+<ol>
+<li>生成标签正确、奇偶正确、数据为 <code>400000</code> 的帧。</li>
+<li>将来源设置为 <code>attacker</code>。</li>
+<li>分别送入 <code>LegacyReceiver</code> 和 <code>SecureGateway</code>。</li>
+</ol>
+<p><strong>结果：</strong> 原生端 <code>accepted=True</code>；网关 <code>accepted=False, reason=unauthorized_source</code>。</p>
+<h4 id="e-03">E-03：捕获和重放</h4>
+<ol>
+<li>生成原始字 <code>0x000fa083</code>。</li>
+<li>原生端在后移时间并改变来源后重发，仍按格式接受。</li>
+<li>给安全帧附加序号 <code>1</code> 和时间戳 <code>0</code>，先在 <code>t=0</code> 送达，再在 <code>t=20 ms</code> 原样重发，最后在 <code>t=500 ms</code> 送达。</li>
+</ol>
+<p><strong>结果：</strong> 原生端接受；网关首次接受，第二次以 <code>replay</code> 拒绝，新的网关在 <code>500 ms</code> 以 <code>stale</code> 拒绝。</p>
+<h4 id="e-04">E-04：重算奇偶后的数据篡改</h4>
+<ol>
+<li>把数据 <code>1000</code> 改为 <code>2000</code>。</li>
+<li>重新生成原生字和奇偶位。</li>
+<li>对安全帧只替换 <code>raw_word</code>，保留旧 MAC。</li>
+</ol>
+<p><strong>结果：</strong> 原生端接受且 <code>parity_ok=True</code>；网关以 <code>authentication</code> 拒绝。</p>
+<h4 id="e-05">E-05：语义范围检查</h4>
+<ol>
+<li>对合成标签配置策略 <code>0..10000</code>。</li>
+<li>发送数据 <code>10001</code> 的格式合法帧。</li>
+</ol>
+<p><strong>结果：</strong> 原生端接受；网关以 <code>semantic_range</code> 拒绝。该测试不宣称真实标签 <code>0o203</code> 的物理范围。</p>
+<h4 id="e-06">E-06：连续占线</h4>
+<ol>
+<li>在 <code>t=0</code> 排队 64 个攻击帧，再排队一个合法帧。</li>
+<li>使用 100 kbps 计算纯字串行化。</li>
+<li>将合法帧截止时间设为 5 ms，比较其开始发送时间。</li>
+</ol>
+<p><strong>结果：</strong> 原生队列中 64 个攻击帧均被接受，合法帧从 <code>20.48 ms</code> 开始，超过 5 ms；安全网关拒绝全部攻击帧，合法帧从 <code>0 ms</code> 开始。该结果是“攻击者已取得发送侧能力”的时序证据，不是对任意并联发射器电气可行性的证明。</p>
+<h4 id="e-07">E-07：速率失配</h4>
+<ol>
+<li>接收端配置 100 kbps，发送端配置 12.5 kbps。</li>
+<li>按 32 bit 纯字时长计算并调用 <code>timing_lock</code>。</li>
+</ol>
+<p><strong>结果：</strong> <code>0.32 ms</code> 对 <code>2.56 ms</code>，接收端有效字判定为 <code>False</code>。该模型用于证明失配的攻击/故障触发条件；具体 LRU 的同步捕获、容差、告警和备用源动作必须在硬件台架复测。</p>
+<h3 id="54">5.4 证据效力边界</h3>
+<p>本实验可以证明：在给定抽象接收规则下，原生字段不足以区分若干恶意输入，而网关策略可以拒绝这些输入。它不能证明：</p>
+<ul>
+<li>某个真实机型采用 <code>0o203</code>，或该标签直接连接某个飞控/发动机控制功能；</li>
+<li>任意线束都能被无损插入或任意第二发射器都能与原发射器并联工作；</li>
+<li>具体 LRU 的电压、端接、波形、EMI、容错和故障隔离行为；</li>
+<li>某种密码算法已满足该型号的适航审定基础。</li>
+</ul>
+<h2 id="6">6. 风险分级与整改后残余风险</h2>
+<h3 id="61">6.1 本报告采用的四级规则</h3>
+<p>按赛题指定的“极高、高、中、低”四级，本报告使用以下判定口径。等级是当前架构假设下的安全风险初判，最终等级要和功能危害分析、系统安全性评估、暴露条件及飞行阶段结合。</p>
+<table>
+<thead>
+<tr>
+<th>等级</th>
+<th>判定口径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>极高</td>
+<td>具有可信的在役/飞行中攻击路径，能够直接或级联造成灾难性飞行安全后果，且没有有效独立遏制/检测</td>
+</tr>
+<tr>
+<td>高</td>
+<td>可影响安全相关数据的真实性、时效或可用性，可能导致错误计算、危险降级或关键时序违约；路径或后果仍有条件约束</td>
+</tr>
+<tr>
+<td>中</td>
+<td>主要造成可检测的局部功能、维护或运行影响，或需要地面维护/特殊接触条件；存在独立冗余或安全降级</td>
+</tr>
+<tr>
+<td>低</td>
+<td>信息泄露、非关键数据异常或已被快速检测且不改变安全功能；仍需记录并防止与其他路径组合放大</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62">6.2 风险登记</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>初始等级</th>
+<th>主要判定</th>
+<th>加固后目标残余</th>
+<th>必须闭环的证据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AR-01</td>
+<td>高</td>
+<td>无来源认证，关键标签可被伪造</td>
+<td>低/中</td>
+<td>受控入口单发射源、MAC 验证、旁路测试</td>
+</tr>
+<tr>
+<td>AR-02</td>
+<td>高</td>
+<td>无新鲜度，捕获有效字可重放</td>
+<td>低/中</td>
+<td>序号回放、重启、双通道切换和时钟异常测试</td>
+</tr>
+<tr>
+<td>AR-03</td>
+<td>高</td>
+<td>奇偶可重算，恶意篡改可过格式检查</td>
+<td>低/中</td>
+<td>修改字/MAC 负例、密钥错误、标签字段覆盖测试</td>
+</tr>
+<tr>
+<td>AR-04</td>
+<td>高</td>
+<td>语义策略缺失时越界值进入消费者</td>
+<td>低/中</td>
+<td>基于真实 ICD 的范围、变化率、SSM、冗余交叉检查</td>
+</tr>
+<tr>
+<td>AR-05</td>
+<td>高</td>
+<td>无安全调度/隔离时连续发送拖延关键帧</td>
+<td>中</td>
+<td>总线占用、bus guardian、超时和故障隔离台架测试</td>
+</tr>
+<tr>
+<td>AR-06</td>
+<td>中</td>
+<td>双速率失配造成有效数据不可用</td>
+<td>低/中</td>
+<td>具体 LRU 两速率、容差、告警和降级测试</td>
+</tr>
+<tr>
+<td>AR-07</td>
+<td>低</td>
+<td>明文可观测并可辅助重放</td>
+<td>低</td>
+<td>线束/端口防护和受控边界信息泄露测试</td>
+</tr>
+</tbody>
+</table>
+<p>当前没有把任何条目直接判为“极高”，原因不是忽略其可能性，而是本实验没有提供具体型号的关键标签映射、故障传播链、飞行中暴露条件和独立保护失效证据。若型号级安全评估证明 AR-01/02/03/05 能直接导致灾难性功能后果，应按 [5][6] 的安全评估结果将相应条目升为极高，并提高验证独立性和审定要求。</p>
+<h2 id="7">7. 整体安全加固方案</h2>
+<h3 id="71">7.1 目标架构</h3>
+<pre><code class="language-text">合法 LRU / 受控数据源
+        |
+        | 受控输入（来源、通道、标签、序号、MAC）
+        v
+[安全终止网关：认证 / 新鲜度 / 语义 / 速率 / 告警]
+        |
+        | 仅允许网关作为发送源的原生 ARINC 429 输出
+        v
+多个受保护接收 LRU（FMS/显示/自动飞行等，具体以 ICD 为准）
+
+GSE ---- 经过身份认证、签名配置和维护模式授权 ----&gt; 网关
+</code></pre>
+<p>网关必须位于不可信维护/桥接输入和安全相关消费者之间，并且物理输出侧不能再提供未授权的注入点。若把网关放在普通网络上游，却允许攻击者从输出线束直接驱动接收端，认证控制可以被物理旁路，AR-01 和 AR-05 仍然成立。</p>
+<h3 id="72">7.2 控制项与航空适配</h3>
+<table>
+<thead>
+<tr>
+<th>控制</th>
+<th>实施要点</th>
+<th>解决的条目</th>
+<th>航空约束/验证要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>来源认证</td>
+<td>安全边界验证来源 ID、通道 ID、原生字、序号和时间戳的 MAC；多来源使用每源独立密钥或经批准的密钥派生</td>
+<td>AR-01/03</td>
+<td>MAC 是系统级外包，不是原生 32 位字字段；密码方案和失效状态进入项目审定基础</td>
+</tr>
+<tr>
+<td>防重放</td>
+<td>每个来源/标签/SDI/通道单调序号，持久化启动计数和回绕策略</td>
+<td>AR-02</td>
+<td>覆盖掉电、LRU 更换、双通道切换、维护模式和时间同步异常</td>
+</tr>
+<tr>
+<td>语义验证</td>
+<td>ICD 驱动范围、变化率、更新周期、SSM 状态机、冗余交叉源</td>
+<td>AR-04</td>
+<td>不在通用网关中硬编码未经安全分析的飞行限值；异常动作需与系统安全逻辑一致</td>
+</tr>
+<tr>
+<td>单发射端/物理隔离</td>
+<td>端口白名单、连接器封签、发送使能、物理分区、维护模式隔离、故障隔离</td>
+<td>AR-01/05/07</td>
+<td>必须验证绕过路径、短路/断线、维护插拔和单故障，不只做软件单元测试</td>
+</tr>
+<tr>
+<td>占用和更新监测</td>
+<td>监测字间隔、标签更新率、超时、异常突发、队列深度并告警/隔离</td>
+<td>AR-05/06</td>
+<td>监测器不能因告警洪泛影响安全任务；定义安全告警和维护告警优先级</td>
+</tr>
+<tr>
+<td>速率锁定</td>
+<td>只允许已批准配置，启动/维护时核对实际比特定时</td>
+<td>AR-06</td>
+<td>对 100 kbps、12.5 kbps、错误配置和恢复动作做目标 LRU 台架测试</td>
+</tr>
+<tr>
+<td>保密保护</td>
+<td>物理防护；必要时在跨域边界使用经批准的加密封装</td>
+<td>AR-07</td>
+<td>评估延迟、密钥不可用、故障降级、可维护性和不改写原生消费者接口</td>
+</tr>
+<tr>
+<td>密钥和配置生命周期</td>
+<td>制造/装机注入、轮换、撤销、零化、维护授权、审计</td>
+<td>AR-01/02/03</td>
+<td>与 DO-326A/DO-356A 安全过程和持续适航流程衔接</td>
+</tr>
+</tbody>
+</table>
+<h3 id="73">7.3 受控安全帧的实验定义</h3>
+<p>本实验使用如下外部封装，便于验证控制链：</p>
+<pre><code class="language-text">source | timestamp_ms | sequence | native_raw_word | HMAC-SHA-256 tag
+</code></pre>
+<p>这不是 ARINC 429 原生字的新格式。安全网关验证后才把 <code>native_raw_word</code> 输出到原生接收侧。代码中的密钥 <code>arinc429-lab-secret</code> 是单一合成来源的固定测试密钥，只为确定性实验；多来源装机不能共享该密钥，应使用每源独立密钥或经批准的密钥派生。实际系统应由安全架构确定算法、密钥层级、硬件保护、更新和失效策略，并完成独立验证。</p>
+<h2 id="8">8. 加固验证计划</h2>
+<table>
+<thead>
+<tr>
+<th>用例</th>
+<th>输入</th>
+<th>预期原生结果</th>
+<th>预期加固结果</th>
+<th>通过标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V-01 未授权来源</td>
+<td>合法标签/奇偶，未知 source</td>
+<td>可能接受</td>
+<td>拒绝并记录</td>
+<td>不得到达安全相关输出</td>
+</tr>
+<tr>
+<td>V-02 重放</td>
+<td>已接受帧再次提交</td>
+<td>接受</td>
+<td><code>replay</code> 拒绝</td>
+<td>不重复更新消费者状态</td>
+</tr>
+<tr>
+<td>V-03 过期</td>
+<td>合法认证帧超时提交</td>
+<td>无时效判断</td>
+<td><code>stale</code> 拒绝</td>
+<td>时钟误差在批准窗口内不误拒绝</td>
+</tr>
+<tr>
+<td>V-04 重算奇偶篡改</td>
+<td>改 Data、重算 parity、旧 MAC</td>
+<td>接受</td>
+<td><code>authentication</code> 拒绝</td>
+<td>任何受保护字段改变均失败</td>
+</tr>
+<tr>
+<td>V-05 语义越界</td>
+<td>超范围/超变化率/非法 SSM</td>
+<td>取决于 LRU</td>
+<td>策略拒绝或安全降级</td>
+<td>动作与真实 ICD/SSA 一致</td>
+</tr>
+<tr>
+<td>V-06 突发占用</td>
+<td>64 个连续攻击字</td>
+<td>合法帧延迟</td>
+<td>攻击帧隔离、合法帧满足预算</td>
+<td>5 ms 期限下合法帧不被该入口拖延</td>
+</tr>
+<tr>
+<td>V-07 速率失配</td>
+<td>100↔12.5 kbps</td>
+<td>数据无效/实现相关</td>
+<td>端口告警/隔离</td>
+<td>目标设备行为实测并留存波形</td>
+</tr>
+<tr>
+<td>V-08 旁路攻击</td>
+<td>直接接入网关输出侧</td>
+<td>不适用</td>
+<td>应由物理控制阻断/告警</td>
+<td>没有未授权第二发射路径</td>
+</tr>
+<tr>
+<td>V-09 恢复与重启</td>
+<td>网关掉电、序号回绕、密钥失效</td>
+<td>取决于 LRU</td>
+<td>fail-safe/fail-silent 或批准降级</td>
+<td>不接受旧会话帧，不产生误放行</td>
+</tr>
+</tbody>
+</table>
+<p>当前软件仿真已覆盖 V-01 至 V-07 的逻辑部分；V-08、V-09 以及真实 ICD 语义需要硬件在环或目标设备台架验证，不能用当前结果替代。</p>
+<h2 id="9">9. 适航与持续适航落地</h2>
+<ol>
+<li>以机型功能架构、ICD、标签分配表和数据流图建立资产清单；每个标签绑定消费者、更新周期、范围、冗余和故障动作。</li>
+<li>按 DO-326A/ED-202A 建立航空器系统信息安全过程：资产/威胁、脆弱性、风险、保护目标、验证证据和变更控制闭环[2]。</li>
+<li>按 DO-356A/ED-203A 选择与验证安全方法；本报告提出的认证网关、物理隔离、监测和反重放应转化为系统安全需求，而不是停留在“建议使用加密”[3]。</li>
+<li>对维护和在役变化按 DO-355/ED-204A 纳入持续适航：密钥撤销、GSE 版本、配置装载、事件日志、漏洞情报和异常报告[4]。</li>
+<li>用 ARP4754A、ARP4761A 及适用的机型安全评估流程分析错误数据、数据丢失和时延对功能的传播；DO-178C/DO-254 等软件/硬件保证活动是否适用，由项目审定基础决定[5][6]。</li>
+<li>向民航适航规章的设备系统安全要求映射时，应使用项目实际适用的 CCAR/局方审定基础；例如运输类飞机设备系统安全性不能仅以“实验脚本通过”替代适航符合性判断[7]。</li>
+</ol>
+<h2 id="10">10. 组合民航仿真平台接入记录</h2>
+<h3 id="101">10.1 组合关系和状态</h3>
+<p>本项目按“飞行动力学、空域/运行、航电总线、安全验证”分层搭建，不把任何单一开源项目误写成完整民航适航平台：</p>
+<pre><code class="language-text">JSBSim（可选飞行动力学）
+        |
+        v
+AircraftState -&gt; ARINC 429 sensor publisher -&gt; SecureGateway
+        |
+        +-- BlueSky/OpenAP：空域和交通场景适配边界
+        +-- FlightGear：可视化/驾驶舱适配边界
+        +-- PX4：仅作为 MAVLink HIL 目标适配边界
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>项目/模块</th>
+<th>本次状态</th>
+<th>可复现证据</th>
+<th>边界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>JSBSim 1.3.1</td>
+<td>已接入</td>
+<td><code>artifacts/civil_platform_jsbsim_30s.json</code></td>
+<td>使用公开研究模型和巡航初始条件，不是型号认证模型</td>
+</tr>
+<tr>
+<td>ARINC 429 安全实验</td>
+<td>已接入</td>
+<td><code>sim/arinc429_lab.py</code>、平台 trace</td>
+<td>模拟 32 位字和逻辑接收，不模拟电压/波形</td>
+</tr>
+<tr>
+<td>BlueSky</td>
+<td>未启动</td>
+<td>依赖库存中 <code>bluesky_python=false</code></td>
+<td>未安装完整导航数据；不宣称已完成空管联仿</td>
+</tr>
+<tr>
+<td>FlightGear</td>
+<td>未启动</td>
+<td><code>flightgear_binary=false</code></td>
+<td>当前环境无 <code>fgfs</code> 可执行文件</td>
+</tr>
+<tr>
+<td>PX4</td>
+<td>已完成本机软件联仿</td>
+<td><a href="../artifacts/px4_jsbsim_hil_results.json"><code>artifacts/px4_jsbsim_hil_results.json</code></a>、<a href="../artifacts/px4_jsbsim_hil_results.md"><code>artifacts/px4_jsbsim_hil_results.md</code></a>、<code>scripts/run_px4_jsbsim_hil.py</code></td>
+<td>PX4 为 POSIX/SITL 软件进程；仅使用 <code>127.0.0.1:4560</code>，不是实体飞控板或 ARINC 429 物理链路</td>
+</tr>
+</tbody>
+</table>
+<p>项目来源： <a href="https://github.com/JSBSim-Team/jsbsim">JSBSim</a>（LGPL-2.1，飞行动力学）、<a href="https://github.com/TUDelft-CNS-ATM/bluesky">BlueSky</a>（MIT，空中交通仿真）、<a href="https://github.com/FlightGear/flightgear">FlightGear</a>（GPL-2.0，飞行可视化）、<a href="https://github.com/junzis/openap">OpenAP</a>（LGPL-3.0，民航性能数据）和 <a href="https://github.com/PX4/PX4-Autopilot">PX4 Autopilot</a>（HITL 目标参考）。许可证和项目状态以各自仓库的固定提交/发布版本为准；本次平台没有把这些项目声称为适航软件。</p>
+<h3 id="102-jsbsim-arinc-429">10.2 JSBSim + ARINC 429 验证</h3>
+<p>运行命令：</p>
+<pre><code class="language-bash">PYTHONPATH=/tmp/civil_aviation_jsbsim_deps \
+python3 scripts/run_civil_platform.py \
+  --engine jsbsim --aircraft 737 --duration-s 30 --step-ms 1000 \
+  --attack injection --attack-at-ms 20000 \
+  --px4-root /home/starlight/winECode/PX4-Autopilot \
+  --output artifacts/civil_platform_jsbsim_30s.json \
+  --markdown-output artifacts/civil_platform_jsbsim_30s.md
+</code></pre>
+<p>本次运行使用 JSBSim 自带的 <code>737/cruise_init.xml</code> 研究初始条件，并执行 JSBSim 纵向配平以去除启动瞬态；外部采样周期为 1000 ms，内部积分步长按 JSBSim 模型的 8.33 ms 设置。正常流共输出 124 个合成 ARINC 429 帧，安全网关接受 124 个，拒绝 0 个。攻击时选择合成高度标签 <code>0o203</code>，构造奇偶有效但来源为 <code>attacker</code> 的数据字：简化原生接收端 <code>accepted=True</code>，受控网关 <code>accepted=False, reason=unauthorized_source</code>。</p>
+<p>这证明的是“飞行动力学状态能够进入本项目的航电安全验证链，并且攻击判定仍然有效”，不证明 737/A320 真实设备使用本实验标签，也不证明任何具体飞行控制功能可被该字直接影响。</p>
+<h3 id="103-px4-jsbsim-hil">10.3 PX4 + JSBSim 外部 HIL 风格软件联仿</h3>
+<p>PX4 源码副本 <code>/tmp/px4-source</code> 的提交为 <code>547e2caa9883</code>，原始
+<code>/home/starlight/winECode/PX4-Autopilot</code> 未被修改。桥接器启动 PX4
+<code>simulator_mavlink</code>，在本机 TCP 回环上发送 MAVLink <code>HIL_SENSOR</code> 和
+<code>HIL_GPS</code>，再接收 <code>HIL_ACTUATOR_CONTROLS</code>。运行命令为：</p>
+<pre><code class="language-bash">python3 scripts/run_px4_jsbsim_hil.py \
+  --duration-s 8 \
+  --output artifacts/px4_jsbsim_hil_results.json
+</code></pre>
+<p>2026-08-24 的 8 秒实测结果如下：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th style="text-align: right;">结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PX4 TCP 连接/心跳</td>
+<td style="text-align: right;"><code>True</code> / <code>1</code></td>
+</tr>
+<tr>
+<td>发送 <code>HIL_SENSOR</code></td>
+<td style="text-align: right;"><code>2000</code>（250 Hz）</td>
+</tr>
+<tr>
+<td>发送 <code>HIL_GPS</code></td>
+<td style="text-align: right;"><code>400</code>（50 Hz）</td>
+</tr>
+<tr>
+<td>接收 <code>HIL_ACTUATOR_CONTROLS</code></td>
+<td style="text-align: right;"><code>799</code></td>
+</tr>
+<tr>
+<td><code>COMMAND_LONG</code></td>
+<td style="text-align: right;"><code>1</code></td>
+</tr>
+<tr>
+<td>PX4 进程返回码</td>
+<td style="text-align: right;"><code>0</code></td>
+</tr>
+<tr>
+<td>正常关闭</td>
+<td style="text-align: right;"><code>True</code></td>
+</tr>
+</tbody>
+</table>
+<p>JSBSim 首状态为高度 <code>30000.17 ft</code>、真空速 <code>444.36 kt</code>、航向
+<code>225.00°</code>；末状态为高度 <code>30001.20 ft</code>、真空速 <code>444.33 kt</code>、航向
+<code>225.02°</code>。本次未发送解锁命令，PX4 执行器反馈为零，属于预期的安全默认状态。
+PX4 日志还记录了 <code>no heading reference</code> 和 <code>High Accelerometer Bias</code> 的
+预检提示，以及未启用的 <code>UXRCE_DDS_*</code> 参数提示；这些属于当前传感器模型和
+启动配置限制，不能写成攻击结论，也不能在正式型号验证中忽略。</p>
+<p>本项可以称为“JSBSim + PX4 SITL 外部 HIL 风格软件联仿”，因为两个真实软件
+进程已经完成输入、控制器处理和反馈闭环；不能称为真实飞控板 HITL。PX4 使用
+的 <code>5001_xplane_cessna172</code> 只是固定翼控制器配置，JSBSim <code>737</code> 是公开研究
+模型，两者都不是经批准的民航运输机航电/适航模型。完整机器可读结果和 Markdown
+记录分别见 [E3]。</p>
+<h3 id="104-arinc-429-lru">10.4 虚拟飞控板、ARINC 429 卡和 LRU 联仿</h3>
+<p>为在没有实体设备时验证物理接口的控制边界，本项目增加了明确命名和参数化
+的软件硬件模型：</p>
+<pre><code class="language-text">JSBSim 737
+    |
+    v
+SecureGateway -- 未授权/重放/篡改帧在此拒绝
+    |
+    v
+V429-LAB-2T4R 虚拟 ARINC 429 卡
+    | 100 kbps, 32 bit, 4 bit interword gap, 64-word TX FIFO
+    v
+SYNTHETIC_AIR_DATA_LRU（合成 ICD，标签 0o203/0o210/0o211/0o212）
+    |
+    v
+PX4-FMU-VIRTUAL（HIL 状态端点，默认不解锁、零执行器输出）
+</code></pre>
+<p>运行命令：</p>
+<pre><code class="language-bash">PYTHONPATH=/tmp/civil_aviation_jsbsim_deps \
+python3 scripts/run_virtual_hardware_lab.py \
+  --engine jsbsim --duration-s 2 --step-ms 20 --attack none \
+  --output artifacts/virtual_hardware_lab_results.json
+</code></pre>
+<p>2026-08-24 使用 JSBSim 1.3.1 <code>737</code> 研究模型完成的正常场景结果为：404 个
+合成 ARINC 字经网关放行并由虚拟卡发送，虚拟 LRU 接受 404 个；虚拟飞控板
+收到 101 个 HIL_SENSOR、21 个 HIL_GPS，产生 101 个执行器反馈，失效状态为
+0；解锁请求被拒绝，执行器保持全零。</p>
+<p>攻击复测结果：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>直接送入虚拟 LRU</th>
+<th>安全网关</th>
+<th>虚拟卡/安全输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>未授权注入</td>
+<td>接受 <code>accepted</code></td>
+<td>拒绝 <code>unauthorized_source</code></td>
+<td>不输出加固帧</td>
+</tr>
+<tr>
+<td>重放</td>
+<td>接受 <code>accepted</code></td>
+<td>拒绝 <code>replay</code></td>
+<td>不输出加固帧</td>
+</tr>
+<tr>
+<td>修改数据并重算奇偶</td>
+<td>接受 <code>accepted</code>，<code>parity_valid=True</code></td>
+<td>拒绝 <code>authentication</code></td>
+<td>不输出加固帧</td>
+</tr>
+<tr>
+<td>100 kbps 卡对 12.5 kbps LRU</td>
+<td>拒收 <code>rate_mismatch</code></td>
+<td>网关仍可放行数字字</td>
+<td>飞控无传感器输入并进入安全状态</td>
+</tr>
+<tr>
+<td>64 字突发占线</td>
+<td>接受 64 个</td>
+<td>拒绝 64 个</td>
+<td>不输出加固帧</td>
+</tr>
+</tbody>
+</table>
+<p>机器可读记录为 <code>artifacts/virtual_hardware_lab_*.json</code>，归档记录为对应的
+<code>.md</code> 文件；实现位于 <code>sim/virtual_hardware.py</code>、<code>sim/virtual_hardware_lab.py</code>
+和 <code>scripts/run_virtual_hardware_lab.py</code>。本项证明的是数字接口、FIFO/时序、
+LRU 逻辑和 HIL 状态机的闭环，不证明电压幅度、阻抗、端接、EMI、USB/PCIe
+SDK、PX4 MCU 中断/PWM、真实 LRU 行为或真实飞机安全性。</p>
+<h3 id="105">10.5 接入下一步</h3>
+<ol>
+<li>使用 BlueSky/OpenAP 生成经批准的空域、航路、交通冲突场景，再通过明确的状态接口送入本平台；空管场景和机载总线安全场景分别记录时间基准和数据来源。</li>
+<li>在 FlightGear 启动后增加只读可视化适配器，用于显示 JSBSim 状态；显示进程不能成为安全网关的隐式可信输入。</li>
+<li>当前已完成 <code>AircraftState</code> 到 PX4 MAVLink HIL 消息的研究适配；下一步应对单位、坐标系、时间戳和失效语义做目标设备台架复核，PX4 不能代替民航运输机航电 LRU。</li>
+<li>真实 ARINC 429 HIL 需要经批准的接口卡或 FPGA/电气收发器，并增加字间隔、速率、端接、波形、EMI、断线、短路和单发射端故障测试。</li>
+</ol>
+<h2 id="11_1">11. 结论</h2>
+<p>ARINC 429 原生机制适合定义和传输机载数据，但奇偶校验、标签、SDI 和 SSM 不提供密码学来源认证、抗重放、保密性或安全调度。通过本地仿真可以复现具体、可观察的边界：格式正确的未授权帧、重放帧、重算奇偶篡改帧和语义越界帧均可被简化原生接收端接受；增加受控安全入口后，来源、MAC、新鲜度、语义和入口限速控制分别拒绝对应输入。</p>
+<p>整改不能只加一个软件过滤器。民用航空可落地的方案必须把物理单发射端约束、维护/GSE 隔离、网关认证、反重放、ICD 语义策略、占用监测、速率锁定、密钥生命周期和安全/适航验证组合起来。当前结果足以作为协议层风险证明和加固方案的逻辑回归证据；要形成型号级结论，还需补充真实 LRU/ICD、目标标签安全评估、硬件波形/EMI、旁路路径、故障隔离和适航过程证据。</p>
+<h2 id="_2">参考来源</h2>
+<blockquote>
+<p>标准为受版权保护的正式资料；正式参赛提交应使用队伍可获得的正式版本、记录版本号/修订号和对应章节页码。下列编号标明本报告各论断的来源类别；实验数字来自项目自身证据 [E1]，不是外部标准声称的测试结果。</p>
+</blockquote>
+<p><strong>[1]</strong> ARINC Specification 429P1-18, <em>Digital Information Transfer System (DITS), Part 1: Functional Description, Electrical Characteristics, Label Assignment, and Word Formats</em>, Airlines Electronic Engineering Committee/SAE，采用项目持有的正式版本核对字段、速率、电气和传输约束。</p>
+<p><strong>[2]</strong> RTCA DO-326A / EUROCAE ED-202A, <em>Airworthiness Security Process Specification</em>，用于航空器信息安全过程、威胁/风险和安全需求闭环。</p>
+<p><strong>[3]</strong> RTCA DO-356A / EUROCAE ED-203A, <em>Airworthiness Security Methods and Considerations</em>，用于航空器系统安全保护方法、验证和架构控制。</p>
+<p><strong>[4]</strong> RTCA DO-355 / EUROCAE ED-204A, <em>Information Security Guidance for Continuing Airworthiness</em>，用于维护、运行、配置、事件和漏洞响应的持续适航活动。</p>
+<p><strong>[5]</strong> SAE ARP4754A, <em>Guidelines for Development of Civil Aircraft and Systems</em>，用于系统功能、需求、架构和开发保证活动的接口说明。</p>
+<p><strong>[6]</strong> SAE ARP4761A, <em>Guidelines and Methods for Conducting the Safety Assessment Process on Civil Airborne Systems and Equipment</em>，用于把数据完整性/可用性异常映射到功能危害和安全评估；不把它当作网络安全标准。</p>
+<p><strong>[7]</strong> 中国民用航空适用的运输类飞机适航标准 CCAR-25（项目适用修订版）第 25.1309 条“设备、系统及安装”，用于说明系统安全后果和审定基础必须按型号/项目确定；具体符合性方法应以局方批准的审定基础和项目文件为准。</p>
+<p><strong>[8]</strong> H. Krawczyk, M. Bellare, R. Canetti, RFC 2104, <em>HMAC: Keyed-Hashing for Message Authentication</em>, IETF，https://www.rfc-editor.org/rfc/rfc2104 。仅作为实验封装的密码学原语来源，不表示该实验密钥或算法配置可直接装机。</p>
+<p><strong>[9]</strong> NIST FIPS 180-4, <em>Secure Hash Standard (SHS)</em>，https://csrc.nist.gov/pubs/fips/180-4/upd1/final 。用于说明实验所用 SHA-256 哈希的公开算法来源；实际机载密码配置仍须按项目批准的安全架构确定。</p>
+<p><strong>[E1]</strong> 本项目本地证据：<code>sim/arinc429_lab.py</code>、<code>tests/test_arinc429_lab.py</code>、<code>scripts/run_experiments.py</code>、<code>artifacts/results.json</code> 和 <code>artifacts/experiment_log.md</code>。基础实验运行命令为 <code>python3 -m pytest -q</code> 与 <code>python3 scripts/run_experiments.py</code>；基础测试记录为 14 passed，当前包含虚拟硬件测试的全量回归为 28 passed。</p>
+<p><strong>[E2]</strong> 本项目组合平台证据：<code>sim/civil_aviation_platform.py</code>、<code>scripts/run_civil_platform.py</code>、<code>artifacts/civil_platform_jsbsim_30s.json</code> 和 <code>artifacts/civil_platform_jsbsim_30s.md</code>。外部项目来源为 JSBSim-Team/jsbsim、TUDelft-CNS-ATM/bluesky、FlightGear/flightgear 和 PX4 文档；本次 JSBSim 运行使用隔离的 <code>/tmp</code> 依赖目录，未打开网络或串口。</p>
+<p><strong>[E3]</strong> 本项目 PX4 + JSBSim 软件联仿证据：<code>scripts/run_px4_jsbsim_hil.py</code>、<code>artifacts/px4_jsbsim_hil_results.json</code> 和 <code>artifacts/px4_jsbsim_hil_results.md</code>。证据记录 PX4 SITL 与 JSBSim 737 在 <code>127.0.0.1:4560</code> 上的 MAVLink HIL 消息计数、PX4 返回码和边界声明；不包含真实飞控板、ARINC 429 电气波形、真实 ICD 或适航符合性结论。</p>
+<p><strong>[E4]</strong> 本项目虚拟硬件联仿证据：<code>sim/virtual_hardware.py</code>、<code>sim/virtual_hardware_lab.py</code>、<code>scripts/run_virtual_hardware_lab.py</code>、<code>tests/test_virtual_hardware.py</code> 和 <code>artifacts/virtual_hardware_lab_*.json/.md</code>。JSBSim 737 正常场景输出 404 个合成字；注入、重放、重算奇偶、速率失配和 64 字突发场景均有独立机器可读记录。该证据是数字模型结果，不是实体接口卡、实体飞控板、真实 LRU 或物理波形证据。</p></body>
+</html>

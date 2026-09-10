@@ -1,0 +1,119 @@
+{
+  "checks": {
+    "fresh_model_results_match_artifact": true,
+    "full_regression_command_passes": true,
+    "hash_manifest_created": true,
+    "report_reference_mapping_complete": true,
+    "required_regression_command_passes": true,
+    "traceability_paths_resolve": true
+  },
+  "commands": {
+    "experiment": "python3 scripts/run_atg5g_experiments.py",
+    "focused_tests": "python3 -m pytest -q tests/test_atg5g_lab.py",
+    "render": "python3 scripts/render_report.py",
+    "verification": "python3 scripts/verify_atg5g_evidence.py"
+  },
+  "file_manifest": {
+    "artifacts/5g_atg_experiment_log.md": {
+      "bytes": 4553,
+      "lines": 78,
+      "path": "artifacts/5g_atg_experiment_log.md",
+      "sha256": "d6224ec824cf14cfa4ad0b01eb832260d2683889df31780537bc204018209920"
+    },
+    "artifacts/5g_atg_results.json": {
+      "bytes": 14206,
+      "lines": 440,
+      "path": "artifacts/5g_atg_results.json",
+      "sha256": "6cf3967bd777375b1a58f0a26c241b57bd74fe65f07a38c9ce0584d35ae8efbb"
+    },
+    "artifacts/5g_atg_security_report.html": {
+      "bytes": 74229,
+      "lines": 839,
+      "path": "artifacts/5g_atg_security_report.html",
+      "sha256": "7c8c1f6a0790a1eaef4458e9bf3b817a89ae74ad6e409a2a862a285511cef71e"
+    },
+    "report/5g_atg_security_report.md": {
+      "bytes": 62396,
+      "lines": 556,
+      "path": "report/5g_atg_security_report.md",
+      "sha256": "2472f97df3051411727199123a37af056cf5e833c0c804a1ce5bb2873624c7e4"
+    },
+    "report/5g_atg_traceability.json": {
+      "bytes": 36260,
+      "lines": 466,
+      "path": "report/5g_atg_traceability.json",
+      "sha256": "24895b1534e7a5429100cb089193b6cec7ee7d69a2e077944c32bd9cccba6a16"
+    },
+    "report/5g_atg_traceability_matrix.md": {
+      "bytes": 24057,
+      "lines": 113,
+      "path": "report/5g_atg_traceability_matrix.md",
+      "sha256": "6488cf1ef46b29f1534d42314cd98c40d848b3c470418a43809dcaa0fea6bd90"
+    },
+    "scripts/render_atg5g_traceability.py": {
+      "bytes": 5990,
+      "lines": 129,
+      "path": "scripts/render_atg5g_traceability.py",
+      "sha256": "0ce8be2e1d0005078a2f2dd193ae7aa20ccc70c625c789e80b3495833f7cc3cd"
+    },
+    "scripts/render_report.py": {
+      "bytes": 2719,
+      "lines": 58,
+      "path": "scripts/render_report.py",
+      "sha256": "0926d039d7bcfd2bab483df81c395561eb0ca1df9ef0cd92da0934164abd2f5c"
+    },
+    "scripts/run_atg5g_experiments.py": {
+      "bytes": 8623,
+      "lines": 171,
+      "path": "scripts/run_atg5g_experiments.py",
+      "sha256": "e903e781fb56352741403c84e73578f7518d5f93d42b3abfd46e6bef0317810c"
+    },
+    "scripts/verify_atg5g_evidence.py": {
+      "bytes": 11939,
+      "lines": 264,
+      "path": "scripts/verify_atg5g_evidence.py",
+      "sha256": "467b7d0d9fa4a81411a32a4bb6725052d78a883a7d4a786fa6c8f1dbf2b06a26"
+    },
+    "sim/atg5g_lab.py": {
+      "bytes": 35793,
+      "lines": 917,
+      "path": "sim/atg5g_lab.py",
+      "sha256": "0c674732490ddc933e9f7e60f4313b136f0502228fb5d9de18e9c6a1e6bf15b4"
+    },
+    "tests/test_atg5g_lab.py": {
+      "bytes": 3877,
+      "lines": 90,
+      "path": "tests/test_atg5g_lab.py",
+      "sha256": "2dfc843cfd6d4091ee7b7f052c109bf2c2a5c591841e8ca2d42ed2fc67dfa864"
+    }
+  },
+  "focused_test_stderr": "",
+  "focused_test_stdout": "........                                                                 [100%]\n8 passed in 0.02s",
+  "full_test_stderr": "",
+  "full_test_stdout": ".............................................                            [100%]\n45 passed in 0.07s",
+  "matrix_counts": {
+    "normative": 6,
+    "quantitative": 11,
+    "scenario": 16
+  },
+  "platform": "Linux-7.1.9-zen1-2-zen-x86_64-with-glibc2.44",
+  "python": "3.14.7",
+  "runner_recorded_verification": {
+    "focused": {
+      "command": "/home/starlight/CtfTools/PwnVenv/bin/python3 -m pytest -q tests/test_atg5g_lab.py",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": "........                                                                 [100%]\n8 passed in 0.02s"
+    },
+    "full": {
+      "command": "/home/starlight/CtfTools/PwnVenv/bin/python3 -m pytest -q",
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ".............................................                            [100%]\n45 passed in 0.09s"
+    }
+  },
+  "schema_version": "1.0",
+  "self_hash_exclusion": "The provenance JSON and verification log are excluded from the hash manifest because they contain the manifest itself.",
+  "status": "passed",
+  "verified_at_utc": "2026-08-24T09:14:30.911247+00:00"
+}

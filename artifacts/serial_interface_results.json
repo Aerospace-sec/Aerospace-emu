@@ -1,0 +1,269 @@
+{
+  "environment": {
+    "model_sha256": "b0c338abfc2e4f81068c214ee49b1eaa2d5d66d89edc4847fcb1f078e1a23497",
+    "platform": "Linux-7.1.9-zen1-2-zen-x86_64-with-glibc2.44",
+    "python": "3.14.7"
+  },
+  "results": {
+    "attacks": {
+      "airborne_maintenance": {
+        "direct_native": {
+          "accepted": true,
+          "reason": "accepted"
+        },
+        "hardened_gateway": {
+          "accepted": false,
+          "reason": "maintenance_not_available"
+        }
+      },
+      "flood": {
+        "attacker_frames": 64,
+        "deadline_ms": 20.0,
+        "hardened_attacker_rejected": 64,
+        "hardened_deadline_missed": false,
+        "hardened_legal_admitted": true,
+        "hardened_legal_start_ms": 0.0,
+        "native_attacker_accepted": 64,
+        "native_deadline_missed": true,
+        "native_legal_effect": "bite_log_read:0",
+        "native_legal_start_ms": 72.22222222222223
+      },
+      "injection": {
+        "hardened": {
+          "accepted": false,
+          "effect": "no_physical_output",
+          "reason": "unauthorized_source"
+        },
+        "native": {
+          "accepted": true,
+          "effect": "air_data_updated:500ft@100ms",
+          "reason": "accepted",
+          "state_after": {
+            "airspeed_kt": 80,
+            "altitude_ft": 500,
+            "valid": true
+          }
+        },
+        "wire": {
+          "baud_rate": 115200,
+          "direction": "ADC_LRU->FMS_DISPLAY_LRU",
+          "end_ms": 105.208333,
+          "fault": null,
+          "length_bytes": 60,
+          "link": "RS422-AVIONICS-LRU",
+          "raw_hex": "7e01400000038400317b2261697273706565645f6b74223a38302c22616c7469747564655f6674223a3530302c2276616c6964223a747275657dfa7b",
+          "requested_ms": 100,
+          "start_ms": 100.0,
+          "wire_duration_ms": 5.208333
+        }
+      },
+      "physical_tap_and_capture": {
+        "captured_length_bytes": 63,
+        "captured_raw_hex": "7e01400000000100347b2261697273706565645f6b74223a3434302c22616c7469747564655f6674223a33303030302c2276616c6964223a747275657d5a87",
+        "confidentiality": false,
+        "decoded_message_type": "AIR_DATA_UPDATE",
+        "decoded_payload": {
+          "airspeed_kt": 440,
+          "altitude_ft": 30000,
+          "valid": true
+        },
+        "direction": "ADC_LRU->FMS_DISPLAY_LRU",
+        "link": "RS422-AVIONICS-LRU"
+      },
+      "replay": {
+        "first_hardened": {
+          "accepted": true,
+          "reason": "accepted"
+        },
+        "hardened": {
+          "accepted": false,
+          "effect": "no_physical_output",
+          "reason": "replay"
+        },
+        "native": {
+          "accepted": true,
+          "effect": "air_data_updated:30000ft@300ms",
+          "reason": "accepted"
+        },
+        "wire": {
+          "baud_rate": 115200,
+          "direction": "ADC_LRU->FMS_DISPLAY_LRU",
+          "end_ms": 305.46875,
+          "fault": null,
+          "length_bytes": 63,
+          "link": "RS422-AVIONICS-LRU",
+          "raw_hex": "7e01400000000100347b2261697273706565645f6b74223a3434302c22616c7469747564655f6674223a33303030302c2276616c6964223a747275657d5a87",
+          "requested_ms": 300,
+          "start_ms": 300.0,
+          "wire_duration_ms": 5.46875
+        }
+      },
+      "tamper_recomputed_crc": {
+        "crc_valid_after_tamper": true,
+        "hardened": {
+          "accepted": false,
+          "effect": "no_physical_output",
+          "reason": "authentication"
+        },
+        "native": {
+          "accepted": true,
+          "effect": "air_data_updated:1000ft@200ms",
+          "reason": "accepted"
+        },
+        "wire": {
+          "baud_rate": 115200,
+          "direction": "ADC_LRU->FMS_DISPLAY_LRU",
+          "end_ms": 205.295139,
+          "fault": null,
+          "length_bytes": 61,
+          "link": "RS422-AVIONICS-LRU",
+          "raw_hex": "7e01400000000100327b2261697273706565645f6b74223a39302c22616c7469747564655f6674223a313030302c2276616c6964223a747275657d9d82",
+          "requested_ms": 200,
+          "start_ms": 200.0,
+          "wire_duration_ms": 5.295139
+        }
+      }
+    },
+    "interfaces": {
+      "rs232": {
+        "baud_rate": 115200,
+        "connector_scope": "ground_maintenance_connector",
+        "cryptographic_authentication": false,
+        "cryptographic_confidentiality": false,
+        "differential": false,
+        "frame_bits": 10,
+        "full_duplex": true,
+        "independent_signal_pairs": 1,
+        "name": "RS232-GSE-MAINT",
+        "standard": "TIA-232-F",
+        "termination_required": false,
+        "uart_format": "8N1"
+      },
+      "rs422": {
+        "baud_rate": 115200,
+        "connector_scope": "aircraft_equipment_interconnect",
+        "cryptographic_authentication": false,
+        "cryptographic_confidentiality": false,
+        "differential": true,
+        "frame_bits": 10,
+        "full_duplex": true,
+        "independent_signal_pairs": 2,
+        "name": "RS422-AVIONICS-LRU",
+        "standard": "TIA-422-B",
+        "termination_required": true,
+        "uart_format": "8N1"
+      }
+    },
+    "limitations": [
+      "RS-232/RS-422 profiles model digital framing and timing only; no voltage, common-mode, impedance, termination, EMI, ESD, cable fault, or transceiver behavior is measured.",
+      "The frame format, command codes, LRU names, payload ranges, and maintenance effects are synthetic project ICD data, not a real aircraft ICD.",
+      "CRC-16 is modeled as transmission-error detection; it is not source authentication, authorization, confidentiality, or anti-replay protection.",
+      "The lab does not open /dev/tty devices and does not connect to an aircraft, certified LRU, or maintenance GSE."
+    ],
+    "model": {
+      "command_codes": {
+        "AIR_DATA_UPDATE": "0x40",
+        "BITE_LOG_READ": "0x11",
+        "BITE_LOG_RESPONSE": "0x12",
+        "CLEAR_BITE_LOG": "0x31",
+        "LOAD_CONFIGURATION": "0x30",
+        "NAV_REFERENCE_UPDATE": "0x41",
+        "SET_MAINTENANCE_MODE": "0x20"
+      },
+      "crc": "CRC-16/CCITT-FALSE",
+      "max_payload_bytes": 2048,
+      "synthetic_frame": "SYNC|VERSION|TYPE|SEQUENCE|LENGTH|JSON_PAYLOAD|CRC16"
+    },
+    "normal": {
+      "rs232": {
+        "clear_log_direct_receiver": {
+          "accepted": true,
+          "effect": "bite_log_cleared",
+          "reason": "accepted"
+        },
+        "clear_log_gateway": {
+          "accepted": true,
+          "reason": "accepted"
+        },
+        "configuration_mismatch": {
+          "accepted": false,
+          "reason": "rate_mismatch",
+          "receiver_expected_baud_rate": 115200,
+          "sender_baud_rate": 9600,
+          "wire": {
+            "baud_rate": 9600,
+            "direction": "GSE_LAPTOP->AIR_DATA_LRU",
+            "end_ms": 13.541667,
+            "fault": null,
+            "length_bytes": 13,
+            "link": "RS232-GSE-MAINT",
+            "raw_hex": "7e01110000006300027b7d0988",
+            "requested_ms": 0,
+            "start_ms": 0.0,
+            "wire_duration_ms": 13.541667
+          }
+        },
+        "full_duplex": {
+          "a_to_b_start_ms": 0.0,
+          "b_to_a_start_ms": 0.0,
+          "independent_direction_clocks": true,
+          "same_requested_ms": true
+        },
+        "maintenance_direct_receiver": {
+          "accepted": true,
+          "effect": "configuration_loaded:CAL-ATTACK",
+          "reason": "accepted"
+        },
+        "maintenance_gateway": {
+          "accepted": true,
+          "reason": "accepted"
+        }
+      },
+      "rs422": {
+        "effect": "air_data_updated:30000ft@0ms",
+        "gateway": {
+          "accepted": true,
+          "reason": "accepted"
+        },
+        "receiver": {
+          "accepted": true,
+          "reason": "accepted"
+        },
+        "wire": {
+          "baud_rate": 115200,
+          "direction": "ADC_LRU->FMS_DISPLAY_LRU",
+          "end_ms": 5.46875,
+          "fault": null,
+          "length_bytes": 63,
+          "link": "RS422-AVIONICS-LRU",
+          "raw_hex": "7e01400000000100347b2261697273706565645f6b74223a3434302c22616c7469747564655f6674223a33303030302c2276616c6964223a747275657d5a87",
+          "requested_ms": 0,
+          "start_ms": 0.0,
+          "wire_duration_ms": 5.46875
+        }
+      }
+    },
+    "state": {
+      "rs232_receiver": {
+        "bite_log_entries": 0,
+        "calibration_id": "CAL-ATTACK",
+        "calibration_offset_ft": 500,
+        "last_air_data": null,
+        "last_nav_reference": null,
+        "maintenance_mode": false
+      },
+      "rs422_receiver": {
+        "bite_log_entries": 12,
+        "calibration_id": "BASELINE",
+        "calibration_offset_ft": 0,
+        "last_air_data": {
+          "airspeed_kt": 440,
+          "altitude_ft": 30000,
+          "valid": true
+        },
+        "last_nav_reference": null,
+        "maintenance_mode": false
+      }
+    }
+  }
+}

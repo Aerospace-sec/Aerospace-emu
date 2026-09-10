@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>链路三：地面网络接入型攻击链分析报告</title><style>
+@page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+* { box-sizing: border-box; }
+body { color: #17202a; font-family: "Noto Serif CJK SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; font-size: 10.5pt; line-height: 1.65; margin: 0 auto; max-width: 920px; }
+h1 { border-bottom: 2px solid #123b5d; color: #123b5d; font-size: 22pt; line-height: 1.25; margin: 0 0 18px; padding-bottom: 10px; }
+h2 { border-bottom: 1px solid #7c9ab2; color: #123b5d; font-size: 15pt; margin-top: 26px; padding-bottom: 4px; }
+h3 { color: #234e70; font-size: 12.5pt; margin-top: 20px; }
+p { text-align: justify; }
+table { border-collapse: collapse; font-size: 9pt; margin: 12px 0 18px; width: 100%; }
+th { background: #eaf1f6; color: #123b5d; font-weight: 700; }
+th, td { border: 1px solid #b6c4ce; padding: 5px 6px; vertical-align: top; }
+code { background: #eef2f4; border-radius: 2px; padding: 1px 3px; }
+pre { background: #17202a; color: #f2f6f8; overflow-wrap: anywhere; padding: 10px; white-space: pre-wrap; }
+blockquote { border-left: 4px solid #7c9ab2; color: #455a64; margin-left: 0; padding-left: 12px; }
+li { margin-bottom: 4px; }
+hr { border: 0; border-top: 1px solid #c8d1d8; }
+@media print { a { color: inherit; text-decoration: none; } h2, h3 { break-after: avoid; } table { break-inside: avoid; } }
+</style></head>
+<body><h1 id="_1">链路三：地面网络接入型攻击链分析与验证报告</h1>
+<p><strong>题目：</strong> 民航地面网络接入型攻击链（链路三）<br>
+<strong>版本：</strong> 1.0<br>
+<strong>日期：</strong> 2026-09-11<br>
+<strong>结论性质：</strong> 本地数字模型复核、既有报告记载与工程推演的组合；不构成真实飞机、机场生产网、运营商5GC或适航结论。</p>
+<h2 id="_2">摘要与结论</h2>
+<p>本链路讨论的不是“进入互联网即可进入飞机”，而是一个有条件的跨域路径：攻击者先取得地面保障网络、供应商维护跳板、5GC OAM/OSS或串口服务器管理面的初始权限，再利用错误的管理授权、路由/DNN/切片策略或串行桥接配置，把数据送入地面应用、维护边界或协议网关，最终影响机载数据消费者、维护放行数据或地面运行系统。</p>
+<p>最小可行攻击链为：</p>
+<pre><code class="language-text">G3 地面网络初始权限
+  -&gt; G4 供应商跳板/OAM/串口服务器
+  -&gt; G5 核心网、网关路由或维护策略变更
+  -&gt; G6 N6/维护应用过度信任
+  -&gt; G7 串行/ARINC 429 跨协议网关
+  -&gt; G8 机载数据消费者、维护放行数据或地面运行系统
+</code></pre>
+<p><strong>结论：</strong> 最危险的共同节点是管理平面到跨域出口的授权变更（G5），而不是初始进入地面网络本身。若 G5 被 RBAC、mTLS、双人审批、签名配置、不可绕过的边界网关和变更审计阻断，后续节点不可达。若真实系统只提供只读监视代理、没有向航电或维护执行面输出，影响应从“极高/高”降级；若存在可写的协议网关且下游消费者缺少来源认证，风险可升高。</p>
+<p>本报告复用以下本地证据：</p>
+<ul>
+<li>5G-ATG：OAM 路由变更、DNN/TEID/QFI 会话绑定、N6 用户面篡改/重放、客舱到航电边界；见 <code>artifacts/5g_atg_results.json</code>、<code>report/5g_atg_security_report.md</code>。</li>
+<li>串行接口：RS-232 维护命令、重算 CRC 篡改、重放、波特率失配、突发占线；见 <code>artifacts/serial_interface_results.json</code>、<code>report/serial_interface_security_report.md</code>。</li>
+<li>ARINC 429：未授权来源、重放、重算奇偶、连续占线、速率失配；见 <code>artifacts/results.json</code>、<code>report/arinc429_security_report.md</code>。</li>
+</ul>
+<p>这些证据证明合成模型中的状态判定，不证明任何真实机型存在该路径或已经被攻破。</p>
+<h2 id="1">1. 民航业务场景、资产与最终破坏目标</h2>
+<h3 id="11">1.1 场景</h3>
+<p>分析对象是航空公司/机场保障组织、供应商维护组织与专属5G-ATG地面核心网共同支撑的航班运行和持续适航数据链。典型业务包括：航班运行监视、机务遥测回传、故障记录读取、配置/校准装载、维护放行数据生成，以及经严格隔离的机载数据消费者输入。</p>
+<p>最终目标按影响递增排列：</p>
+<ol>
+<li>伪造或延迟航班运行监视、机务遥测和告警数据；</li>
+<li>篡改、重放或清除维护记录，使放行判断和故障定位失真；</li>
+<li>通过跨协议网关向合成机载数据消费者提交未授权数据；</li>
+<li>在真实 ICD 证明下，影响安全相关计算输入。当前项目没有证明第4项对具体飞机成立。</li>
+</ol>
+<h3 id="12">1.2 资产与域</h3>
+<table>
+<thead>
+<tr>
+<th>资产</th>
+<th>所属域</th>
+<th>接口/协议</th>
+<th>保护属性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>企业/互联网入口</td>
+<td>企业网/外部域</td>
+<td>IP、VPN、身份服务</td>
+<td>身份、边界、审计</td>
+</tr>
+<tr>
+<td>地面保障工作站和串口服务器</td>
+<td>保障网</td>
+<td>SSH/管理API/RS-232桥</td>
+<td>最小权限、设备身份、命令授权</td>
+</tr>
+<tr>
+<td>供应商跳板</td>
+<td>供应商维护域</td>
+<td>受控远程维护协议</td>
+<td>强认证、审批、会话记录</td>
+</tr>
+<tr>
+<td>AMF/SMF/UPF及OAM/OSS</td>
+<td>5GC/OAM域</td>
+<td>N2/N3/N4/N6、管理面</td>
+<td>配置完整性、路由隔离、变更控制</td>
+</tr>
+<tr>
+<td>N6应用与运行监视</td>
+<td>地面业务域</td>
+<td>应用消息、TLS/消息认证</td>
+<td>来源、飞机/会话绑定、抗重放</td>
+</tr>
+<tr>
+<td>客舱/航电边界网关</td>
+<td>机载跨域域</td>
+<td>白名单代理/单向通道</td>
+<td>默认拒绝、方向、字段和速率</td>
+</tr>
+<tr>
+<td>串行/A429桥接器</td>
+<td>维护/航电接口域</td>
+<td>RS-232/422、ARINC 429</td>
+<td>物理使能、来源认证、ICD语义</td>
+</tr>
+<tr>
+<td>机载数据消费者和放行数据</td>
+<td>航电/持续适航域</td>
+<td>合成项目ICD</td>
+<td>真实性、完整性、新鲜度、可追溯性</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2">2. 完整系统架构与信任边界</h2>
+<h3 id="21">2.1 系统架构图</h3>
+<pre><code class="language-text"> [互联网/企业网]
+        |
+ B0 外部边界：身份、VPN、入口ACL
+        v
+ [地面保障网络] ---- [机场/航空公司运维SOC]
+        |                         |
+ B1 保障边界：跳板白名单、终端态势、工单授权
+        v                         v
+ [供应商维护跳板] ---- [5GC OAM/OSS]
+        |                         |
+ B2 管理边界：mTLS/RBAC/双人审批/签名配置/审计
+        v                         v
+ [串口服务器/GSE]       [AMF-SMF-UPF/N4]
+        |                         |
+ B3 接口边界：端口使能/维护状态/命令授权      [N3/GTP-U]
+        |                         |
+        +------------&gt; [N6应用/运行监视/机务平台]
+                              |
+                       B4 业务边界：飞机、会话、消息认证、重放防护
+                              v
+                      [客舱/维护/航电跨域网关]
+                              |
+                       B5 航电边界：默认拒绝、单向/只读/字段白名单
+                              v
+                 [串行桥] ---- [ARINC 429 TX/RX]
+                              |
+                              v
+                 [机载数据消费者/维护放行数据]
+</code></pre>
+<h3 id="22">2.2 信任边界说明</h3>
+<table>
+<thead>
+<tr>
+<th>边界</th>
+<th>不得直接继承的信任</th>
+<th>必须独立验证</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B0 互联网/企业网→保障网</td>
+<td>网络可达不等于维护身份</td>
+<td>用户、设备、工单、终端状态</td>
+</tr>
+<tr>
+<td>B1 保障网→供应商/OAM</td>
+<td>内部账号不等于变更授权</td>
+<td>角色、时间窗、审批、命令范围</td>
+</tr>
+<tr>
+<td>B2 OAM→5GC路由</td>
+<td>专属核心网不等于逻辑隔离</td>
+<td>配置签名、DNN/S-NSSAI/UPF绑定、回滚</td>
+</tr>
+<tr>
+<td>B3 维护网络→串口服务器</td>
+<td>能登录服务器不等于能驱动端口</td>
+<td>端口、方向、地面状态、命令白名单</td>
+</tr>
+<tr>
+<td>B4 N6→业务应用</td>
+<td>源IP、TEID、QFI不等于消息来源</td>
+<td>飞机/会话/序号/时间/MAC或签名</td>
+</tr>
+<tr>
+<td>B5 网关→航电/维护执行面</td>
+<td>客舱、地面或维护“内部可信”不成立</td>
+<td>明确业务授权、只读/单向约束、原生输出控制</td>
+</tr>
+</tbody>
+</table>
+<p>因此，“进入地面网络”只能使攻击者到达某个候选入口；每一道边界都可能终止链路，且不同边界需要不同证据。</p>
+<h2 id="3">3. 编号体系与漏洞关联</h2>
+<p>以下编号是本链路的统一追踪编号；名称与既有第5题、第6题和ARINC 429报告中的场景一一映射，不把编号解释为厂商CVE。</p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>漏洞名称</th>
+<th>关联本地证据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ATG-V06</td>
+<td>客舱/航电边界的跨域授权缺失</td>
+<td><code>cabin_to_avionics_boundary</code>；加固拒绝原因 <code>cabin_to_avionics_boundary</code></td>
+</tr>
+<tr>
+<td>ATG-V09</td>
+<td>OAM/OSS未授权路由或跨域策略变更</td>
+<td><code>oam_route_change</code>；加固拒绝原因 <code>oam_rbac</code></td>
+</tr>
+<tr>
+<td>ATG-V12</td>
+<td>N6用户面完整性/新鲜度与会话绑定不足</td>
+<td><code>data_tamper</code>、<code>data_replay</code>、<code>session_binding</code></td>
+</tr>
+<tr>
+<td>SER-V09</td>
+<td>RS-232维护端口/命令缺少状态与角色授权</td>
+<td><code>airborne_maintenance</code>、<code>maintenance_direct_receiver</code></td>
+</tr>
+<tr>
+<td>SER-V10</td>
+<td>串口桥接缺少来源认证、抗重放和限速</td>
+<td><code>tamper_recomputed_crc</code>、<code>replay</code>、<code>flood</code></td>
+</tr>
+<tr>
+<td>A429-V05</td>
+<td>ARINC 429入口无来源认证/占线保护</td>
+<td><code>injection</code>、<code>flood</code>、<code>parity_recomputed_tamper</code></td>
+</tr>
+<tr>
+<td>A429-V06</td>
+<td>ARINC 429速率/配置与受控出口隔离不足</td>
+<td><code>rate_mismatch</code>、<code>replay</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="4">4. 编号化攻击链</h2>
+<h3 id="41">4.1 节点与边</h3>
+<table>
+<thead>
+<tr>
+<th>节点</th>
+<th>资产/域</th>
+<th>接口与协议</th>
+<th>攻击前权限</th>
+<th>利用后权限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G1</td>
+<td>外部操作者</td>
+<td>互联网/企业网身份面</td>
+<td>无目标系统权限</td>
+<td>可能获得低权限企业账号或入口可达性</td>
+</tr>
+<tr>
+<td>G2</td>
+<td>地面保障网络</td>
+<td>VPN、堡垒机、管理网</td>
+<td>保障网普通访问</td>
+<td>可探测或访问维护服务；不应能改配置</td>
+</tr>
+<tr>
+<td>G3</td>
+<td>供应商跳板/OAM或串口服务器</td>
+<td>管理API、SSH、串口服务器控制面</td>
+<td>受限维护会话</td>
+<td>若控制失效，可取得某一跳板/端口管理权限</td>
+</tr>
+<tr>
+<td>G4</td>
+<td>5GC路由与策略</td>
+<td>OAM、N4/PFCP、DNN、S-NSSAI、N6 ACL</td>
+<td>只读配置查看</td>
+<td>错误或未授权的路由/切片/策略变更能力</td>
+</tr>
+<tr>
+<td>G5</td>
+<td>N6应用/运行监视/机务平台</td>
+<td>N6应用消息、GTP-U外层、TLS/消息认证</td>
+<td>业务提交或只读</td>
+<td>伪造、篡改、重放业务消息，或改变数据落点</td>
+</tr>
+<tr>
+<td>G6</td>
+<td>客舱/航电边界网关</td>
+<td>跨域代理、白名单、单向通道</td>
+<td>不应有航电写入权</td>
+<td>若边界失败，可提交合成航电命令/数据</td>
+</tr>
+<tr>
+<td>G7</td>
+<td>串行/A429桥接器</td>
+<td>RS-232/422、ARINC 429</td>
+<td>维护数据或只读桥接</td>
+<td>可产生合法CRC/奇偶的原生帧</td>
+</tr>
+<tr>
+<td>G8</td>
+<td>机载消费者/放行和运行系统</td>
+<td>合成ICD、应用状态</td>
+<td>接收合法业务输入</td>
+<td>接收错误/陈旧维护或运行数据；后果由真实ICD决定</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-text">E01 G1 -&gt; G2：凭据/远程维护入口被接受（工程推演）
+E02 G2 -&gt; G3：跳板、OAM或串口服务器横向访问（工程推演）
+E03 G3 -&gt; G4：变更路由、DNN/切片或维护策略（ATG-V09/ATG-V12）
+E04 G4 -&gt; G5：N6转发到过度信任应用（ATG-V12）
+E05 G5 -&gt; G6：跨域网关未按业务域拒绝（ATG-V06）
+E06 G6 -&gt; G7：协议代理把业务数据转为原生帧（SER-V09/SER-V10/A429-V05）
+E07 G7 -&gt; G8：原生消费者按CRC/奇偶/标签接受（A429-V05/A429-V06）
+</code></pre>
+<p>任意 E01-E03 的身份、物理接入、审批或网络路径不成立，链路即中断；任意 E05-E07 有独立默认拒绝和物理发送使能，不能把前一步权限自动升级为航电写入权。</p>
+<h3 id="42">4.2 典型分支</h3>
+<p><strong>分支 A：OAM→N6→跨域网关。</strong> G3取得OAM变更能力后，修改UPF/N6路由或DNN/S-NSSAI映射；G5应用错误接受伪造/重放遥测；若客舱到航电边界错误放行，进入G6。对应ATG-V09、ATG-V12、ATG-V06。</p>
+<p><strong>分支 B：跳板→串口服务器→维护命令。</strong> G3取得串口服务器端口控制后，向RS-232维护端口提交合法格式命令；若设备只检查CRC且未执行地面互锁，G7可改变配置、清除BITE或产生维护数据。对应SER-V09、SER-V10。</p>
+<p><strong>分支 C：维护/应用网关→ARINC 429。</strong> G6或G7把输入转换为标签正确、奇偶正确的ARINC 429字；原生接收端可能无法验证来源、新鲜度和语义。对应A429-V05、A429-V06。该分支必须有真实桥接器、端口方向和ICD证据，不能从网络可达性推断成立。</p>
+<h2 id="5">5. 前提、设备、能力与时间</h2>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>触发前提</th>
+<th>所需设备/能力</th>
+<th style="text-align: right;">准备时间</th>
+<th style="text-align: right;">实施时间</th>
+<th style="text-align: right;">保持访问</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>初始地面入口</td>
+<td>有效账号、维护窗口或物理保障网位置</td>
+<td>普通终端、经批准的VPN/跳板客户端</td>
+<td style="text-align: right;">天到周</td>
+<td style="text-align: right;">分钟到小时</td>
+<td style="text-align: right;">受会话和工单限制</td>
+</tr>
+<tr>
+<td>跳板/OAM</td>
+<td>供应商身份或被攻陷维护工作站</td>
+<td>管理终端、配置阅读能力</td>
+<td style="text-align: right;">周到月</td>
+<td style="text-align: right;">分钟到小时</td>
+<td style="text-align: right;">需持续会话/令牌</td>
+</tr>
+<tr>
+<td>路由/策略变更</td>
+<td>变更权限或配置发布绕过</td>
+<td>5GC/OAM知识、策略理解</td>
+<td style="text-align: right;">周到月</td>
+<td style="text-align: right;">分钟到小时</td>
+<td style="text-align: right;">配置持久化前后不同</td>
+</tr>
+<tr>
+<td>N6/业务伪造</td>
+<td>可到达应用或桥接器且缺少端到端认证</td>
+<td>协议和ICD理解、消息构造能力</td>
+<td style="text-align: right;">天到周</td>
+<td style="text-align: right;">秒到小时</td>
+<td style="text-align: right;">取决于序号/会话</td>
+</tr>
+<tr>
+<td>串口/A429输出</td>
+<td>真实端口、GSE或桥接器可驱动</td>
+<td>专用适配器、目标波特率/速率和ICD</td>
+<td style="text-align: right;">周到月</td>
+<td style="text-align: right;">秒到分钟</td>
+<td style="text-align: right;">需物理连接或输出侧控制</td>
+</tr>
+</tbody>
+</table>
+<p><strong>瓶颈：</strong> 真实系统中最难证明的是 E03 的可写管理授权、E05 的跨域输出，以及 E06 的物理/逻辑发送能力。知道DNN、TEID、标签或命令码不等于获得权限；本地合成模型不替代这些证据。</p>
+<h2 id="6">6. 可观测性、告警与检测条件</h2>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>应记录的日志/传感器</th>
+<th>告警条件</th>
+<th>可检测阻断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G1/G2</td>
+<td>IAM登录、VPN、终端态势、源位置</td>
+<td>异常地理位置、失败次数、非工单访问</td>
+<td>身份吊销、MFA、网络隔离</td>
+</tr>
+<tr>
+<td>G2/G3</td>
+<td>跳板会话、命令审计、录屏、工单号</td>
+<td>非维护窗口、角色与命令不匹配</td>
+<td>会话审批、命令白名单</td>
+</tr>
+<tr>
+<td>G3/G4</td>
+<td>OAM配置diff、PFCP/N4、DNN/S-NSSAI变更</td>
+<td>单人变更、未签名配置、路由跨域</td>
+<td>双人审批、签名、回滚、基线比对</td>
+</tr>
+<tr>
+<td>G4/G5</td>
+<td>N3/N6流量、TEID/QFI、应用序号、飞机/航班绑定</td>
+<td>绑定不一致、重放、突变速率</td>
+<td>丢弃、隔离、密钥/会话吊销</td>
+</tr>
+<tr>
+<td>G5/G6</td>
+<td>跨域网关决策、方向、字段和目标域</td>
+<td>客舱/维护到航电写入尝试</td>
+<td>默认拒绝、只读代理、单向出口</td>
+</tr>
+<tr>
+<td>G6/G7</td>
+<td>网关输出、串口帧、A429标签/速率/奇偶</td>
+<td>未授权源、CRC/奇偶合法但认证失败、突发占线</td>
+<td>物理发送使能、限速、bus guardian类控制</td>
+</tr>
+<tr>
+<td>G7/G8</td>
+<td>LRU接收计数、超时、冗余比较、BITE</td>
+<td>陈旧序号、语义越界、更新率异常</td>
+<td>冻结/切换/告警，按安全分析决定</td>
+</tr>
+</tbody>
+</table>
+<p>本链路的高价值检测点是 G3/G4 的<strong>配置变更审计</strong>和 G6/G7 的<strong>实际输出审计</strong>。只记录登录成功不足以证明阻断；必须记录“请求是否到达应用、是否转发、是否产生原生输出、是否被消费者使用”。</p>
+<h2 id="7">7. 风险量化模型</h2>
+<h3 id="71">7.1 参数定义</h3>
+<p>不使用CVSS替代航空业务风险，也不把多个主观概率相乘成伪精确成功率。每条链路分别给出等级和区间。</p>
+<ul>
+<li><strong>设备成本 C：</strong> 1低（通用终端/软件）至5高（专用GSE、串口/A429适配器、授权台架）。</li>
+<li><strong>技术门槛 T：</strong> 1为一般网络操作；2为管理面基础；3为5GC/OAM或串行协议理解；4为跨域策略和ICD理解；5为真实设备、时序、冗余和安全分析能力。</li>
+<li><strong>时间成本 P：</strong> 准备、实施、保持访问分别记录，不合并。</li>
+<li><strong>接入难度 A：</strong> 1为远程可达；3为需保障网/维护窗口；5为需实体端口、在场设备或飞行器台架。</li>
+<li><strong>被检测概率 D：</strong> 给出区间并说明传感器依据；无真实数据时标注为分析模型估计。</li>
+<li><strong>业务影响 I：</strong> 低/中/高/极高，按是否到达写入边界、维护放行数据或安全关键消费者调整。</li>
+</ul>
+<h3 id="72">7.2 场景评级</h3>
+<table>
+<thead>
+<tr>
+<th>分支</th>
+<th style="text-align: right;">C</th>
+<th style="text-align: right;">T</th>
+<th style="text-align: right;">A</th>
+<th>D（分析模型估计）</th>
+<th>I</th>
+<th>攻击可行性判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A OAM→N6→跨域</td>
+<td style="text-align: right;">2-4</td>
+<td style="text-align: right;">4-5</td>
+<td style="text-align: right;">3-4</td>
+<td>70%-95%，OAM diff/审计/网关日志可见</td>
+<td>高；真实航电写入时极高</td>
+<td>瓶颈是可写OAM和跨域错误放行</td>
+</tr>
+<tr>
+<td>B 跳板→RS-232维护</td>
+<td style="text-align: right;">2-4</td>
+<td style="text-align: right;">3-4</td>
+<td style="text-align: right;">3-5</td>
+<td>60%-90%，端口日志和BITE变化可见</td>
+<td>高</td>
+<td>瓶颈是实体/服务器端口和地面互锁失效</td>
+</tr>
+<tr>
+<td>C 网关→ARINC 429</td>
+<td style="text-align: right;">4-5</td>
+<td style="text-align: right;">4-5</td>
+<td style="text-align: right;">4-5</td>
+<td>50%-90%，取决于认证、接收计数和冗余监视</td>
+<td>高；关键消费者时极高</td>
+<td>瓶颈是真实桥接器、方向和ICD</td>
+</tr>
+</tbody>
+</table>
+<p>D区间不是实验测得概率，而是基于“有/无IAM、变更审计、N6认证、网关决策和LRU监视”的分析估计；必须用目标系统日志和授权台架校准。设备成本也只表示类别等级，不是假定市场报价。</p>
+<h3 id="73">7.3 敏感性分析与最小阻断点</h3>
+<table>
+<thead>
+<tr>
+<th>条件变化</th>
+<th>链路结果</th>
+<th>影响评级变化</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>无法进入保障网或无合法维护身份</td>
+<td>G1→G2中断</td>
+<td>由路径不可达转为仅理论风险</td>
+</tr>
+<tr>
+<td>有保障网但无跳板/OAM/串口授权</td>
+<td>G2→G3中断</td>
+<td>不应升级到配置或输出风险</td>
+</tr>
+<tr>
+<td>OAM可读但不可写，配置需双人签名</td>
+<td>G3→G4中断</td>
+<td>ATG-V09分支基本终止</td>
+</tr>
+<tr>
+<td>N6应用强制飞机/会话绑定和抗重放</td>
+<td>G4→G5数据分支中断</td>
+<td>遥测伪造/重放降为可用性或无效</td>
+</tr>
+<tr>
+<td>航电边界默认拒绝且仅只读</td>
+<td>G5→G6中断</td>
+<td>航电写入影响降级，仍需评估地面数据</td>
+</tr>
+<tr>
+<td>串口端口物理断开/空中互锁</td>
+<td>G6→G7中断</td>
+<td>维护命令分支不可行</td>
+</tr>
+<tr>
+<td>A429安全网关认证、限速、单一输出</td>
+<td>G7→G8恶意帧中断</td>
+<td>原生协议缺口不再直接暴露给消费者</td>
+</tr>
+<tr>
+<td>真实ICD不允许该标签/命令到达目标消费者</td>
+<td>G7→G8语义中断</td>
+<td>该具体影响不成立</td>
+</tr>
+</tbody>
+</table>
+<p><strong>最小阻断点：</strong> 在 G3/G4 设置经过签名和双人审批的配置发布控制；在 G5/G6 设置不可绕过、默认拒绝的跨域业务网关；在 G6/G7 设置物理/逻辑单一受控输出。三者中任一点有效，整条链不能无条件闭合。</p>
+<h2 id="8">8. 证据等级与复核结果</h2>
+<table>
+<thead>
+<tr>
+<th>结论</th>
+<th>证据等级</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OAM未授权路由变更可被加固模型拒绝</td>
+<td>本地复核</td>
+<td><code>5g_atg_results.json</code> 的 <code>oam_route_change</code>，原因 <code>oam_rbac</code></td>
+</tr>
+<tr>
+<td>TEID/QFI错误不能仅靠标识符获得会话信任</td>
+<td>本地复核</td>
+<td><code>session_binding</code>，加固原因 <code>session_binding</code>/<code>qfi_binding</code></td>
+</tr>
+<tr>
+<td>N6篡改/重放可被应用层认证和序号拒绝</td>
+<td>本地复核</td>
+<td><code>data_tamper</code>、<code>data_replay</code></td>
+</tr>
+<tr>
+<td>客舱到航电边界应独立授权</td>
+<td>本地复核</td>
+<td><code>cabin_to_avionics_boundary</code></td>
+</tr>
+<tr>
+<td>RS-232空中维护应拒绝</td>
+<td>本地复核</td>
+<td><code>serial_interface_results.json</code>，原因 <code>maintenance_not_available</code></td>
+</tr>
+<tr>
+<td>CRC重算不提供来源认证</td>
+<td>本地复核</td>
+<td><code>tamper_recomputed_crc</code>，加固原因 <code>authentication</code></td>
+</tr>
+<tr>
+<td>A429奇偶重算不提供认证</td>
+<td>本地复核</td>
+<td><code>results.json</code>，加固原因 <code>authentication</code></td>
+</tr>
+<tr>
+<td>地面网络到真实飞机存在可写路径</td>
+<td>待实装验证</td>
+<td>缺少真实拓扑、账号矩阵、维护流程和端口/ICD证据</td>
+</tr>
+<tr>
+<td>具体飞机的最终飞行安全后果</td>
+<td>待实装验证</td>
+<td>缺少型号FHA/SSA、真实消费者和独立遏制证据</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9">9. 不成立条件、阻断点与待补真实证据</h2>
+<h3 id="91">9.1 不成立条件</h3>
+<ul>
+<li>初始账号只是企业网普通账号，不能到达保障网或维护跳板；</li>
+<li>OAM、N4/PFCP和路由配置均由签名、双人审批和不可回滚旁路的发布系统保护；</li>
+<li>N6应用执行飞机、航班、会话、序号、时间窗和消息认证；</li>
+<li>客舱/维护到航电只有只读、单向或字段级代理；</li>
+<li>串口服务器没有可驱动的机载端口，或地面/空中状态由硬件互锁强制执行；</li>
+<li>ARINC 429输出侧仅有一个受控发射端，网关外无法旁路；</li>
+<li>真实ICD证明相关数据不进入安全关键消费者。</li>
+</ul>
+<h3 id="92">9.2 需要补齐的证据</h3>
+<ol>
+<li>真实地面网络、保障网、供应商网络、OAM和N6拓扑及ACL；</li>
+<li>账号、角色、MFA、跳板、工单、双人审批和应急账号矩阵；</li>
+<li>AMF/SMF/UPF、N4/PFCP、DNN/S-NSSAI/QFI/TEID的配置基线和变更审计；</li>
+<li>N6应用ICD、TLS/消息签名、飞机/航班/会话绑定、重放状态持久化；</li>
+<li>客舱/航电网关数据流、方向、白名单、旁路测试和失效安全策略；</li>
+<li>串口服务器、GSE、维护连接器、地面状态互锁及日志链；</li>
+<li>ARINC 429桥接器的发射使能、标签策略、速率、冗余源和真实接收消费者；</li>
+<li>真实机型FHA/SSA、维护放行流程、告警响应和运行降级证据。</li>
+</ol>
+<h2 id="10">10. 防御性验证设计与验收条件</h2>
+<p>验证只在离线数字模型、隔离网络或批准台架进行，不连接机场生产网、运营商公网、真实飞机、空管网或公共频谱。</p>
+<table>
+<thead>
+<tr>
+<th>验证项</th>
+<th>输入</th>
+<th>通过条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V3-01 管理变更</td>
+<td>未授权OAM路由/DNN策略请求</td>
+<td>无配置生效；有完整审计和告警</td>
+</tr>
+<tr>
+<td>V3-02 会话绑定</td>
+<td>错误TEID/QFI、跨飞机/跨DNN消息</td>
+<td>无应用投递、无数据库副作用</td>
+</tr>
+<tr>
+<td>V3-03 N6完整性</td>
+<td>修改payload、旧序号、旧会话消息</td>
+<td><code>authentication</code>或<code>replay</code>拒绝</td>
+</tr>
+<tr>
+<td>V3-04 跨域边界</td>
+<td>客舱/维护向航电提交写入请求</td>
+<td>默认拒绝；只读允许项不产生写入</td>
+</tr>
+<tr>
+<td>V3-05 维护互锁</td>
+<td>空中状态的配置/BITE命令</td>
+<td><code>maintenance_not_available</code>；无状态改变</td>
+</tr>
+<tr>
+<td>V3-06 串行/A429输出</td>
+<td>合法CRC/奇偶的未知来源帧</td>
+<td>网关拒绝；无原生输出或消费者更新</td>
+</tr>
+<tr>
+<td>V3-07 审计闭环</td>
+<td>从登录到网关输出的完整事件链</td>
+<td>可关联用户、设备、工单、会话、目标和结果</td>
+</tr>
+</tbody>
+</table>
+<p>现有数字证据可直接复核 V3-02、V3-03、V3-04、V3-05、V3-06 的合成版本；V3-01和V3-07仍需接入真实配置发布与审计系统验证。</p>
+<h2 id="11_1">11. 证据索引与参考资料</h2>
+<ul>
+<li><code>report/5g_atg_security_report.md</code>：第5题全链路架构、OAM、N6、会话绑定和客舱/航电边界分析。</li>
+<li><code>artifacts/5g_atg_results.json</code>：OAM、边界、篡改、重放和TEID/QFI机器证据。</li>
+<li><code>report/serial_interface_security_report.md</code>：RS-232/RS-422维护端口、CRC、重放和突发占线分析。</li>
+<li><code>artifacts/serial_interface_results.json</code>：维护命令、空中拒绝、篡改、重放、失配和洪泛证据。</li>
+<li><code>report/arinc429_security_report.md</code>：ARINC 429来源认证、奇偶、重放、占线和速率边界分析。</li>
+<li><code>artifacts/results.json</code>：ARINC 429攻击前后对照数据。</li>
+<li><code>sim/atg5g_lab.py</code>、<code>sim/serial_lab.py</code>、<code>sim/arinc429_lab.py</code>：本地确定性模型；合成协议和参数不得当作真实ICD。</li>
+<li><code>needed.txt</code>：链路三路径、强制字段、风险量化与防御性边界要求。</li>
+</ul>
+<h2 id="12_1">12. 独立完成与工具使用声明</h2>
+<p>本报告基于仓库内既有模型、测试结果和报告进行独立整理；工具仅用于阅读、检索、编辑和运行本地验证。未连接真实飞机、机场生产网、空管网、公共移动网络或公共频谱，未提供针对真实航空系统的直接攻击指令。</p></body>
+</html>

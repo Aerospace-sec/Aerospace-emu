@@ -1,0 +1,466 @@
+{
+  "schema_version": "1.0",
+  "report": "report/5g_atg_security_report.md",
+  "report_reference_mapping": {
+    "[1]": "SRC-01",
+    "[2]": "SRC-02",
+    "[3]": "SRC-03",
+    "[4]": "SRC-04",
+    "[5]": "SRC-05",
+    "[6]": "SRC-06",
+    "[7]": "SRC-07",
+    "[8]": "SRC-08",
+    "[9]": "SRC-09",
+    "[10]": "SRC-10",
+    "[11]": "SRC-11",
+    "[12]": "SRC-12",
+    "[13]": "SRC-13",
+    "[14]": "SRC-14",
+    "[15]": "SRC-15"
+  },
+  "source_registry": [
+    {
+      "id": "SRC-01",
+      "citation": "3GPP TS 23.501, System architecture for the 5G System (5GS)",
+      "locator": "Official specification index; architecture, reference points, DNN, QoS, network slicing and N6 topics",
+      "url": "https://www.3gpp.org/DynaReport/23501.htm",
+      "use": "Normative protocol and deployment architecture source",
+      "version_status": "Series reference; project configuration must freeze the adopted revision before formal approval"
+    },
+    {
+      "id": "SRC-02",
+      "citation": "3GPP TS 23.502, Procedures for the 5G System (5GS)",
+      "locator": "Official specification index; Registration, PDU Session Establishment, Service Request, mobility and handover topics",
+      "url": "https://www.3gpp.org/DynaReport/23502.htm",
+      "use": "Normative procedure source",
+      "version_status": "Series reference; project configuration must freeze the adopted revision before formal approval"
+    },
+    {
+      "id": "SRC-03",
+      "citation": "3GPP TS 24.501, Non-Access-Stratum (NAS) protocol for 5G System (5GS)",
+      "locator": "Official specification index; NAS registration, authentication-related procedures, security mode and error handling topics",
+      "url": "https://www.3gpp.org/DynaReport/24501.htm",
+      "use": "Normative NAS protocol source",
+      "version_status": "Series reference; project configuration must freeze the adopted revision before formal approval"
+    },
+    {
+      "id": "SRC-04",
+      "citation": "3GPP TS 33.501, Security architecture and procedures for 5G System",
+      "locator": "Official specification index; 5G-AKA, NAS/RRC security, user-plane confidentiality/integrity, keys and security contexts",
+      "url": "https://www.3gpp.org/DynaReport/33501.htm",
+      "use": "Normative 5G security source",
+      "version_status": "Series reference; project configuration must freeze the adopted revision before formal approval"
+    },
+    {
+      "id": "SRC-05",
+      "citation": "3GPP TS 38.300, NR; NR and NG-RAN Overall Description",
+      "locator": "Official specification index; NR/NG-RAN architecture, access and mobility topics",
+      "url": "https://www.3gpp.org/DynaReport/38300.htm",
+      "use": "Normative NR/NG-RAN architecture source",
+      "version_status": "Series reference; project configuration must freeze the adopted revision before formal approval"
+    },
+    {
+      "id": "SRC-06",
+      "citation": "3GPP TS 38.331, NR; Radio Resource Control (RRC) protocol specification",
+      "locator": "Official specification index; system information broadcast, RRC connection, re-establishment and security-related signaling topics",
+      "url": "https://www.3gpp.org/DynaReport/38331.htm",
+      "use": "Normative RRC source",
+      "version_status": "Series reference; project configuration must freeze the adopted revision before formal approval"
+    },
+    {
+      "id": "SRC-07",
+      "citation": "3GPP TS 29.281, General Packet Radio System (GPRS) Tunnelling Protocol User Plane (GTP-U) protocol",
+      "locator": "Official specification index; GTP-U tunnel and TEID user-plane topics",
+      "url": "https://www.3gpp.org/DynaReport/29281.htm",
+      "use": "Normative GTP-U source",
+      "version_status": "Series reference; project configuration must freeze the adopted revision before formal approval"
+    },
+    {
+      "id": "SRC-08",
+      "citation": "3GPP TS 29.244, Interface between the Control Plane and the User Plane nodes",
+      "locator": "Official specification index; PFCP/N4 session and UPF forwarding-rule topics",
+      "url": "https://www.3gpp.org/DynaReport/29244.htm",
+      "use": "Normative PFCP/N4 source",
+      "version_status": "Series reference; project configuration must freeze the adopted revision before formal approval"
+    },
+    {
+      "id": "SRC-09",
+      "citation": "RTCA DO-326A / EUROCAE ED-202A, Airworthiness Security Process Specification",
+      "locator": "Controlled standard copy; airworthiness security process, assets, threats and assurance activities",
+      "url": "https://www.rtca.org/",
+      "use": "Civil-aviation security process source",
+      "version_status": "Controlled project copy and revision must be recorded before approval"
+    },
+    {
+      "id": "SRC-10",
+      "citation": "RTCA DO-356A / EUROCAE ED-203A, Airworthiness Security Methods and Considerations",
+      "locator": "Controlled standard copy; aviation cybersecurity analysis, protection and verification methods",
+      "url": "https://www.rtca.org/",
+      "use": "Civil-aviation security methods source",
+      "version_status": "Controlled project copy and revision must be recorded before approval"
+    },
+    {
+      "id": "SRC-11",
+      "citation": "RTCA DO-355 / EUROCAE ED-204, Information Security Guidance for Continuing Airworthiness",
+      "locator": "Controlled standard copy; continuing-airworthiness information-security and maintenance activities",
+      "url": "https://www.rtca.org/",
+      "use": "Continuing-airworthiness security source",
+      "version_status": "Controlled project copy and revision must be recorded before approval"
+    },
+    {
+      "id": "SRC-12",
+      "citation": "SAE ARP4754A, Guidelines for Development of Civil Aircraft and Systems",
+      "locator": "Controlled standard copy; system development, function allocation and safety objectives",
+      "url": "https://www.sae.org/standards/content/arp4754a/",
+      "use": "Civil-aircraft system-development source",
+      "version_status": "Controlled project copy and revision must be recorded before approval"
+    },
+    {
+      "id": "SRC-13",
+      "citation": "SAE ARP4761A, Guidelines and Methods for Conducting the Safety Assessment Process on Civil Airborne Systems and Equipment",
+      "locator": "Controlled standard copy; FHA, PSSA, SSA and safety-assessment methods",
+      "url": "https://www.sae.org/standards/content/arp4761a/",
+      "use": "Civil-airborne safety-assessment source",
+      "version_status": "Controlled project copy and revision must be recorded before approval"
+    },
+    {
+      "id": "SRC-14",
+      "citation": "CAAC CCAR-25, Transport Category Airworthiness Standards, section 25.1309",
+      "locator": "Applicable CAAC controlled regulation and adopted amendment; system safety and equipment/function effects",
+      "url": "https://www.caac.gov.cn/",
+      "use": "Civil-aviation regulatory source",
+      "version_status": "Applicable amendment and certification basis must be recorded before approval"
+    },
+    {
+      "id": "SRC-15",
+      "citation": "NIST SP 800-207, Zero Trust Architecture",
+      "locator": "NIST publication; explicit authorization, segmentation and continuous verification engineering guidance",
+      "url": "https://csrc.nist.gov/publications/detail/sp/800-207/final",
+      "use": "Supplementary engineering reference only; not a civil-aviation approval substitute",
+      "version_status": "Final publication"
+    }
+  ],
+  "local_evidence_registry": [
+    {
+      "id": "LOC-01",
+      "path": "sim/atg5g_lab.py",
+      "anchors": ["AtgAirInterface.register", "AtgCore.signaling_attempt", "SecureAtgGateway.admit", "SecureOamController.apply", "run_atg_scenarios"],
+      "purpose": "Deterministic digital architecture, attack-state transitions and hardening policies"
+    },
+    {
+      "id": "LOC-02",
+      "path": "tests/test_atg5g_lab.py",
+      "anchors": ["test_normal_registration_and_business_paths_are_available", "test_interference_and_rogue_cell_states_are_explicit", "test_signaling_rate_limit_reduces_context_pressure", "test_cabin_to_avionics_boundary_is_blocked_before_delivery", "test_user_plane_tamper_and_replay_are_rejected", "test_n3_session_and_qfi_binding_rejects_forged_context", "test_oam_route_change_requires_authorization_and_preserves_boundary", "test_capture_model_distinguishes_metadata_transport_and_payload"],
+      "purpose": "Independent regression assertions for the report's principal evidence"
+    },
+    {
+      "id": "LOC-03",
+      "path": "scripts/run_atg5g_experiments.py",
+      "anchors": ["run_atg_scenarios", "5g_atg_results.json", "5g_atg_experiment_log.md"],
+      "purpose": "Reproducible experiment invocation, environment capture and artifact generation"
+    },
+    {
+      "id": "LOC-04",
+      "path": "scripts/verify_atg5g_evidence.py",
+      "anchors": ["verify_atg5g_evidence", "fresh_model_results_match_artifact", "traceability_paths_resolve", "required_regression_command_passes"],
+      "purpose": "Independent cross-check of source paths, JSON paths, fresh model output, tests and hashes"
+    },
+    {
+      "id": "LOC-05",
+      "path": "artifacts/5g_atg_results.json",
+      "anchors": ["results.architecture", "results.air_interface", "results.attacks", "results.captures"],
+      "purpose": "Immutable-in-practice machine-readable observation record identified by SHA-256"
+    },
+    {
+      "id": "LOC-06",
+      "path": "artifacts/5g_atg_experiment_log.md",
+      "anchors": ["结果摘要", "关键观测", "证据边界"],
+      "purpose": "Human-readable execution record"
+    }
+  ],
+  "normative_and_architecture_claims": [
+    {
+      "id": "C-N-01",
+      "statement": "5G-ATG is treated as a civil-aviation deployment profile of 3GPP 5GS/NR, not as a separate universal protocol.",
+      "report_location": "section 2.1",
+      "sources": ["SRC-01", "SRC-02", "SRC-03", "SRC-04", "SRC-05", "SRC-06"],
+      "local_evidence": [{"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "Digital 5G-ATG security laboratory"}, {"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.architecture.chain"}],
+      "derivation": "The report applies the cited 5GS/NR interfaces to an explicitly synthetic aviation deployment; it does not claim a separate standard.",
+      "limitation": "The profile is not a real operator or aircraft configuration."
+    },
+    {
+      "id": "C-N-02",
+      "statement": "Broadcast and pre-security registration metadata are distinct from post-security user-plane payload protection.",
+      "report_location": "sections 2.3 and 4.1",
+      "sources": ["SRC-03", "SRC-04", "SRC-06"],
+      "local_evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.captures.uu"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_capture_model_distinguishes_metadata_transport_and_payload"}],
+      "derivation": "The model records visible broadcast/initial states before security completion and separately records application payload readability.",
+      "limitation": "No RF capture or real UE protocol trace is performed."
+    },
+    {
+      "id": "C-N-03",
+      "statement": "5G-AKA, NAS/RRC security and user-plane protection are capabilities whose deployed behavior depends on configuration, implementation and key management.",
+      "report_location": "sections 2.1, 2.3 and 7.2",
+      "sources": ["SRC-03", "SRC-04", "SRC-06"],
+      "local_evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.limitations"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "This is a digital 5G-ATG architecture and security-state model"}],
+      "derivation": "The report explicitly separates standards capabilities from deployment claims and uses synthetic HMAC only as a local policy model.",
+      "limitation": "The model is not an implementation conformance or cryptographic test."
+    },
+    {
+      "id": "C-N-04",
+      "statement": "N3/GTP-U identifiers, DNN, S-NSSAI and QFI are session/routing context and QoS fields, not standalone message-origin credentials.",
+      "report_location": "section 2.4 and F-06",
+      "sources": ["SRC-01", "SRC-07", "SRC-08"],
+      "local_evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.session_binding"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_n3_session_and_qfi_binding_rejects_forged_context"}],
+      "derivation": "The weak router accepts a known DNN while the hardened gateway verifies the active session and QFI binding.",
+      "limitation": "The packet is a synthetic object, not a real GTP-U datagram."
+    },
+    {
+      "id": "C-N-05",
+      "statement": "Dedicated-core physical isolation does not by itself establish OAM authorization or a cabin-to-avionics logical boundary.",
+      "report_location": "AD-01, F-08 and F-09",
+      "sources": ["SRC-01", "SRC-08", "SRC-09", "SRC-10", "SRC-11", "SRC-14"],
+      "local_evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.oam_route_change"}, {"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.cabin_to_avionics_boundary"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_oam_route_change_requires_authorization_and_preserves_boundary"}],
+      "derivation": "The model intentionally contrasts a trusted management bridge and weak inter-zone router with RBAC, approval and protected-boundary controls.",
+      "limitation": "The real aircraft network partition and OAM protocol must be verified from its approved architecture and ICD."
+    },
+    {
+      "id": "C-N-06",
+      "statement": "Aviation impact severity must be tied to the affected aircraft function and safety assessment, not assigned from a generic IT vulnerability label.",
+      "report_location": "severity criteria and sections 3-4",
+      "sources": ["SRC-09", "SRC-10", "SRC-12", "SRC-13", "SRC-14"],
+      "local_evidence": [{"kind": "report", "path": "report/5g_atg_security_report.md", "anchor": "危害分级"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "synthetic"}],
+      "derivation": "Each report entry states the aviation asset, precondition and boundary needed before assigning 极高/高/中/低.",
+      "limitation": "The synthetic model cannot replace FHA, SSA, PSSA or certification-basis evidence."
+    }
+  ],
+  "quantitative_claims": [
+    {
+      "id": "Q-01",
+      "statement": "The synthetic configuration uses PLMN 999-99, slice sst=1;sd=ATG001, three DNNs and QFI 9.",
+      "report_location": "sections 1.2 and 2.4",
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.architecture"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "SYNTHETIC_PLMN"}],
+      "test": "tests/test_atg5g_lab.py::test_normal_registration_and_business_paths_are_available",
+      "assertions": [{"path": "results.architecture.plmn", "equals": "999-99"}, {"path": "results.architecture.slice", "equals": "sst=1;sd=ATG001"}, {"path": "results.architecture.dnns", "equals": ["atg.cabin", "atg.maint", "atg.avionics"]}, {"path": "results.architecture.qfi", "equals": 9}, {"path": "results.architecture.teid_start", "equals": 4096}]
+    },
+    {
+      "id": "Q-02",
+      "statement": "Trusted registration completes RRC setup, NAS registration request, 5G-AKA, security mode and user-plane readiness in the model.",
+      "report_location": "summary and E5G-01",
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.air_interface.trusted_registration"}],
+      "test": "tests/test_atg5g_lab.py::test_normal_registration_and_business_paths_are_available",
+      "assertions": [{"path": "results.air_interface.trusted_registration.result", "equals": "registered"}, {"path": "results.air_interface.trusted_registration.aka_success", "equals": true}, {"path": "results.air_interface.trusted_registration.security_mode_complete", "equals": true}, {"path": "results.air_interface.trusted_registration.user_plane_ready", "equals": true}]
+    },
+    {
+      "id": "Q-03",
+      "statement": "The digital interference scenario produces registration_timeout and user_plane_ready=false.",
+      "report_location": "F-02 and E5G-03",
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.interference"}],
+      "test": "tests/test_atg5g_lab.py::test_interference_and_rogue_cell_states_are_explicit",
+      "assertions": [{"path": "results.attacks.interference.registration.result", "equals": "registration_timeout"}, {"path": "results.attacks.interference.service_available", "equals": false}]
+    },
+    {
+      "id": "Q-04",
+      "statement": "The rogue-cell model exposes pre-security metadata; hardened UE returns rogue_cell_rejected while weak UE returns camped_untrusted_cell, and neither has a ready user plane.",
+      "report_location": "F-01 and E5G-02",
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.rogue_cell"}],
+      "test": "tests/test_atg5g_lab.py::test_interference_and_rogue_cell_states_are_explicit",
+      "assertions": [{"path": "results.attacks.rogue_cell.hardened.result", "equals": "rogue_cell_rejected"}, {"path": "results.attacks.rogue_cell.legacy.result", "equals": "camped_untrusted_cell"}, {"path": "results.attacks.rogue_cell.hardened.pre_security_metadata_visible", "equals": true}, {"path": "results.attacks.rogue_cell.hardened.user_plane_ready", "equals": false}, {"path": "results.attacks.rogue_cell.legacy.user_plane_ready", "equals": false}]
+    },
+    {
+      "id": "Q-05",
+      "statement": "The signaling-storm experiment submits 50 attempts in a 1000 ms window; the weak model allocates 50 contexts while the hardened model allocates 10 and rejects 40.",
+      "report_location": "summary, F-03 and E5G-04",
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.signaling_storm"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "for _ in range(50)"}],
+      "test": "tests/test_atg5g_lab.py::test_signaling_rate_limit_reduces_context_pressure",
+      "assertions": [{"path": "results.attacks.signaling_storm.attempts", "equals": 50}, {"path": "results.attacks.signaling_storm.window_ms", "equals": 1000}, {"path": "results.attacks.signaling_storm.limit_per_window", "equals": 10}, {"path": "results.attacks.signaling_storm.native_contexts_allocated", "equals": 50}, {"path": "results.attacks.signaling_storm.hardened_contexts_allocated", "equals": 10}, {"path": "results.attacks.signaling_storm.hardened_rejected", "equals": 40}]
+    },
+    {
+      "id": "Q-06",
+      "statement": "The telemetry tamper input changes altitude from 30000 ft to 500 ft and airspeed from 440 kt to 80 kt while retaining the original authentication tag; the weak path accepts and the hardened path rejects authentication.",
+      "report_location": "F-04 and E5G-06",
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.data_tamper"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "tampered = replace"}],
+      "test": "tests/test_atg5g_lab.py::test_user_plane_tamper_and_replay_are_rejected",
+      "assertions": [{"path": "results.attacks.data_tamper.input.original_payload.altitude_ft", "equals": 30000}, {"path": "results.attacks.data_tamper.input.tampered_payload.altitude_ft", "equals": 500}, {"path": "results.attacks.data_tamper.input.original_payload.airspeed_kt", "equals": 440}, {"path": "results.attacks.data_tamper.input.tampered_payload.airspeed_kt", "equals": 80}, {"path": "results.attacks.data_tamper.input.original_tag_retained", "equals": true}, {"path": "results.attacks.data_tamper.native.accepted", "equals": true}, {"path": "results.attacks.data_tamper.hardened.reason", "equals": "authentication"}]
+    },
+    {
+      "id": "Q-07",
+      "statement": "The replay experiment submits the same sequence-3 telemetry at 300 ms and again at 320 ms; the first hardened submission succeeds and the second returns replay.",
+      "report_location": "F-05 and E5G-07",
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.data_replay"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "replay_again ="}],
+      "test": "tests/test_atg5g_lab.py::test_user_plane_tamper_and_replay_are_rejected",
+      "assertions": [{"path": "results.attacks.data_replay.input.sequence", "equals": 3}, {"path": "results.attacks.data_replay.input.first_submission_ms", "equals": 300}, {"path": "results.attacks.data_replay.input.replay_submission_ms", "equals": 320}, {"path": "results.attacks.data_replay.first_hardened.accepted", "equals": true}, {"path": "results.attacks.data_replay.replayed_hardened.reason", "equals": "replay"}]
+    },
+    {
+      "id": "Q-08",
+      "statement": "The cabin session has a synthetic TEID allocated from 0x1000 and QFI 9; forged TEID and QFI values are rejected by separate hardened checks.",
+      "report_location": "F-06 and E5G-08",
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.session_binding"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "if packet.qfi != session.qfi"}],
+      "test": "tests/test_atg5g_lab.py::test_n3_session_and_qfi_binding_rejects_forged_context",
+      "assertions": [{"path": "results.attacks.session_binding.input.qfi", "equals": 9}, {"path": "results.attacks.session_binding.input.forged_qfi", "equals": 10}, {"path": "results.attacks.session_binding.teid_forgery.hardened.reason", "equals": "session_binding"}, {"path": "results.attacks.session_binding.qfi_forgery.hardened.reason", "equals": "qfi_binding"}]
+    },
+    {
+      "id": "Q-09",
+      "statement": "The unauthorised OAM request attempts to enable cabin_to_avionics_route and disable slice_isolation; the native bridge accepts it, while hardened authorization rejects it.",
+      "report_location": "F-09 and E5G-09",
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.oam_route_change"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "protected_boundary_policy"}],
+      "test": "tests/test_atg5g_lab.py::test_oam_route_change_requires_authorization_and_preserves_boundary",
+      "assertions": [{"path": "results.attacks.oam_route_change.input.unauthorized.config.cabin_to_avionics_route", "equals": true}, {"path": "results.attacks.oam_route_change.input.unauthorized.config.slice_isolation", "equals": false}, {"path": "results.attacks.oam_route_change.native.accepted", "equals": true}, {"path": "results.attacks.oam_route_change.hardened_unauthorized.reason", "equals": "oam_rbac"}, {"path": "results.attacks.oam_route_change.hardened_authorized.accepted", "equals": true}]
+    },
+    {
+      "id": "Q-10",
+      "statement": "The capture model marks broadcast SIB, pre-security registration metadata and N3 outer/TEID metadata visible; application payload is readable without app TLS and not directly readable with app TLS.",
+      "report_location": "F-07 and E5G-10",
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.captures"}],
+      "test": "tests/test_atg5g_lab.py::test_capture_model_distinguishes_metadata_transport_and_payload",
+      "assertions": [{"path": "results.captures.uu.broadcast_sib_visible", "equals": true}, {"path": "results.captures.uu.pre_security_registration_metadata_visible", "equals": true}, {"path": "results.captures.n3_n6.gtp_u_outer_headers_visible", "equals": true}, {"path": "results.captures.n3_n6.teid_visible_to_transport_observer", "equals": true}, {"path": "results.captures.n3_n6.application_payload_readable_without_app_tls", "equals": true}, {"path": "results.captures.n3_n6.application_payload_readable_with_app_tls", "equals": false}]
+    },
+    {
+      "id": "Q-11",
+      "statement": "The final evidence run records 8 focused 5G-ATG tests and 45 full-repository tests passing.",
+      "report_location": "evidence-chain section",
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "environment.verification.focused.stdout"}, {"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "environment.verification.full.stdout"}],
+      "test": "tests/test_atg5g_lab.py",
+      "assertions": [{"path": "environment.verification.focused.stdout", "regex": "8 passed"}, {"path": "environment.verification.full.stdout", "regex": "45 passed"}]
+    }
+  ],
+  "scenario_conclusions": [
+    {
+      "id": "C-AD-01",
+      "report_location": "AD-01",
+      "statement": "Dedicated-core physical isolation can be weakened by a trusted OAM/N6 bridge unless logical authorization and protected boundaries are independently enforced.",
+      "sources": ["SRC-01", "SRC-08", "SRC-09", "SRC-10", "SRC-11", "SRC-14"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.oam_route_change"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_oam_route_change_requires_authorization_and_preserves_boundary"}],
+      "limitation": "Real topology, OAM protocol, roles and aircraft ICD are not present."
+    },
+    {
+      "id": "C-AD-02",
+      "report_location": "AD-02",
+      "statement": "DNN/S-NSSAI/TEID/QFI configuration must be bound to the active PDU session and source security zone.",
+      "sources": ["SRC-01", "SRC-07", "SRC-08"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.session_binding"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_n3_session_and_qfi_binding_rejects_forged_context"}],
+      "limitation": "Synthetic packet objects do not prove a vendor UPF implementation behavior."
+    },
+    {
+      "id": "C-AD-03",
+      "report_location": "AD-03",
+      "statement": "High-altitude coverage and mobility require explicit old/new session, sequence and recovery handling; this report marks real handover verification as pending.",
+      "sources": ["SRC-02", "SRC-05", "SRC-06", "SRC-09", "SRC-10", "SRC-11"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.limitations"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "This is a digital 5G-ATG architecture and security-state model"}],
+      "limitation": "No handover, flight-path, Doppler or real coverage experiment is claimed."
+    },
+    {
+      "id": "C-AD-04",
+      "report_location": "AD-04",
+      "statement": "Dedicated deployment patch, certificate, configuration and rollback processes are high-value security controls.",
+      "sources": ["SRC-09", "SRC-10", "SRC-11", "SRC-12", "SRC-14"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.oam_route_change"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "class SecureOamController"}],
+      "limitation": "No vendor firmware, certificate authority or CVE-specific reproduction is included."
+    },
+    {
+      "id": "C-F-01",
+      "report_location": "F-01",
+      "statement": "A rogue-cell state can expose pre-security metadata and cause weak UE camping without establishing a user plane; hardened UE rejects the cell in this model.",
+      "sources": ["SRC-03", "SRC-04", "SRC-06", "SRC-10"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.rogue_cell"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_interference_and_rogue_cell_states_are_explicit"}],
+      "limitation": "Not a real fake-gNB, RF or identity-capture test."
+    },
+    {
+      "id": "C-F-02",
+      "report_location": "F-02",
+      "statement": "Uu/RRC/NAS loss can prevent registration and user-plane readiness; the model represents this as digital packet loss.",
+      "sources": ["SRC-02", "SRC-05", "SRC-06", "SRC-11", "SRC-14"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.interference"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_interference_and_rogue_cell_states_are_explicit"}],
+      "limitation": "No RF power, waveform, propagation, antenna or spectrum measurement."
+    },
+    {
+      "id": "C-F-03",
+      "report_location": "F-03",
+      "statement": "Unbounded registration state allocation is more exposed to signaling pressure than a rate-limited entry point.",
+      "sources": ["SRC-01", "SRC-02", "SRC-03", "SRC-10"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.signaling_storm"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_signaling_rate_limit_reduces_context_pressure"}],
+      "limitation": "Context allocation is a deterministic resource model, not AMF/SMF performance data."
+    },
+    {
+      "id": "C-F-04",
+      "report_location": "F-04",
+      "statement": "A weak trusted-transport path can deliver modified telemetry, while application message authentication blocks the modified payload in the model.",
+      "sources": ["SRC-04", "SRC-07", "SRC-09", "SRC-10", "SRC-11"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.data_tamper"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_user_plane_tamper_and_replay_are_rejected"}],
+      "limitation": "The HMAC is a synthetic policy instrument and not a certified airborne cryptographic implementation."
+    },
+    {
+      "id": "C-F-05",
+      "report_location": "F-05",
+      "statement": "A receiver without sequence/freshness state accepts repeated telemetry in the model; the hardened gateway rejects the duplicate.",
+      "sources": ["SRC-02", "SRC-04", "SRC-07", "SRC-10"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.data_replay"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_user_plane_tamper_and_replay_are_rejected"}],
+      "limitation": "Real handover, restart and persistent sequence-state behavior remains a test-bench item."
+    },
+    {
+      "id": "C-F-06",
+      "report_location": "F-06",
+      "statement": "Forged TEID or QFI is accepted by the weak router but rejected by active-session binding checks.",
+      "sources": ["SRC-01", "SRC-04", "SRC-07", "SRC-08"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.session_binding"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_n3_session_and_qfi_binding_rejects_forged_context"}],
+      "limitation": "No real GTP-U or PFCP socket is opened."
+    },
+    {
+      "id": "C-F-07",
+      "report_location": "F-07",
+      "statement": "Uu broadcast/initial metadata and N3 outer metadata can remain observable even when application payload protection is enabled; no app TLS leaves payload readable in this model.",
+      "sources": ["SRC-01", "SRC-04", "SRC-06", "SRC-07"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.captures"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_capture_model_distinguishes_metadata_transport_and_payload"}],
+      "limitation": "No production capture, RF receiver or transport tap is used."
+    },
+    {
+      "id": "C-F-08",
+      "report_location": "F-08",
+      "statement": "A cabin-to-avionics write path must not be authorized only by DNN or trusted transport; the hardened boundary rejects the synthetic command before application delivery.",
+      "sources": ["SRC-01", "SRC-09", "SRC-10", "SRC-12", "SRC-13", "SRC-14"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.cabin_to_avionics_boundary"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_cabin_to_avionics_boundary_is_blocked_before_delivery"}],
+      "limitation": "The downstream command is synthetic and does not represent a real aircraft function."
+    },
+    {
+      "id": "C-F-09",
+      "report_location": "F-09",
+      "statement": "An OAM bridge that trusts a maintenance jump host can accept a cross-domain route mutation; the hardened controller requires identity/approval and preserves the boundary.",
+      "sources": ["SRC-08", "SRC-09", "SRC-10", "SRC-11", "SRC-14"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.oam_route_change"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_oam_route_change_requires_authorization_and_preserves_boundary"}],
+      "limitation": "OAM protocol and vendor implementation are synthetic."
+    },
+    {
+      "id": "C-F-10",
+      "report_location": "F-10",
+      "statement": "UE credentials, firmware and local bridges are design-review attack surfaces, but this project does not claim a real UE firmware or UICC vulnerability.",
+      "sources": ["SRC-03", "SRC-04", "SRC-09", "SRC-10", "SRC-11"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.limitations"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "does not transmit RF"}],
+      "limitation": "Requires authorized UE security, firmware and key-lifecycle testing."
+    },
+    {
+      "id": "C-F-11",
+      "report_location": "F-11",
+      "statement": "gNB broadcast, neighbor, N2/N3 and slice configuration are configuration-controlled attack surfaces; this project only verifies synthetic trusted/rogue cell states.",
+      "sources": ["SRC-01", "SRC-05", "SRC-06", "SRC-09", "SRC-10"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.air_interface"}, {"kind": "code", "path": "sim/atg5g_lab.py", "anchor": "class AtgCell"}],
+      "limitation": "No real gNB, N2/N3 interoperability or RF coverage test."
+    },
+    {
+      "id": "C-F-12",
+      "report_location": "F-12",
+      "statement": "A ground application must not trust only source IP, DNN, VLAN, TEID or a dedicated-UPF label; it needs aircraft/session/message and semantic validation.",
+      "sources": ["SRC-01", "SRC-04", "SRC-09", "SRC-10", "SRC-11"],
+      "evidence": [{"kind": "artifact", "path": "artifacts/5g_atg_results.json", "json_path": "results.attacks.data_tamper"}, {"kind": "test", "path": "tests/test_atg5g_lab.py", "anchor": "test_user_plane_tamper_and_replay_are_rejected"}],
+      "limitation": "The ground application and schema are synthetic."
+    }
+  ],
+  "audit_steps": [
+    {"id": "AUD-01", "step": "Freeze source registry, synthetic assumptions and report reference mapping", "evidence": ["report/5g_atg_traceability.json", "report/5g_atg_traceability_matrix.md"]},
+    {"id": "AUD-02", "step": "Compile model, runner, verifier and tests", "command": "python3 -m py_compile sim/*.py scripts/*.py tests/*.py"},
+    {"id": "AUD-03", "step": "Run deterministic 5G-ATG scenarios and write structured evidence", "command": "python3 scripts/run_atg5g_experiments.py", "evidence": ["artifacts/5g_atg_results.json", "artifacts/5g_atg_experiment_log.md"]},
+    {"id": "AUD-04", "step": "Run focused regression assertions", "command": "python3 -m pytest -q tests/test_atg5g_lab.py"},
+    {"id": "AUD-05", "step": "Fresh-run model output comparison, JSON-path verification, source-anchor verification and hash manifest", "command": "python3 scripts/verify_atg5g_evidence.py", "evidence": ["artifacts/5g_atg_provenance.json", "artifacts/5g_atg_verification.log"]},
+    {"id": "AUD-06", "step": "Run the full repository regression suite", "command": "python3 -m pytest -q", "evidence": ["artifacts/5g_atg_provenance.json", "artifacts/5g_atg_verification.log"]},
+    {"id": "AUD-07", "step": "Render the report after evidence generation", "command": "python3 scripts/render_report.py", "evidence": ["artifacts/5g_atg_security_report.html"]}
+  ]
+}

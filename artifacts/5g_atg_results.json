@@ -1,0 +1,440 @@
+{
+  "environment": {
+    "command": "/home/starlight/CtfTools/PwnVenv/bin/python3 scripts/run_atg5g_experiments.py",
+    "generated_at_utc": "2026-08-24T09:14:30.078298+00:00",
+    "model_sha256": "0c674732490ddc933e9f7e60f4313b136f0502228fb5d9de18e9c6a1e6bf15b4",
+    "platform": "Linux-7.1.9-zen1-2-zen-x86_64-with-glibc2.44",
+    "python": "3.14.7",
+    "traceability_matrix": "report/5g_atg_traceability.json",
+    "verification": {
+      "focused": {
+        "command": "/home/starlight/CtfTools/PwnVenv/bin/python3 -m pytest -q tests/test_atg5g_lab.py",
+        "returncode": 0,
+        "stderr": "",
+        "stdout": "........                                                                 [100%]\n8 passed in 0.02s"
+      },
+      "full": {
+        "command": "/home/starlight/CtfTools/PwnVenv/bin/python3 -m pytest -q",
+        "returncode": 0,
+        "stderr": "",
+        "stdout": ".............................................                            [100%]\n45 passed in 0.09s"
+      }
+    }
+  },
+  "results": {
+    "air_interface": {
+      "events": [
+        {
+          "cell_id": "ATG-GNB-01",
+          "event": "REGISTRATION_COMPLETE",
+          "security_mode_complete": true,
+          "timestamp_ms": 0,
+          "ue_id": "ATG-UE-001"
+        },
+        {
+          "cell_id": "ROGUE-GNB-01",
+          "event": "UNTRUSTED_GNB_SELECTED",
+          "registration_request_visible": true,
+          "timestamp_ms": 100,
+          "ue_id": "ATG-UE-001"
+        },
+        {
+          "cell_id": "ROGUE-GNB-01",
+          "event": "UNTRUSTED_GNB_SELECTED",
+          "registration_request_visible": true,
+          "timestamp_ms": 200,
+          "ue_id": "ATG-UE-001"
+        },
+        {
+          "event": "RRC_NAS_TIMEOUT",
+          "timestamp_ms": 300,
+          "ue_id": "ATG-UE-001"
+        }
+      ],
+      "interference": {
+        "aka_success": false,
+        "broadcast_visible": true,
+        "camped_on_cell": false,
+        "cell_id": null,
+        "nas_registration_request_sent": false,
+        "pre_security_metadata_visible": true,
+        "reason": "uu_interference_or_signal_blocking",
+        "result": "registration_timeout",
+        "rrc_setup_complete": false,
+        "security_mode_complete": false,
+        "ue_id": "ATG-UE-001",
+        "user_plane_ready": false
+      },
+      "rogue_cell_hardened": {
+        "aka_success": false,
+        "broadcast_visible": true,
+        "camped_on_cell": false,
+        "cell_id": "ROGUE-GNB-01",
+        "nas_registration_request_sent": true,
+        "pre_security_metadata_visible": true,
+        "reason": "5g_aka_or_network_trust_failed",
+        "result": "rogue_cell_rejected",
+        "rrc_setup_complete": true,
+        "security_mode_complete": false,
+        "ue_id": "ATG-UE-001",
+        "user_plane_ready": false
+      },
+      "rogue_cell_legacy": {
+        "aka_success": false,
+        "broadcast_visible": true,
+        "camped_on_cell": true,
+        "cell_id": "ROGUE-GNB-01",
+        "nas_registration_request_sent": true,
+        "pre_security_metadata_visible": true,
+        "reason": "5g_aka_or_network_trust_failed",
+        "result": "camped_untrusted_cell",
+        "rrc_setup_complete": true,
+        "security_mode_complete": false,
+        "ue_id": "ATG-UE-001",
+        "user_plane_ready": false
+      },
+      "trusted_registration": {
+        "aka_success": true,
+        "broadcast_visible": true,
+        "camped_on_cell": true,
+        "cell_id": "ATG-GNB-01",
+        "nas_registration_request_sent": true,
+        "pre_security_metadata_visible": true,
+        "reason": "5g_aka_and_security_mode_complete",
+        "result": "registered",
+        "rrc_setup_complete": true,
+        "security_mode_complete": true,
+        "ue_id": "ATG-UE-001",
+        "user_plane_ready": true
+      }
+    },
+    "architecture": {
+      "chain": [
+        "aircraft_5g_ue",
+        "ATG NR gNB",
+        "AMF/SMF/UPF dedicated core",
+        "N6 ground application",
+        "cabin-avionics boundary",
+        "OAM/OSS management boundary"
+      ],
+      "dedicated_core_physical_isolation": true,
+      "dnns": [
+        "atg.cabin",
+        "atg.maint",
+        "atg.avionics"
+      ],
+      "hardened_cabin_to_avionics_acl": true,
+      "legacy_cabin_to_avionics_acl": false,
+      "legacy_management_bridge_trusted": true,
+      "name": "SYNTHETIC-5G-ATG",
+      "plmn": "999-99",
+      "qfi": 9,
+      "slice": "sst=1;sd=ATG001",
+      "teid_start": 4096
+    },
+    "attacks": {
+      "cabin_to_avionics_boundary": {
+        "hardened": {
+          "accepted": false,
+          "effect": "no_application_delivery",
+          "reason": "cabin_to_avionics_boundary"
+        },
+        "hardened_state": {
+          "avionics_commands": [],
+          "cabin_messages": [],
+          "ground_telemetry": {
+            "airspeed_kt": 440,
+            "altitude_ft": 30000,
+            "phase": "cruise"
+          },
+          "maintenance_records": [
+            {
+              "record_id": "BITE-2026-001",
+              "status": "OPEN"
+            }
+          ]
+        },
+        "input": {
+          "destination_zone": "AVIONICS",
+          "dnn": "atg.cabin",
+          "message_type": "AVIONICS_COMMAND",
+          "payload": {
+            "command": "SET_FLIGHT_DISPLAY_MODE",
+            "mode": "TEST"
+          },
+          "source_id": "ATG-UE-001",
+          "source_zone": "CABIN"
+        },
+        "native": {
+          "accepted": true,
+          "effect": "avionics_command_executed:SET_FLIGHT_DISPLAY_MODE",
+          "reason": "accepted_trusted_transport"
+        },
+        "native_state": {
+          "avionics_commands": [
+            "SET_FLIGHT_DISPLAY_MODE"
+          ],
+          "cabin_messages": [
+            {
+              "message": "forged-session"
+            },
+            {
+              "message": "forged-qfi"
+            }
+          ],
+          "ground_telemetry": {
+            "airspeed_kt": 440,
+            "altitude_ft": 30000,
+            "phase": "cruise"
+          },
+          "maintenance_records": [
+            {
+              "record_id": "BITE-2026-001",
+              "status": "OPEN"
+            }
+          ]
+        }
+      },
+      "data_replay": {
+        "first_hardened": {
+          "accepted": true,
+          "effect": "telemetry_updated:30000ft",
+          "reason": "accepted"
+        },
+        "input": {
+          "first_submission_ms": 300,
+          "payload": {
+            "airspeed_kt": 440,
+            "altitude_ft": 30000,
+            "phase": "cruise"
+          },
+          "replay_submission_ms": 320,
+          "sequence": 3,
+          "timestamp_ms": 300
+        },
+        "native": {
+          "accepted": true,
+          "effect": "telemetry_updated:30000ft",
+          "reason": "accepted_trusted_transport"
+        },
+        "replayed_hardened": {
+          "accepted": false,
+          "effect": "no_application_delivery",
+          "reason": "replay"
+        }
+      },
+      "data_tamper": {
+        "hardened": {
+          "accepted": false,
+          "effect": "no_application_delivery",
+          "reason": "authentication"
+        },
+        "input": {
+          "original_payload": {
+            "airspeed_kt": 440,
+            "altitude_ft": 30000,
+            "phase": "cruise"
+          },
+          "original_tag_retained": true,
+          "sequence": 2,
+          "tampered_payload": {
+            "airspeed_kt": 80,
+            "altitude_ft": 500,
+            "phase": "cruise"
+          },
+          "timestamp_ms": 200
+        },
+        "native": {
+          "accepted": true,
+          "effect": "telemetry_updated:500ft",
+          "reason": "accepted_trusted_transport"
+        }
+      },
+      "interference": {
+        "registration": {
+          "aka_success": false,
+          "broadcast_visible": true,
+          "camped_on_cell": false,
+          "cell_id": null,
+          "nas_registration_request_sent": false,
+          "pre_security_metadata_visible": true,
+          "reason": "uu_interference_or_signal_blocking",
+          "result": "registration_timeout",
+          "rrc_setup_complete": false,
+          "security_mode_complete": false,
+          "ue_id": "ATG-UE-001",
+          "user_plane_ready": false
+        },
+        "safe_degradation_required": true,
+        "service_available": false
+      },
+      "oam_route_change": {
+        "hardened_authorized": {
+          "accepted": true,
+          "config": {
+            "cabin_to_avionics_route": false,
+            "slice_isolation": true
+          },
+          "reason": "oam_authorized"
+        },
+        "hardened_unauthorized": {
+          "accepted": false,
+          "reason": "oam_rbac"
+        },
+        "input": {
+          "authorized": {
+            "config": {
+              "cabin_to_avionics_route": false,
+              "slice_isolation": true
+            },
+            "dual_approval": true,
+            "mtls": true,
+            "operation": "UPDATE_ROUTE_POLICY",
+            "role": "network_admin",
+            "source": "network_admin",
+            "target": "ATG-5GC-UPF"
+          },
+          "unauthorized": {
+            "config": {
+              "cabin_to_avionics_route": true,
+              "slice_isolation": false
+            },
+            "dual_approval": false,
+            "mtls": false,
+            "operation": "UPDATE_ROUTE_POLICY",
+            "role": "vendor_support",
+            "source": "vendor_jump_host",
+            "target": "ATG-5GC-UPF"
+          }
+        },
+        "native": {
+          "accepted": true,
+          "config": {
+            "cabin_to_avionics_route": true,
+            "slice_isolation": false
+          },
+          "reason": "trusted_oam_bridge"
+        }
+      },
+      "rogue_cell": {
+        "hardened": {
+          "aka_success": false,
+          "broadcast_visible": true,
+          "camped_on_cell": false,
+          "cell_id": "ROGUE-GNB-01",
+          "nas_registration_request_sent": true,
+          "pre_security_metadata_visible": true,
+          "reason": "5g_aka_or_network_trust_failed",
+          "result": "rogue_cell_rejected",
+          "rrc_setup_complete": true,
+          "security_mode_complete": false,
+          "ue_id": "ATG-UE-001",
+          "user_plane_ready": false
+        },
+        "legacy": {
+          "aka_success": false,
+          "broadcast_visible": true,
+          "camped_on_cell": true,
+          "cell_id": "ROGUE-GNB-01",
+          "nas_registration_request_sent": true,
+          "pre_security_metadata_visible": true,
+          "reason": "5g_aka_or_network_trust_failed",
+          "result": "camped_untrusted_cell",
+          "rrc_setup_complete": true,
+          "security_mode_complete": false,
+          "ue_id": "ATG-UE-001",
+          "user_plane_ready": false
+        },
+        "user_plane_established_by_rogue": false
+      },
+      "session_binding": {
+        "input": {
+          "dnn": "atg.cabin",
+          "forged_qfi": 10,
+          "forged_teid": 4097,
+          "qfi": 9,
+          "slice_id": "sst=1;sd=ATG001",
+          "teid": 4096,
+          "ue_id": "ATG-UE-001"
+        },
+        "qfi_forgery": {
+          "hardened": {
+            "accepted": false,
+            "effect": "no_application_delivery",
+            "reason": "qfi_binding"
+          },
+          "native": {
+            "accepted": true,
+            "effect": "cabin_data_forwarded",
+            "reason": "accepted_trusted_transport"
+          }
+        },
+        "teid_forgery": {
+          "hardened": {
+            "accepted": false,
+            "effect": "no_application_delivery",
+            "reason": "session_binding"
+          },
+          "native": {
+            "accepted": true,
+            "effect": "cabin_data_forwarded",
+            "reason": "accepted_trusted_transport"
+          }
+        }
+      },
+      "signaling_storm": {
+        "attempts": 50,
+        "hardened_contexts_allocated": 10,
+        "hardened_reason": "signaling_rate_limit",
+        "hardened_rejected": 40,
+        "limit_per_window": 10,
+        "native_contexts_allocated": 50,
+        "window_ms": 1000
+      }
+    },
+    "captures": {
+      "n3_n6": {
+        "application_payload_readable_with_app_tls": false,
+        "application_payload_readable_without_app_tls": true,
+        "gtp_u_outer_headers_visible": true,
+        "reason": "N3_transport_and_N6_application_protection_are_deployment_controls",
+        "teid_visible_to_transport_observer": true
+      },
+      "uu": {
+        "broadcast_sib_visible": true,
+        "pre_security_registration_metadata_visible": true,
+        "reason": "5g_air_interface_security_context_not_yet_complete_for_broadcast_and_initial_signaling",
+        "user_plane_payload_readable_after_security": false
+      }
+    },
+    "limitations": [
+      "This is a digital 5G-ATG architecture and security-state model; it does not transmit RF, create a gNB, operate a 5GC, or use a SIM/eSIM.",
+      "Cell IDs, PLMN, DNN, slice, TEID, QFI, UE IDs, application messages, and route policy are synthetic project data, not a real operator deployment.",
+      "Interference is represented as RRC/NAS packet loss; no RF power, spectrum, antenna, waveform, propagation, Doppler, or jamming equipment is modeled.",
+      "Rogue-cell behavior is represented as broadcast/pre-security visibility and 5G-AKA failure; it is not an operational fake-gNB or IMSI-capture implementation.",
+      "The model does not prove a real aircraft avionics boundary, cabin network, 5GC, gNB, operator OAM, ground application, or airworthiness result."
+    ],
+    "normal": {
+      "maintenance_hardened": {
+        "accepted": true,
+        "effect": "maintenance_record_stored",
+        "reason": "accepted"
+      },
+      "maintenance_native": {
+        "accepted": true,
+        "effect": "maintenance_record_stored",
+        "reason": "accepted_trusted_transport"
+      },
+      "telemetry_hardened": {
+        "accepted": true,
+        "effect": "telemetry_updated:30000ft",
+        "reason": "accepted"
+      },
+      "telemetry_native": {
+        "accepted": true,
+        "effect": "telemetry_updated:30000ft",
+        "reason": "accepted_trusted_transport"
+      }
+    }
+  }
+}

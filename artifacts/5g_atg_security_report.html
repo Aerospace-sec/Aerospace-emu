@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>5G-ATG 航空地空宽带通信系统脆弱性分析报告</title><style>
+@page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+* { box-sizing: border-box; }
+body { color: #17202a; font-family: "Noto Serif CJK SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; font-size: 10.5pt; line-height: 1.65; margin: 0 auto; max-width: 920px; }
+h1 { border-bottom: 2px solid #123b5d; color: #123b5d; font-size: 22pt; line-height: 1.25; margin: 0 0 18px; padding-bottom: 10px; }
+h2 { border-bottom: 1px solid #7c9ab2; color: #123b5d; font-size: 15pt; margin-top: 26px; padding-bottom: 4px; }
+h3 { color: #234e70; font-size: 12.5pt; margin-top: 20px; }
+p { text-align: justify; }
+table { border-collapse: collapse; font-size: 9pt; margin: 12px 0 18px; width: 100%; }
+th { background: #eaf1f6; color: #123b5d; font-weight: 700; }
+th, td { border: 1px solid #b6c4ce; padding: 5px 6px; vertical-align: top; }
+code { background: #eef2f4; border-radius: 2px; padding: 1px 3px; }
+pre { background: #17202a; color: #f2f6f8; overflow-wrap: anywhere; padding: 10px; white-space: pre-wrap; }
+blockquote { border-left: 4px solid #7c9ab2; color: #455a64; margin-left: 0; padding-left: 12px; }
+li { margin-bottom: 4px; }
+hr { border: 0; border-top: 1px solid #c8d1d8; }
+@media print { a { color: inherit; text-decoration: none; } h2, h3 { break-after: avoid; } table { break-inside: avoid; } }
+</style></head>
+<body><h1 id="55g-atg5g">第5题：5G-ATG（5G航空地空宽带通信系统）脆弱性深度分析</h1>
+<p><strong>作答场景：</strong> 民用航空5G地空宽带通信全链路，包括机载5G终端、地空基站、专属核心网、地面应用系统，以及客舱网络、机载航电和地面运维之间的边界</p>
+<p><strong>报告版本：</strong> 1.0</p>
+<p><strong>验证日期：</strong> 2026-08-24</p>
+<p><strong>危害分级：</strong> 极高、高、中、低四级。分级针对本报告定义的民航业务和边界，不能替代具体机型的 FHA、SSA、网络安全评估或适航审定结论。</p>
+<p><strong>结论性质：</strong> 本报告的攻击证据来自本地数字状态模型和合成项目 ICD，不是实际射频发射、真实伪基站、真实gNB/5GC、真实SIM/eSIM、真实飞机或运行系统测试。</p>
+<h3 id="c-n-06">四级危害判定准则（结论：C-N-06）</h3>
+<p>本报告按题设统一采用四级，并以真实系统中的功能危害分析、系统安全评估、运行程序和适用审定基础进行最终校准：</p>
+<table>
+<thead>
+<tr>
+<th>等级</th>
+<th>本报告判定口径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>极高</strong></td>
+<td>已有场景化证据表明攻击路径能够绕过安全域边界并向安全关键航电写入，或能够改变专属核心网/OAM的关键隔离策略，且后果可能影响飞行运行安全；仅当真实ICD和下游功能确认时采用。</td>
+</tr>
+<tr>
+<td><strong>高</strong></td>
+<td>能影响机载/地面运行监视、机务数据真实性、注册/切换可用性、维护操作或业务隔离，可能造成持续运行或持续适航判断错误，但尚未证明直接改变安全关键控制功能。</td>
+</tr>
+<tr>
+<td><strong>中</strong></td>
+<td>主要造成业务数据、运行元数据或维护信息泄露，或造成可恢复的非安全关键服务降级；攻击需要明确的观察点或维护/传输接入前提。</td>
+</tr>
+<tr>
+<td><strong>低</strong></td>
+<td>影响局部、短时、可监测且可快速恢复，不改变安全关键数据、维护状态或跨域策略；本报告未把仅有理论可能性的条目强行评为低。</td>
+</tr>
+</tbody>
+</table>
+<p>分级原则与CCAR-25 §25.1309、ARP4754A/ARP4761A的功能安全和系统安全评估相衔接；DO-326A/DO-356A用于网络安全威胁、保护和验证活动。四级标签不是把网络安全严重性直接等同于适航失效概率，必须结合具体飞机、设备、功能和独立安全措施复核。</p>
+<h2 id="_1">摘要</h2>
+<p>5G-ATG不是一个脱离3GPP 5GS/NR体系、所有运营方都采用同一实现的独立协议。本报告将它建模为面向民航航空地空宽带业务的5GS/NR部署profile：机载5G UE通过Uu接入ATG地空gNB，经N2/N3进入AMF/SMF/UPF专属核心网，再由N6连接地面应用系统。<code>atg.cabin</code>、<code>atg.maint</code>、<code>atg.avionics</code>、S-NSSAI、QFI和TEID均作为合成的项目接口控制数据，用于验证隔离和安全状态，不代表任何运营商或机型的实际配置。</p>
+<p>结论不是“5G天然不安全”。3GPP 5GS已经定义了5G-AKA、NAS/RRC安全、用户面保护和网络功能安全机制，但这些机制在空口广播、初始接入、N3/N6传输、应用接口、切片路由、OAM配置和客舱/航电边界之间并不会自动形成端到端安全闭环。专属核心网的物理隔离也不能替代逻辑认证、最小权限和跨域策略。</p>
+<p>本地模型复现了以下可验证差异：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>弱化/原生信任模型</th>
+<th>加固模型</th>
+<th>业务含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>可信小区注册</td>
+<td>注册成功</td>
+<td>注册成功</td>
+<td>正常客舱宽带、机务回传和地面应用路径可建立</td>
+</tr>
+<tr>
+<td>数字化干扰</td>
+<td>RRC/NAS超时</td>
+<td>RRC/NAS超时并要求安全降级</td>
+<td>证明可用性风险，不等于真实射频干扰功率试验</td>
+</tr>
+<tr>
+<td>恶意小区</td>
+<td>可驻留在未信任小区，用户面未建立</td>
+<td>拒绝驻留</td>
+<td>广播及初始注册元数据仍可能可见；5G-AKA失败未被绕过</td>
+</tr>
+<tr>
+<td>注册信令风暴</td>
+<td>50次请求分配50个上下文</td>
+<td>分配10个，拒绝40个</td>
+<td>AMF/SMF状态资源需有入口限速和过载控制</td>
+</tr>
+<tr>
+<td>客舱到航电</td>
+<td>命令被合成航电消费者执行</td>
+<td><code>cabin_to_avionics_boundary</code>拒绝</td>
+<td>专属DNN或TEID不等于跨域授权</td>
+</tr>
+<tr>
+<td>用户面篡改</td>
+<td>修改后的高度被地面应用接受</td>
+<td>HMAC完整性校验返回<code>authentication</code></td>
+<td>N6应用层需要独立完整性保护</td>
+</tr>
+<tr>
+<td>用户面重放</td>
+<td>重复遥测再次生效</td>
+<td>返回<code>replay</code></td>
+<td>序号、新鲜度和会话状态必须绑定业务消息</td>
+</tr>
+<tr>
+<td>N3会话伪造</td>
+<td>错误TEID/QFI仍被转发</td>
+<td>分别返回<code>session_binding</code>、<code>qfi_binding</code></td>
+<td>GTP-U标识符不是发送者身份凭证</td>
+</tr>
+<tr>
+<td>OAM路由变更</td>
+<td>未授权跳板修改跨域路由</td>
+<td>RBAC、mTLS、双人审批及边界策略阻断</td>
+<td>物理隔离的核心网仍可能被管理平面重新连通</td>
+</tr>
+<tr>
+<td>被动监听</td>
+<td>Uu广播/初始信息和N3外层元数据可见；无应用TLS时payload可读</td>
+<td>应用TLS时payload不可直接读取</td>
+<td>元数据保密、业务保密和链路保护需分别设计</td>
+</tr>
+</tbody>
+</table>
+<p>机器可读证据见 <a href="../artifacts/5g_atg_results.json"><code>artifacts/5g_atg_results.json</code></a>，实验归档见 <a href="../artifacts/5g_atg_experiment_log.md"><code>artifacts/5g_atg_experiment_log.md</code></a>，模型源代码见 <a href="../sim/atg5g_lab.py"><code>sim/atg5g_lab.py</code></a>，自动化测试见 <a href="../tests/test_atg5g_lab.py"><code>tests/test_atg5g_lab.py</code></a>。</p>
+<h2 id="_2">证据链与反向核验入口</h2>
+<p>本报告的数字引用<code>[1]</code>至<code>[15]</code>与 <a href="5g_atg_traceability.json"><code>report/5g_atg_traceability.json</code></a> 中的 <code>SRC-01</code> 至 <code>SRC-15</code>一一对应。报告中的量化数据和技术结论不以摘要表为唯一依据，分别在追溯矩阵中登记为 <code>Q-*</code> 和 <code>C-*</code>，并绑定外部来源、模型函数、JSON字段、测试断言和限制条件。人类可读矩阵见 <a href="5g_atg_traceability_matrix.md"><code>report/5g_atg_traceability_matrix.md</code></a>。</p>
+<p>完整实验过程由以下文件留痕：</p>
+<ul>
+<li><a href="../artifacts/5g_atg_results.json"><code>artifacts/5g_atg_results.json</code></a>：带环境信息和模型SHA-256的机器记录；</li>
+<li><a href="../artifacts/5g_atg_experiment_log.md"><code>artifacts/5g_atg_experiment_log.md</code></a>：实验输入、结果摘要和边界说明；</li>
+<li><a href="../artifacts/5g_atg_verification.log"><code>artifacts/5g_atg_verification.log</code></a>：验证器输出、聚焦测试输出和检查状态；</li>
+<li><a href="../artifacts/5g_atg_provenance.json"><code>artifacts/5g_atg_provenance.json</code></a>：输入/输出文件大小、行数、SHA-256和执行环境清单。</li>
+</ul>
+<p>评审可在项目根目录执行 <code>python3 scripts/verify_atg5g_evidence.py</code>。验证器会重新运行模型并与归档结果深比较，解析追溯矩阵中的JSON路径和代码锚点，重新执行 <code>tests/test_atg5g_lab.py</code>，并生成哈希清单。报告标准引用的具体采用版本、RTCA/EUROCAE受控修订、SAE版本和CCAR修订号仍必须在项目配置基线中冻结；矩阵明确标记了尚未核实的系列级引用，不用未核实版本号冒充精确条款来源。</p>
+<p>本次归档的验证记录为：第5题聚焦测试 <code>8 passed</code>，全量回归 <code>45 passed</code>；对应输出首先由实验运行器写入 <a href="../artifacts/5g_atg_results.json"><code>artifacts/5g_atg_results.json</code></a> 的 <code>environment.verification</code> 字段，再由 <a href="../artifacts/5g_atg_provenance.json"><code>artifacts/5g_atg_provenance.json</code></a> 复核并登记。</p>
+<h2 id="1">1. 场景、架构和边界</h2>
+<h3 id="11">1.1 民航全链路场景</h3>
+<pre><code class="language-text">        飞机机身/客舱
+  +-----------------------+
+  |  机载5G UE             |
+  |   |                   |
+  |   +-- 客舱网络         |   机载航电域
+  |                       |   +------------------+
+  |   机务数据适配器 ------+--&gt;| 航电数据网/LRU    |
+  +-----------|-----------+   +------------------+
+              | Uu
+              v
+      ATG NR gNB / 地空基站
+              | N2: NGAP/NAS
+              | N3: GTP-U
+              v
+       专属5G核心网
+   +----------------------+
+   | AMF / AUSF / SEAF     |
+   | SMF / PCF / UDM       |
+   | UPF / N4 PFCP         |
+   +-----------|----------+
+               | N6
+               v
+       地面应用与运营系统
+   +-----------------------------+
+   | 客舱宽带服务 / 机务平台      |
+   | 航班运行监视 / 数据接收      |
+   | OSS/OAM / 维护跳板           |
+   +-----------------------------+
+</code></pre>
+<p>本报告把上述架构分成五个安全域：</p>
+<ol>
+<li><strong>机载5G终端域：</strong> 机载调制解调器、UE协议栈、UICC/eSIM、终端操作系统和机载数据适配器。</li>
+<li><strong>Uu/ATG接入域：</strong> NR空口、地空基站、广播系统信息、RRC/NAS初始接入和移动性控制。</li>
+<li><strong>专属核心网域：</strong> AMF、AUSF/SEAF、SMF、PCF、UDM、UPF，以及N2、N3、N4和N6边界。</li>
+<li><strong>地面业务域：</strong> 客舱宽带汇聚、机务数据接收、运行监视、数据存储和地面运营系统。</li>
+<li><strong>跨域管理和航电边界：</strong> OAM/OSS、供应商维护跳板、客舱网络到机载航电数据网的安全网关，以及必要的协议代理或单向数据通道。</li>
+</ol>
+<h3 id="12-q-01">1.2 合成实验配置（数据：Q-01）</h3>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>实验值</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PLMN</td>
+<td><code>999-99</code></td>
+<td>合成值，不是运营商PLMN</td>
+</tr>
+<tr>
+<td>可信小区</td>
+<td><code>ATG-GNB-01</code></td>
+<td>合成gNB/Cell ID</td>
+</tr>
+<tr>
+<td>恶意小区</td>
+<td><code>ROGUE-GNB-01</code></td>
+<td>数字诱捕状态，不是真实伪基站</td>
+</tr>
+<tr>
+<td>TAC</td>
+<td><code>ATG-TAC-01</code></td>
+<td>合成跟踪区</td>
+</tr>
+<tr>
+<td>S-NSSAI</td>
+<td><code>sst=1;sd=ATG001</code></td>
+<td>合成ATG业务切片标识</td>
+</tr>
+<tr>
+<td>DNN</td>
+<td><code>atg.cabin</code>、<code>atg.maint</code>、<code>atg.avionics</code></td>
+<td>合成业务接入点名称</td>
+</tr>
+<tr>
+<td>UE</td>
+<td><code>ATG-UE-001</code>、<code>ATG-AVIONICS-001</code>、<code>ATG-MAINT-001</code></td>
+<td>合成终端标识</td>
+</tr>
+<tr>
+<td>QFI</td>
+<td><code>9</code></td>
+<td>合成QoS Flow标识</td>
+</tr>
+<tr>
+<td>TEID</td>
+<td>从<code>0x1000</code>递增</td>
+<td>合成GTP-U会话标识</td>
+</tr>
+<tr>
+<td>应用消息</td>
+<td>遥测、维护记录、航电命令</td>
+<td>合成项目ICD</td>
+</tr>
+</tbody>
+</table>
+<h3 id="13">1.3 真实系统中必须补齐的条件</h3>
+<p>真实5G-ATG系统的安全结论至少还需要冻结以下输入：运营商5GS版本和网元清单、gNB和UPF的安全配置、UE型号和固件版本、UICC/eSIM密钥生命周期、DNN/S-NSSAI/QFI策略、N2/N3/N4/N6拓扑、地面应用接口控制文件、客舱/航电安全域定义、OAM跳板和供应商维护流程、飞行阶段和链路丢失时的安全降级逻辑。</p>
+<p>若这些输入未知，只能形成架构级风险假设，不能把本报告的合成PLMN、TEID、命令或结果写成某一真实机型的缺陷证据。</p>
+<h3 id="14">1.4 仿真边界</h3>
+<p>本项目只执行本地、确定性的状态转换和应用消息处理：</p>
+<ul>
+<li>不发射真实RF，不模拟发射功率、频谱占用、波形、天线、传播、多普勒或干扰设备；</li>
+<li>不创建可接入的真实小区，不实现fake-gNB、IMSI/SUPI捕获或伪基站工具；</li>
+<li>不运行真实gNB、AMF、SMF、UPF，不打开网络套接字，不使用真实SIM/eSIM；</li>
+<li>不连接真实飞机、机载5G终端、LRU、客舱网络、民航运营系统或供应商OAM；</li>
+<li>用户面HMAC、时间戳、序号和合成应用TLS字段只表示安全策略的判定接口，不替代经过批准的机载密码方案、密钥管理或适航软件实现。</li>
+</ul>
+<h2 id="2">2. 协议原理与原生安全边界</h2>
+<h3 id="21-5g-atg5gc-n-01">2.1 5G-ATG与公网5G的关系（结论：C-N-01）</h3>
+<p>5G-ATG的差异主要来自民航业务、空地覆盖、频率和部署profile，而不是另有一套统一的“ATG安全协议”。基础协议仍应在项目采用的3GPP 5GS/NR版本范围内确认：TS 23.501描述5GS架构和参考点，TS 23.502描述注册、PDU会话、移动性等流程，TS 24.501描述5GS NAS，TS 38.300/38.331描述NR/NG-RAN和RRC，TS 33.501描述5G安全架构与过程。[1]-[6]</p>
+<p>因此相对公网5G，专属民航部署的重点差异和风险是：</p>
+<ul>
+<li><strong>网元专属化：</strong> 专属AMF/SMF/UPF和地面应用物理隔离公网，降低共享基础设施暴露，但如果OAM跳板、供应商维护链路或N6出口被信任地桥接，物理隔离不会自动形成逻辑授权；</li>
+<li><strong>业务专用化：</strong> DNN、S-NSSAI和QFI按客舱、机务、航电业务划分，减少业务混合，但DNN/切片配置错误可能把错误业务映射到错误UPF或错误地面应用；</li>
+<li><strong>空中覆盖和移动性：</strong> 高空长距离覆盖、跨地面站切换和三维航迹使小区选择、邻区、切换、状态同步和链路丢失处理成为民航特有关注点；</li>
+<li><strong>定制和运维：</strong> 专用频率、定制空口参数、供应商专用网元和机载固件会减少通用公网生态的自动升级能力，补丁、配置、证书和回滚流程成为高价值控制点；</li>
+<li><strong>业务后果更集中：</strong> 客舱宽带中断主要影响旅客服务，机务回传错误影响持续适航和放行判断，而任何通向航电控制或安全关键显示的数据路径都必须独立隔离、鉴权和验证。</li>
+</ul>
+<h3 id="22">2.2 关键接口及安全属性</h3>
+<table>
+<thead>
+<tr>
+<th>接口/层级</th>
+<th>在本场景的作用</th>
+<th>原生机制能做什么</th>
+<th>不能直接推出的结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uu / NR物理层、RRC</td>
+<td>UE与ATG gNB的接入、广播、连接和移动性</td>
+<td>RRC状态、系统信息和后续安全配置</td>
+<td>差异化覆盖参数不等于来源认证；广播阶段不等于业务保密</td>
+</tr>
+<tr>
+<td>NAS/NGAP/N2</td>
+<td>注册、鉴权相关信令和核心网控制面连接</td>
+<td>NAS安全上下文、控制面程序和网元间流程</td>
+<td>不能代替应用命令授权；未完成安全上下文时不能假设所有字段保密</td>
+</tr>
+<tr>
+<td>Uu用户面/N3</td>
+<td>UE到UPF的业务承载；N3承载GTP-U</td>
+<td>由5GS配置的用户面机密性/完整性和隧道状态</td>
+<td>GTP-U TEID、QFI、DNN本身不是密码凭证</td>
+</tr>
+<tr>
+<td>N4/PFCP</td>
+<td>SMF向UPF下发会话和转发规则</td>
+<td>会话规则、QoS和转发状态</td>
+<td>规则配置错误仍可造成跨DNN、跨切片或跨安全域转发</td>
+</tr>
+<tr>
+<td>N6</td>
+<td>UPF到地面应用、运营和维护业务的出口</td>
+<td>IP转发和部署侧安全控制</td>
+<td>没有端到端应用认证时，地面应用可能过度信任源地址或传输元数据</td>
+</tr>
+<tr>
+<td>OAM/OSS</td>
+<td>配置、证书、切片、路由、告警、版本和维护操作</td>
+<td>取决于供应商和部署的管理协议及身份体系</td>
+<td>专属核心网的“物理隔离”不等于OAM命令已经授权</td>
+</tr>
+<tr>
+<td>客舱/航电边界</td>
+<td>机载5G业务与航电数据网的跨域交换</td>
+<td>由项目安全架构定义的网关、代理、单向通道或白名单</td>
+<td>任意IP路由、共享DNN或“内部可信”不能作为跨域依据</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23-c-n-02c-n-03">2.3 注册和安全建立顺序（结论：C-N-02、C-N-03）</h3>
+<p>在抽象流程中，UE先选择可见小区并接收系统信息，随后建立RRC连接、发送初始NAS注册请求，完成5G-AKA和安全模式，再建立PDU会话。广播、部分小区信息和初始接入元数据处在完整安全上下文之前；这解释了为什么加固UE可以拒绝未信任小区，却不能让外部观察者看不见所有广播和初始交互。[2]-[6]</p>
+<p>5G-AKA和NAS/RRC安全建立后，真实系统的算法选择、完整性和加密开关、用户面保护、密钥派生、重建和切换处理都必须按TS 33.501及项目安全配置核验。报告不能把“使用5G”简化成“任何Uu、N3、N6和应用消息都天然端到端加密”。</p>
+<h3 id="24-n3dnnqfiteidc-n-04">2.4 N3、DNN、切片、QFI和TEID的安全边界（结论：C-N-04）</h3>
+<p>GTP-U由TS 29.281定义承载格式和隧道语义；PFCP/N4由TS 29.244定义会话规则和UPF控制。TEID是隧道标识，QFI是QoS Flow标识，DNN和S-NSSAI用于业务选择与切片/会话上下文。它们必须与UE、PDU会话、N3对端、来源安全域和应用授权绑定，但不能单独证明“这条消息来自合法航电设备”。</p>
+<p>本项目加固网关的判定顺序是：活动PDU会话 -&gt; TEID和S-NSSAI -&gt; QFI -&gt; 来源安全域 -&gt; 客舱/航电跨域策略 -&gt; 应用TLS要求 -&gt; 来源HMAC -&gt; 时间戳 -&gt; 序号 -&gt; 业务字段范围 -&gt; 入口限速。该顺序用于展示分层控制；真实系统应由经过批准的安全架构和实现完成，不能直接复制合成HMAC接口。</p>
+<h2 id="3">3. 架构差异脆弱性</h2>
+<h3 id="31-ad-01c-ad-01">3.1 AD-01：专属核心网物理隔离被误当成逻辑隔离（结论：C-AD-01）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> 5GS部署架构、N2/N3/N6和OAM/OSS管理平面；对应TS 23.501参考点和TS 29.281/29.244会话转发语义。</li>
+<li><strong>触发条件：</strong> 专属AMF/SMF/UPF与公网物理隔离，但供应商维护跳板、运营OAM、N6路由或跨域代理被配置为可信桥接；缺少按身份、角色、DNN、S-NSSAI和目标安全域的显式授权。</li>
+<li><strong>适配设备：</strong> 专属核心网网元、地面路由器、UPF、OAM服务器、供应商跳板、机载5G数据适配器和客舱/航电边界网关。</li>
+<li><strong>利用前提：</strong> 攻击者先获得维护跳板、管理账号、被攻陷网元或错误配置的跨域路由；本报告不假定公网用户可以直接穿透物理隔离。</li>
+<li><strong>攻击路径：</strong> 维护入口或内部桥接器 -&gt; OAM/N6配置 -&gt; UPF转发规则或边界ACL -&gt; 客舱业务到航电/维护目标的错误路径。</li>
+<li><strong>具体业务影响：</strong> 物理隔离仍在，但逻辑路由可能把客舱宽带或维护流量送到不应到达的应用和航电安全域，形成跨域注入、数据泄露或维护操作越权。</li>
+<li><strong>危害分级：</strong> <strong>极高</strong>。本级别只适用于该错误路径确实能够到达安全关键航电功能的项目；若经过只读监视代理且不能输出控制命令，应按实际功能降级。</li>
+<li><strong>验证思路：</strong> 在隔离台架建立合成DNN/S-NSSAI和UPF规则，分别提交未授权OAM路由变更、客舱命令和合法航电遥测，检查路由、应用消费和审计记录。</li>
+<li><strong>仿真证据：</strong> <code>attacks.oam_route_change.native.accepted=True</code>，未授权加固请求返回<code>oam_rbac</code>；<code>attacks.cabin_to_avionics_boundary.native.accepted=True</code>，加固网关返回<code>cabin_to_avionics_boundary</code>。证据文件见<code>artifacts/5g_atg_results.json</code>。</li>
+<li><strong>整改措施：</strong> 将物理隔离和逻辑隔离作为两个独立控制；边界默认拒绝；客舱到航电只允许明确的只读字段或经过安全代理的单向数据；OAM使用独立管理面、mTLS、RBAC、双人审批、签名配置、不可篡改审计和回滚；以真实ICD和安全域定义验证所有N6及机载路由。</li>
+<li><strong>来源：</strong> [1] TS 23.501的5GS架构和参考点；[8] TS 29.244的UPF会话规则；[9]-[11] DO-326A、DO-356A、DO-355；[14] CCAR-25 §25.1309。</li>
+</ul>
+<h3 id="32-ad-02dnnupfc-ad-02">3.2 AD-02：专用DNN、切片和UPF路由的配置差异风险（结论：C-AD-02）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> 5GS DNN、S-NSSAI、PDU会话、N4/PFCP和N6路由；对应TS 23.501切片/DNN/QoS架构、TS 23.502 PDU会话流程、TS 29.244。</li>
+<li><strong>触发条件：</strong> <code>atg.cabin</code>、<code>atg.maint</code>和<code>atg.avionics</code>共用UPF或转发策略，但未执行DNN-S-NSSAI-UE-应用的绑定校验；TEID/QFI被当作可信来源字段。</li>
+<li><strong>适配设备：</strong> 机载UE profile、AMF/SMF、UPF、PCF、N4控制链路、N6防火墙和地面应用接入网关。</li>
+<li><strong>利用前提：</strong> 需要恶意或错误的PDU会话参数、被攻陷的UPF/桥接器或可修改的PFCP/OAM配置；不能仅凭知道DNN名称绕过真实5G-AKA。</li>
+<li><strong>攻击路径：</strong> 伪造/错配PDU会话状态 -&gt; 使用合法格式的GTP-U业务包 -&gt; UPF按错误TEID或QFI转发 -&gt; 另一DNN或地面应用消费。</li>
+<li><strong>具体业务影响：</strong> 客舱数据可能进入机务或航电接收端；机务记录可能进入错误飞机或错误航班；QoS误配可能使遥测、维护和客舱流量争用带宽。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>；一旦跨入安全关键航电输出路径，按AD-01条件升级为极高。</li>
+<li><strong>验证思路：</strong> 为每个PDU会话记录UE、Cell、DNN、S-NSSAI、TEID、QFI、N3对端和目标应用，逐一改变一个字段，确认错误字段在UPF/安全网关被拒绝且没有应用副作用。</li>
+<li><strong>仿真证据：</strong> TEID伪造返回<code>session_binding</code>，QFI伪造返回<code>qfi_binding</code>；弱化路由均接受并转发到合成地面应用。</li>
+<li><strong>整改措施：</strong> 建立配置生成器和静态检查；每条规则绑定完整PDU会话和安全域；拒绝未注册DNN、未知S-NSSAI、TEID/QFI不匹配、来源区改变和N3端点改变；对N4/PFCP和OAM配置做完整性保护、双人复核、变更回放和负向测试。</li>
+<li><strong>来源：</strong> [1] TS 23.501；[2] TS 23.502；[7] TS 29.281；[8] TS 29.244；[10] DO-356A。</li>
+</ul>
+<h3 id="33-ad-03c-ad-03">3.3 AD-03：高空大覆盖和高速移动性带来的状态连续性风险（结论：C-AD-03）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> NR小区选择、RRC连接、NG-RAN移动性、N2/Xn切换、NAS安全上下文、PDU会话和N3隧道；对应TS 23.502、TS 38.300和TS 38.331。</li>
+<li><strong>触发条件：</strong> 飞机快速跨越地空小区覆盖区、邻区重叠或链路质量快速变化，切换上下文、密钥、QoS和TEID更新存在延迟、回滚或配置不一致。</li>
+<li><strong>适配设备：</strong> 机载UE、ATG gNB邻区配置、AMF/SMF/UPF、地面传输网络和应用接收缓冲区。</li>
+<li><strong>利用前提：</strong> 需要真实或仿真的移动性状态、可控的邻区/链路条件或错误的gNB切换配置；本项目当前只完成注册状态，未声称已复现真实切换缺陷。</li>
+<li><strong>攻击路径：</strong> 构造覆盖边缘/丢包/重复切换条件 -&gt; 触发旧小区和新小区状态交叠 -&gt; 旧TEID或旧序号包被错误接受，或合法业务长时间中断 -&gt; 地面应用使用陈旧状态。</li>
+<li><strong>具体业务影响：</strong> 客舱宽带和机务回传间歇中断；遥测时间顺序错误；重复维护记录；切换期间的安全降级、重新注册或恢复策略失效。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>；如果业务路径被证明影响安全关键数据，应结合独立备用源和时间预算重新评估。</li>
+<li><strong>验证思路：</strong> 扩展状态模型或真实授权台架，按航迹时间序列注入切换、重复、延迟和旧上下文包，核对安全上下文、TEID、序号、时间戳和应用状态是否原子更新。</li>
+<li><strong>仿真证据：</strong> 当前证据覆盖注册超时、初始安全状态和会话绑定；切换/飞行航迹验证标记为“待扩展验证”，不得写成已测试结果。</li>
+<li><strong>整改措施：</strong> 对切换前后上下文设置明确生效边界和旧状态失效时间；应用层使用单调序号和时间窗；地面应用按飞机、航班、会话和时间戳去重；设计链路丢失时的安全降级和恢复，不能以静默重连替代安全状态确认。</li>
+<li><strong>来源：</strong> [2] TS 23.502移动性和PDU会话流程；[5] TS 38.300；[6] TS 38.331；[9]-[11]民航航空器网络安全方法和持续适航指导。</li>
+</ul>
+<h3 id="34-ad-04c-ad-04">3.4 AD-04：专用部署和运维节奏造成的补丁、证书和配置风险（结论：C-AD-04）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> gNB/5GC网元固件、OAM管理接口、证书/密钥管理、配置发布和回滚流程；具体OAM协议依供应商ICD冻结，不能泛化为某一种REST、NETCONF或CLI缺陷。</li>
+<li><strong>触发条件：</strong> 专属网络不能像公网共享平台一样自动更新；网元版本、UE固件、信任锚、切片策略和地面应用版本由不同组织维护，存在版本漂移、过期证书、临时调试账号或未验证回滚配置。</li>
+<li><strong>适配设备：</strong> 机载UE、ATG gNB、AMF/SMF/UPF、OAM/OSS、供应商跳板、证书服务器和地面应用。</li>
+<li><strong>利用前提：</strong> 需要维护窗口、供应商账号、被篡改的升级包、错误信任锚或配置发布权限；本报告不指向某个厂商的具体CVE。</li>
+<li><strong>攻击路径：</strong> 供应链/维护介质/跳板 -&gt; 网元或UE配置/固件 -&gt; 安全策略降级、跨域路由打开或日志失效 -&gt; 业务流量进入错误边界。</li>
+<li><strong>具体业务影响：</strong> 空地链路无法注册；证书验证失败；专属切片隔离失效；维护数据被错误接收；故障追溯和持续适航记录不完整。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>；若升级包或配置能关闭航电边界控制，按极高处理。</li>
+<li><strong>验证思路：</strong> 建立版本、证书、配置基线；在断网台架验证签名、回滚、过期证书、角色变更和审计；用合成OAM请求验证未经授权的配置不会生效。</li>
+<li><strong>仿真证据：</strong> OAM弱化模型接受未授权路由变更；加固模型要求RBAC、mTLS、双人审批、HMAC、序号和受保护边界策略。</li>
+<li><strong>整改措施：</strong> 固件和配置签名；硬件保护的密钥和信任锚；最小权限和临时授权；供应商账号隔离；版本互操作矩阵；变更前后自动化负向测试；安全审计和可回滚基线。</li>
+<li><strong>来源：</strong> [9] DO-326A/ED-202A；[10] DO-356A/ED-203A；[11] DO-355/ED-204A；[12] SAE ARP4754A；[14] CCAR-25 §25.1309。</li>
+</ul>
+<h2 id="4">4. 全链路脆弱性深度分析</h2>
+<h3 id="41-f-01uuc-f-01">4.1 F-01：Uu广播和初始安全上下文完成前的恶意小区诱捕（结论：C-F-01）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> NR系统信息广播、RRC连接建立、初始NAS注册和5G-AKA/安全模式建立；对应TS 38.331、TS 24.501和TS 33.501。</li>
+<li><strong>触发条件：</strong> UE在可见范围内发现具有相同或相似PLMN/ATG能力标识的未信任小区；UE的网络信任校验、运营商白名单、降级策略或告警策略不严格。</li>
+<li><strong>适配设备：</strong> 机载5G UE、ATG gNB、机载天线/射频前端和地面小区规划；实验中的设备名为合成<code>ROGUE-GNB-01</code>。</li>
+<li><strong>利用前提：</strong> 现实攻击需要经授权频谱和安全实验环境验证的射频覆盖或信号条件；本实验只提供数字广播可见、初始注册可见和AKA失败状态。</li>
+<li><strong>攻击路径：</strong> 可见SIB/小区参数 -&gt; UE选择小区 -&gt; RRC setup -&gt; 初始NAS Registration Request元数据暴露 -&gt; 5G-AKA或网络信任校验失败；弱化策略可能先驻留后拒绝业务。</li>
+<li><strong>具体业务影响：</strong> 机载终端身份/能力/业务元数据暴露；合法小区被诱导离开造成业务中断；维护终端可能进入错误接入状态。真实5G-AKA未被绕过时，不能宣称攻击者获得用户面密钥或真实IMSI/SUPI。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>。若存在允许未认证网络承载敏感业务、明文降级或可到达航电边界的例外路径，应升级为极高。</li>
+<li><strong>验证思路：</strong> 在射频屏蔽或纯数字状态台架中配置可信/未信任小区，记录SIB可见、RRC setup、初始NAS、AKA结果、安全模式和用户面状态；检查加固UE是否拒绝驻留并告警。</li>
+<li><strong>仿真证据：</strong> <code>rogue_cell_hardened.result=rogue_cell_rejected</code>，<code>rogue_cell_legacy.result=camped_untrusted_cell</code>；两者<code>pre_security_metadata_visible=True</code>，两者<code>user_plane_ready=False</code>。</li>
+<li><strong>整改措施：</strong> 严格校验运营商PLMN、TAC、ATG能力和授权邻区；禁止不受控安全降级；在安全上下文建立前只发送协议必需的最小信息；UE保存并保护信任锚和网络策略；对AKA失败、异常小区选择和重复注册告警；不以“隐藏广播”代替认证。</li>
+<li><strong>来源：</strong> [6] TS 38.331关于NR系统信息和RRC；[3] TS 24.501关于NAS注册；[4] TS 33.501关于5G-AKA和接入安全；[10] DO-356A。</li>
+</ul>
+<h3 id="42-f-02uuc-f-02">4.2 F-02：Uu信号干扰造成注册、切换和业务不可用（结论：C-F-02）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> NR物理层/链路层可用性、RRC连接、NAS注册和PDU会话建立；对应TS 38.300、TS 38.331和TS 23.502。</li>
+<li><strong>触发条件：</strong> UE无法稳定接收同步、系统信息或RRC/NAS消息，或者上下行丢包超过重传和超时窗口。</li>
+<li><strong>适配设备：</strong> 机载UE、ATG gNB、地面站覆盖区、机载天线和无线资源管理组件。</li>
+<li><strong>利用前提：</strong> 现实验证需要频谱授权、射频屏蔽、EMC/EMI安全流程和批准的干扰模拟器；本实验将其抽象为RRC/NAS丢失，不产生RF。</li>
+<li><strong>攻击路径：</strong> Uu消息丢失 -&gt; RRC setup或NAS Registration Request无法完成 -&gt; 5G-AKA/安全模式/PDU会话不发生 -&gt; 客舱、机务和地面业务进入链路不可用状态。</li>
+<li><strong>具体业务影响：</strong> 客舱宽带中断；机务数据回传延迟；运行监视缺少最新数据；若系统错误地把5G-ATG当作唯一安全关键数据源，可能使飞行运行和维护判断失去独立信息。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>。存在经安全评估确认的独立备用链路和安全降级时，不应把可用性中断直接升级为飞机失控；无备用且影响安全关键功能时应重新评估为极高。</li>
+<li><strong>验证思路：</strong> 在数字模型中改变RRC/NAS丢失状态，测量注册超时、业务恢复、告警和安全降级；在后续授权射频台架中再测覆盖边缘、频偏、多普勒、遮挡和干扰容限。</li>
+<li><strong>仿真证据：</strong> <code>attacks.interference.registration.result=registration_timeout</code>，<code>reason=uu_interference_or_signal_blocking</code>，<code>service_available=False</code>。</li>
+<li><strong>整改措施：</strong> 设计空地链路丢失检测、重连上限、告警和安全降级；客舱和机务业务分级恢复；航电数据不得依赖未验证的客舱承载；利用覆盖冗余、链路监测和频谱管理降低单点可用性风险；所有RF试验遵守批准的频谱和安全流程。</li>
+<li><strong>来源：</strong> [2] TS 23.502；[5] TS 38.300；[6] TS 38.331；[11] DO-355；[14] CCAR-25 §25.1309。</li>
+</ul>
+<h3 id="43-f-03naspduc-f-03">4.3 F-03：NAS注册和PDU会话信令风暴（结论：C-F-03）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> NAS Registration、Service Request、PDU Session Establishment及N2控制面状态；对应TS 23.502、TS 24.501和TS 23.501。</li>
+<li><strong>触发条件：</strong> 可见ATG小区允许大量请求进入AMF/SMF，认证前没有按源、UE、时间窗和航班/接入批次做资源保护，或者异常重试没有上限。</li>
+<li><strong>适配设备：</strong> 机载UE、恶意或故障UE、ATG gNB、AMF、SMF、UDM/AUSF前置状态和地面接入控制器。</li>
+<li><strong>利用前提：</strong> 需要能够向授权实验小区或数字接入边界提交注册/会话请求；本实验不生成真实NAS/GTP报文，只重复合成状态请求。</li>
+<li><strong>攻击路径：</strong> 50次同一时刻注册请求 -&gt; 弱化AMF模型逐次分配上下文 -&gt; 状态表、计时器或认证链路压力增大；加固模型在每秒10次后拒绝后续40次。</li>
+<li><strong>具体业务影响：</strong> 合法飞机注册延迟、切换和PDU会话建立失败；AMF/SMF资源被异常消耗；地面应用看见数据长时间缺失；如果与干扰同时发生，恢复风暴可能加剧不可用窗口。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>。</li>
+<li><strong>验证思路：</strong> 在隔离数字模型中固定时间戳，重复注册请求，分别记录上下文分配、拒绝原因、合法UE恢复时间和告警；用不同源、不同DNN和不同飞行阶段验证限速不误伤合法业务。</li>
+<li><strong>仿真证据：</strong> <code>attempts=50</code>；弱化模型<code>native_contexts_allocated=50</code>；加固模型<code>hardened_contexts_allocated=10</code>、<code>hardened_rejected=40</code>、原因<code>signaling_rate_limit</code>。</li>
+<li><strong>整改措施：</strong> 在gNB/AMF入口实施每源、每UE、每小区、每DNN和全局配额；把昂贵状态分配推迟到必要的认证和策略检查之后；设置异常重试上限、过载保护、优先级和白名单；保护合法在航UE的切换和恢复资源；将限速、丢弃、上下文数和恢复时延纳入监控与安全测试。</li>
+<li><strong>来源：</strong> [2] TS 23.502；[3] TS 24.501；[1] TS 23.501；[10] DO-356A。</li>
+</ul>
+<h3 id="44-f-04c-f-04">4.4 F-04：用户面报文篡改导致地面遥测和维护判断错误（结论：C-F-04）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> N3 GTP-U承载、N6应用消息和地面应用数据完整性；对应TS 29.281、TS 23.501和TS 33.501的用户面保护要求。</li>
+<li><strong>触发条件：</strong> 业务从UPF到地面应用只依赖源地址、TEID或受信任传输，未对应用消息做端到端完整性校验，或安全网关允许未认证数据直接入库。</li>
+<li><strong>适配设备：</strong> 机载航电数据适配器、UPF/N3传输、N6路由器、航班运行监视和机务数据接收应用。</li>
+<li><strong>利用前提：</strong> 攻击者需要位于可修改数据的传输/桥接边界，或已经控制发送端、地面接入代理或网元；不能把“知道报文字段”当成获得合法密钥。</li>
+<li><strong>攻击路径：</strong> 捕获合成<code>AIRCRAFT_TELEMETRY</code> -&gt; 将高度从30000 ft改为500 ft、保留原始认证字段 -&gt; 弱化路由直接交给地面应用；加固网关验证来源密钥和完整消息后拒绝。</li>
+<li><strong>具体业务影响：</strong> 运行监视画面、告警判断、航班状态和机务数据记录出现错误；如果同一机制承载未经隔离的航电命令，可能转化为对航电功能的非授权输入。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>。实际消息进入安全关键功能时应按该功能的安全目标升级为极高。</li>
+<li><strong>验证思路：</strong> 先让合法遥测通过，再只修改一个字段，不修改原始HMAC/签名，比较原生和加固网关的应用状态；验证拒绝报文没有写入地面数据库和航电命令队列。</li>
+<li><strong>仿真证据：</strong> <code>data_tamper.native.accepted=True</code>且效果为<code>telemetry_updated:500ft</code>；加固结果为<code>accepted=False</code>、<code>reason=authentication</code>。</li>
+<li><strong>整改措施：</strong> 在N6业务入口采用经过项目批准的mTLS、消息认证码或数字签名；认证覆盖飞机、会话、DNN、S-NSSAI、QFI、TEID引用、消息类型、序号、时间戳和payload；实施模式校验、范围校验、异常隔离、审计和密钥轮换；地面应用不得仅信任源IP、GTP-U外层或VLAN。</li>
+<li><strong>来源：</strong> [7] TS 29.281；[4] TS 33.501；[9]-[11] DO-326A、DO-356A、DO-355。</li>
+</ul>
+<h3 id="45-f-05c-f-05">4.5 F-05：用户面重放造成陈旧遥测或重复维护操作（结论：C-F-05）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> N3/N6用户面消息、业务序号、时间戳和应用状态；GTP-U承载由TS 29.281定义，抗重放需要部署侧或应用侧状态。</li>
+<li><strong>触发条件：</strong> 接收端只检查帧格式、DNN或传输完整性，不保存每飞机/每会话/每消息类型的最新序号和时间窗，或者切换后旧会话仍被接受。</li>
+<li><strong>适配设备：</strong> 机载UE、UPF、N6网关、地面遥测数据库、机务工单/维护应用。</li>
+<li><strong>利用前提：</strong> 攻击者先获得一条合法业务消息的副本，或者控制记录/转发设备；被动监听和主动注入需要不同物理或网络前提。</li>
+<li><strong>攻击路径：</strong> 记录合法遥测或维护记录 -&gt; 在稍后重复提交 -&gt; 弱化路由再次消费；加固网关检查序号和时间窗，第二次提交返回<code>replay</code>。</li>
+<li><strong>具体业务影响：</strong> 地面状态回退或重复；维护记录重复入库；旧配置/旧状态在错误时间被使用；切换恢复期间可能放大状态混乱。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>。重复维护命令或安全关键输入的后果按目标功能重新评估。</li>
+<li><strong>验证思路：</strong> 合法消息首次提交必须成功；相同消息立即再次提交、跨时间窗提交、切换后使用旧TEID提交，分别观察拒绝原因和应用状态是否保持不变。</li>
+<li><strong>仿真证据：</strong> <code>data_replay.native.accepted=True</code>；加固网关第一次接受，第二次<code>accepted=False</code>、<code>reason=replay</code>。</li>
+<li><strong>整改措施：</strong> 使用持久化单调序号、每会话和每消息类型的窗口、明确时间同步误差和切换状态；重启/回滚时保护序号状态；维护操作使用一次性授权、双人审批和业务幂等键；记录拒绝和异常时钟事件。</li>
+<li><strong>来源：</strong> [2] TS 23.502移动性和会话流程；[4] TS 33.501安全过程；[7] TS 29.281；[10] DO-356A。</li>
+</ul>
+<h3 id="46-f-06teidqfidnns-nssaic-f-06">4.6 F-06：TEID、QFI、DNN和S-NSSAI未绑定造成会话/切片混淆（结论：C-F-06）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> N3 GTP-U、N4 PFCP、DNN、S-NSSAI和QoS Flow/QFI；对应TS 23.501、TS 29.244和TS 29.281。</li>
+<li><strong>触发条件：</strong> UPF或地面接入网关仅根据一个外层标识转发，未同时核对UE、活动PDU会话、N3对端、DNN、S-NSSAI、TEID、QFI和来源安全域。</li>
+<li><strong>适配设备：</strong> UPF、N3边界、N6安全网关、机载5G UE、客舱和航电数据适配器。</li>
+<li><strong>利用前提：</strong> 需要能够构造或修改合成数据面元数据、控制错误转发设备或利用配置错误；真实GTP-U发送必须在授权实验网络内验证。</li>
+<li><strong>攻击路径：</strong> 保留已知<code>atg.cabin</code>而修改TEID或QFI -&gt; 弱化路由把包视为可信传输并交给地面应用 -&gt; 加固网关按当前PDU会话拒绝。</li>
+<li><strong>具体业务影响：</strong> 跨飞机、跨切片、跨DNN的数据混淆；客舱与机务数据错投；错误QoS造成关键遥测延迟；若路由继续向航电域，可能形成跨域输入。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>；可到达航电控制路径时为极高。</li>
+<li><strong>验证思路：</strong> 对合法包分别改变TEID、QFI、S-NSSAI、DNN、UE来源区和N3对端，要求每一项都有独立拒绝记录并且应用无副作用。</li>
+<li><strong>仿真证据：</strong> TEID错误返回<code>session_binding</code>；QFI错误返回<code>qfi_binding</code>；弱化路由均返回<code>accepted_trusted_transport</code>。</li>
+<li><strong>整改措施：</strong> UPF按完整PDU会话和N3对端维护短生命周期状态；严格校验DNN/S-NSSAI/QFI/TEID；配置N3传输保护和入口过滤；PFCP/OAM使用认证、完整性和变更审计；地面应用再次做飞机/会话/消息授权校验。</li>
+<li><strong>来源：</strong> [1] TS 23.501；[7] TS 29.281；[8] TS 29.244；[4] TS 33.501。</li>
+</ul>
+<h3 id="47-f-07n3n6tlsc-f-07">4.7 F-07：N3/N6外层元数据和无应用TLS业务的被动监听（结论：C-F-07）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> Uu广播/初始接入、N3 GTP-U外层头、N6业务payload和应用层TLS；对应TS 38.331、TS 29.281、TS 23.501及部署侧安全方案。</li>
+<li><strong>触发条件：</strong> 观察者具有Uu覆盖接收条件或进入N3/N6传输观察点；业务应用没有端到端TLS/消息加密，或者只保护了无线段而未保护地面出口。</li>
+<li><strong>适配设备：</strong> 机载5G UE、ATG gNB、地面传输设备、UPF、N6交换/路由设备和地面应用。</li>
+<li><strong>利用前提：</strong> 被动监听只需观察条件，不需驱动发送线；真实RF捕获和运营网络抓包不在本项目范围内。</li>
+<li><strong>攻击路径：</strong> 观察广播和初始注册元数据；在N3观察点读取GTP-U外层头和TEID；在无应用TLS时解析业务payload；保存数据供后续重放或画像分析。</li>
+<li><strong>具体业务影响：</strong> 暴露小区、会话、业务类型、飞机运行状态、机务记录或配置内容；元数据可帮助攻击者选择目标和时间窗口。监听本身不证明已经修改业务。</li>
+<li><strong>危害分级：</strong> <strong>中</strong>；真实维护配置、身份或运行数据敏感度较高时可升级为高。</li>
+<li><strong>验证思路：</strong> 分别记录Uu广播/初始信息、N3外层字段和应用payload；开启/关闭应用TLS，比较传输观察点可读字段；不使用真实身份或生产数据。</li>
+<li><strong>仿真证据：</strong> <code>captures.uu.broadcast_sib_visible=True</code>、<code>pre_security_registration_metadata_visible=True</code>；N3外层和TEID可见；无应用TLS时payload可读，有应用TLS时不可直接读取。</li>
+<li><strong>整改措施：</strong> 关键业务采用端到端应用TLS或批准的消息加密；按部署安全要求保护N3/N6传输；最小化初始接入元数据；分离客舱、机务和航电日志；对观察点和调试抓包进行物理、逻辑和权限控制；禁止将演示流量带入生产。</li>
+<li><strong>来源：</strong> [6] TS 38.331；[7] TS 29.281；[4] TS 33.501；[9]-[11]民航航空器网络安全指导。</li>
+</ul>
+<h3 id="48-f-08c-f-08">4.8 F-08：客舱网络到机载航电边界的跨域注入（结论：C-F-08）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> 机载UE用户面、N6/机载数据适配器、客舱到航电安全网关及其下游协议代理；具体ARINC、以太网或串行接口必须按真实ICD另行确认。</li>
+<li><strong>触发条件：</strong> 客舱DNN或客舱网络路由能够直接到达航电域；边界只检查网络可达、IP地址、TEID或“来自专属核心网”，没有消息类型、来源设备、命令权限和安全关键功能白名单。</li>
+<li><strong>适配设备：</strong> 客舱交换/路由设备、机载5G UE、N6/机载安全网关、航电数据集中器、显示/FMS/其他LRU。</li>
+<li><strong>利用前提：</strong> 攻击者先控制客舱终端、客舱应用、机载数据适配器或跨域网关；本报告不声称互联网或公网5G可以直接到达真实航电。</li>
+<li><strong>攻击路径：</strong> <code>ATG-UE-001</code>的<code>atg.cabin</code>会话 -&gt; <code>CABIN</code>源区 -&gt; 合成<code>AVIONICS_COMMAND</code> -&gt; 弱化路由直接调用航电消费者；加固网关在应用交付前拒绝。</li>
+<li><strong>具体业务影响：</strong> 在真实系统若边界后存在写入型航电功能，可能执行未授权模式、配置或指令，影响显示、导航、告警或其他安全关键功能；当前模型只执行合成命令字符串，不代表真实机载功能已经改变。</li>
+<li><strong>危害分级：</strong> <strong>极高</strong>，但必须以真实ICD证明存在可写安全关键路径；只读遥测代理或隔离测试接口应按实际功能重新分级。</li>
+<li><strong>验证思路：</strong> 建立客舱、机务、航电三个独立安全域；对每个DNN和消息类型做正向/负向矩阵测试；验证客舱命令无论是否带有正确传输标识都不能进入航电消费者，并检查下游没有副作用。</li>
+<li><strong>仿真证据：</strong> 原生结果为<code>accepted_trusted_transport</code>且效果为<code>avionics_command_executed:SET_FLIGHT_DISPLAY_MODE</code>；加固结果为<code>cabin_to_avionics_boundary</code>，加固航电命令列表为空。</li>
+<li><strong>整改措施：</strong> 默认拒绝客舱到航电写入路径；采用物理/逻辑分域、单向或只读代理、协议白名单、命令白名单、独立认证、速率和状态限制；任何跨域数据定义飞机、会话、方向、消息类型和安全目标；按ARP4754A/ARP4761A和DO-326A/DO-356A验证隔离失效模式。</li>
+<li><strong>来源：</strong> [1] TS 23.501；[9] DO-326A/ED-202A；[10] DO-356A/ED-203A；[12] SAE ARP4754A；[13] SAE ARP4761A；[14] CCAR-25 §25.1309。</li>
+</ul>
+<h3 id="49-f-09oamossc-f-09">4.9 F-09：OAM/OSS或供应商跳板修改专属核心网路由（结论：C-F-09）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> 5GC OAM/OSS管理边界、网元配置、N4/PFCP转发规则和N6/机载跨域策略；OAM具体协议需按供应商ICD和安全架构冻结。</li>
+<li><strong>触发条件：</strong> 维护跳板被视为“内网可信”，只凭网络位置、共享账号或未审计接口接受路由更新；没有mTLS、RBAC、双人审批、签名配置和边界不可绕过策略。</li>
+<li><strong>适配设备：</strong> OAM服务器、供应商维护跳板、SMF/UPF、N6安全网关、地面应用和机载边界控制器。</li>
+<li><strong>利用前提：</strong> 需要维护账号、跳板控制权、供应商工具权限或配置发布权限；不假定客舱用户可直接调用OAM接口。</li>
+<li><strong>攻击路径：</strong> <code>vendor_jump_host</code>以<code>vendor_support</code>角色提交<code>UPDATE_ROUTE_POLICY</code> -&gt; 弱化OAM直接把<code>cabin_to_avionics_route</code>打开、关闭切片隔离 -&gt; 后续客舱数据沿新路由到达航电边界。</li>
+<li><strong>具体业务影响：</strong> 隔离策略被配置层面拆除；攻击者不必攻破Uu加密就可能改变业务流向；维护审计、故障定位和持续适航记录失真。</li>
+<li><strong>危害分级：</strong> <strong>极高</strong>，因为它可能一次性改变多个业务和安全域的边界；真实后果仍取决于实际路由和下游功能。</li>
+<li><strong>验证思路：</strong> 用合成OAM请求覆盖未授权来源、错误角色、缺mTLS、缺双人审批、错误签名、过期时间戳、重复序号和试图打开航电路由的授权请求；每种情况都应无配置副作用。</li>
+<li><strong>仿真证据：</strong> 弱化OAM返回<code>trusted_oam_bridge</code>并接受路由变更；未授权加固请求返回<code>oam_rbac</code>；正确授权但试图打开边界也会被<code>protected_boundary_policy</code>阻止；正确的非跨域配置返回<code>oam_authorized</code>。</li>
+<li><strong>整改措施：</strong> OAM独立于业务面；每个网元和管理员使用设备证书/mTLS和最小RBAC；敏感路由采用双人审批、签名配置、变更窗口、自动回滚、不可篡改日志和实时告警；安全策略控制器必须能拒绝越过航电边界的配置，即使请求来自授权管理员。</li>
+<li><strong>来源：</strong> [8] TS 29.244；[9]-[11]DO-326A、DO-356A、DO-355；[14]CCAR-25 §25.1309。</li>
+</ul>
+<h3 id="410-f-105g-uec-f-10">4.10 F-10：机载5G UE的凭证、固件和本地边界被攻陷（结论：C-F-10）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> UE UICC/eSIM认证材料、NAS/RRC安全上下文、UE固件启动链、机载数据适配器和本地客舱/航电端口。</li>
+<li><strong>触发条件：</strong> UE调试口开放、固件/配置未签名、信任锚可被替换、认证材料保护不足，或机载适配器把已认证的5G承载无条件映射到高权限本地接口。</li>
+<li><strong>适配设备：</strong> 机载5G调制解调器、通信管理单元、UICC/eSIM、机载网络交换机、数据适配器和维护端口。</li>
+<li><strong>利用前提：</strong> 需要设备维护接触、供应链/固件更新权限、被攻陷的机载应用或本地调试能力；不是只凭一个无线用户就能实现。</li>
+<li><strong>攻击路径：</strong> 攻陷UE固件/本地桥 -&gt; 使用合法网络凭证建立正常5GS会话 -&gt; 通过已授权DNN发送异常应用流量或修改本地跨域映射 -&gt; 地面/边界应用过度信任该流量。</li>
+<li><strong>具体业务影响：</strong> 客舱宽带、机务回传和航电遥测的真实性失去；设备成为跨域注入跳板；密钥泄露会使单一UE的攻击影响扩大。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>；若同一UE持有航电写入权限或可直接绕过边界，按极高评估。</li>
+<li><strong>验证思路：</strong> 在离线UE安全台架检查安全启动、固件签名、信任锚、调试口、证书轮换和DNN权限；用合成已认证UE验证“网络认证成功”不能直接获得航电写权限。</li>
+<li><strong>仿真证据：</strong> 本项目通过合成UE会话和来源密钥证明会话绑定/应用认证边界；未实现真实UE固件、UICC/eSIM或调试口漏洞，因此该条为设计审查和后续台架验证项。</li>
+<li><strong>整改措施：</strong> 安全启动和签名固件；硬件保护密钥；禁用或受控调试口；UE profile最小权限；客舱和航电承载分离；本地适配器再做设备认证和命令授权；证书/密钥吊销、轮换和失效审计。</li>
+<li><strong>来源：</strong> [3] TS 24.501；[4] TS 33.501；[9]DO-326A；[10]DO-356A；[11]DO-355。</li>
+</ul>
+<h3 id="411-f-11gnbn2n3c-f-11">4.11 F-11：地空gNB的广播、邻区和N2/N3配置错误（结论：C-F-11）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> NR系统信息、RRC小区选择/重选、NG-RAN到5GC的N2/N3接口、邻区和切换配置；对应TS 38.300、TS 38.331、TS 23.501。</li>
+<li><strong>触发条件：</strong> gNB广播PLMN/TAC/ATG能力、邻区列表、N2/N3对端、证书、切片支持或空口参数配置错误；配置发布缺少签名、审批和一致性检查。</li>
+<li><strong>适配设备：</strong> ATG gNB、地面站控制器、传输路由器、AMF/UPF、UE cell-selection策略和OAM系统。</li>
+<li><strong>利用前提：</strong> 需要gNB配置权限、供应商维护权限或授权测试环境中的可控邻区；普通客舱用户不应拥有这些权限。</li>
+<li><strong>攻击路径：</strong> 修改广播或邻区配置 -&gt; UE选择错误/未信任小区，或gNB把流量送到错误N2/N3对端 -&gt; 注册失败、用户面黑洞或错误安全域交付。</li>
+<li><strong>具体业务影响：</strong> 空地业务中断、切换失败、初始注册元数据暴露、跨站点/跨飞机数据错误交付，地面监控难以判断问题来自空口还是核心网。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>。</li>
+<li><strong>验证思路：</strong> 运行配置静态检查和数字小区选择矩阵；对PLMN/TAC/ATG能力、邻区、N2/N3端点和切片配置做一字段变更，检查UE选择、核心会话和告警。</li>
+<li><strong>仿真证据：</strong> 可信/恶意Cell ID的注册结果、广播可见和AKA失败状态已记录；真实gNB广播、N2/N3互通和RF覆盖仍为后续授权台架项。</li>
+<li><strong>整改措施：</strong> gNB配置签名和双人发布；邻区/PLMN白名单；N2/N3端点证书和传输保护；禁止未授权切片/切换配置；持续监测小区身份、注册失败率、切换失败率和异常覆盖。</li>
+<li><strong>来源：</strong> [1] TS 23.501；[5]TS 38.300；[6]TS 38.331；[9]-[10]DO-326A、DO-356A。</li>
+</ul>
+<h3 id="412-f-12n6c-f-12">4.12 F-12：N6地面应用过度信任网络来源或缺少业务语义校验（结论：C-F-12）</h3>
+<ul>
+<li><strong>协议/接口层级：</strong> N6 IP接入、地面遥测/机务应用协议、消息schema、应用认证和数据库写入；对应TS 23.501的N6架构，具体业务协议按项目ICD。</li>
+<li><strong>触发条件：</strong> 地面应用根据源IP、DNN、VLAN、TEID或“来自专属UPF”直接写入遥测/维护数据库，没有飞机、航班、会话、消息类型、范围、序号和授权校验。</li>
+<li><strong>适配设备：</strong> UPF、N6防火墙、地面运行监视、机务数据平台、消息队列、数据库和告警服务。</li>
+<li><strong>利用前提：</strong> 能到达N6入口、控制转发代理或发送一个合法格式的业务包；不需要攻破地面数据库本身。</li>
+<li><strong>攻击路径：</strong> 进入N6 -&gt; 发送合法JSON/业务字段 -&gt; 弱化应用按可信传输写入状态；加固网关在应用交付前执行认证、时效、序号和语义范围检查。</li>
+<li><strong>具体业务影响：</strong> 运行状态、机务记录、BITE结果或维护工单错误；错误数据被下游系统二次传播，形成跨系统一致性问题。</li>
+<li><strong>危害分级：</strong> <strong>高</strong>。</li>
+<li><strong>验证思路：</strong> 对高度、空速、飞机标识、维护记录、命令类型、序号和时间戳分别构造越界、错配、旧包和未知枚举；验证数据库和下游告警不被拒绝数据改变。</li>
+<li><strong>仿真证据：</strong> 用户面篡改、重放、TEID/QFI伪造和正常遥测的原生/加固结果形成前后对照。</li>
+<li><strong>整改措施：</strong> N6采用mTLS或批准的消息级认证；schema和范围校验；飞机/航班/会话关联；消息去重、时间同步和隔离队列；维护写操作采用人工复核和双人控制；对拒绝包保留可审计但不影响业务安全域的证据。</li>
+<li><strong>来源：</strong> [1] TS 23.501；[4] TS 33.501；[9]-[11]DO-326A、DO-356A、DO-355。</li>
+</ul>
+<h2 id="5">5. 攻击实现条件、技术路径和验证矩阵</h2>
+<h3 id="51">5.1 攻击前提分级</h3>
+<p>为避免把通用网络攻击泛化到民航，本报告把攻击前提分为：</p>
+<table>
+<thead>
+<tr>
+<th>前提级别</th>
+<th>民航场景含义</th>
+<th>可证明范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0 被动观察</td>
+<td>能观察Uu广播/初始信息或进入N3/N6传输观察点</td>
+<td>只能证明元数据/明文暴露，不证明可注入</td>
+</tr>
+<tr>
+<td>P1 接入链路</td>
+<td>能控制授权实验小区、机载UE或测试传输边界</td>
+<td>可验证注册超时、注册风暴、会话/数据面策略</td>
+</tr>
+<tr>
+<td>P2 物理/维护接触</td>
+<td>能接触机载设备、维护连接器、OAM跳板或批准台架端口</td>
+<td>可验证配置变更、桥接和跨域边界</td>
+</tr>
+<tr>
+<td>P3 网元/供应链控制</td>
+<td>能修改gNB、UE、AMF/SMF/UPF、配置或固件</td>
+<td>可能改变全链路信任根，须按适航安全过程升级评估</td>
+</tr>
+</tbody>
+</table>
+<p>公网可达性、客舱用户权限和真实飞机航电可达性不能从P0或P1自动推导出来，必须有拓扑和配置证据。</p>
+<h3 id="52">5.2 本地数字实验矩阵</h3>
+<table>
+<thead>
+<tr>
+<th>证据编号</th>
+<th>初始条件</th>
+<th>攻击变更</th>
+<th>弱化模型观测</th>
+<th>加固模型观测</th>
+<th>业务影响</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E5G-01/Q-02</td>
+<td>可信Cell、授权UE、合法DNN</td>
+<td>无</td>
+<td>注册成功</td>
+<td>注册成功</td>
+<td>正常业务基线</td>
+</tr>
+<tr>
+<td>E5G-02/Q-04</td>
+<td>可见合成恶意Cell</td>
+<td>选择<code>ROGUE-GNB-01</code></td>
+<td>弱化UE驻留</td>
+<td>加固UE拒绝</td>
+<td>诱捕/拒绝服务，未建立用户面</td>
+</tr>
+<tr>
+<td>E5G-03/Q-03</td>
+<td>可信Cell</td>
+<td>模拟Uu/RRC/NAS丢失</td>
+<td>注册超时</td>
+<td>注册超时并进入降级要求</td>
+<td>业务不可用</td>
+</tr>
+<tr>
+<td>E5G-04/Q-05</td>
+<td>AMF/SMF入口</td>
+<td>同时提交50次注册状态请求</td>
+<td>分配50上下文</td>
+<td>接受10、拒绝40</td>
+<td>合法UE资源被挤压</td>
+</tr>
+<tr>
+<td>E5G-05</td>
+<td>客舱DNN和航电消费者</td>
+<td>提交客舱航电命令</td>
+<td>命令执行</td>
+<td>边界拒绝</td>
+<td>跨域注入风险</td>
+</tr>
+<tr>
+<td>E5G-06/Q-06</td>
+<td>合法航电遥测</td>
+<td>修改payload，保留原认证值</td>
+<td>错误遥测入库</td>
+<td><code>authentication</code>拒绝</td>
+<td>运行/维护判断错误</td>
+</tr>
+<tr>
+<td>E5G-07/Q-07</td>
+<td>一条合法遥测</td>
+<td>重复相同消息</td>
+<td>再次生效</td>
+<td><code>replay</code>拒绝</td>
+<td>陈旧状态/重复操作</td>
+</tr>
+<tr>
+<td>E5G-08/Q-08</td>
+<td>合法客舱会话</td>
+<td>修改TEID或QFI</td>
+<td>继续转发</td>
+<td><code>session_binding</code>/<code>qfi_binding</code>拒绝</td>
+<td>会话/切片混淆</td>
+</tr>
+<tr>
+<td>E5G-09/Q-09</td>
+<td>OAM路由策略</td>
+<td>供应商跳板请求打开跨域路由</td>
+<td>接受</td>
+<td><code>oam_rbac</code>拒绝；保护策略不允许跨域</td>
+<td>核心网边界被配置拆除</td>
+</tr>
+<tr>
+<td>E5G-10/Q-10</td>
+<td>Uu/N3/N6观察点</td>
+<td>分层观察</td>
+<td>广播、初始信息、外层元数据可见</td>
+<td>应用TLS保护payload</td>
+<td>机务/运行数据泄露</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53">5.3 复现命令</h3>
+<pre><code class="language-bash">cd /mnt/winE/CTF/航空
+python3 scripts/run_atg5g_experiments.py
+python3 -m pytest -q tests/test_atg5g_lab.py
+</code></pre>
+<p>脚本写出：</p>
+<ul>
+<li><code>artifacts/5g_atg_results.json</code>：环境信息、模型SHA-256和完整结构化结果；</li>
+<li><code>artifacts/5g_atg_experiment_log.md</code>：供报告归档和人工复核的摘要；</li>
+<li><code>artifacts/5g_atg_security_report.html</code>：由渲染器生成的可打印HTML报告。</li>
+</ul>
+<h2 id="6">6. 整改加固方案</h2>
+<h3 id="61">6.1 分层控制</h3>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>立即整改</th>
+<th>验证指标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>机载UE</td>
+<td>安全启动、签名固件、保护UICC/eSIM密钥、禁用未授权调试、DNN最小权限</td>
+<td>未签名固件/错误信任锚/未授权DNN均拒绝；密钥轮换和吊销可追溯</td>
+</tr>
+<tr>
+<td>Uu/接入</td>
+<td>严格PLMN/TAC/邻区/ATG能力校验，禁止不受控降级，记录AKA失败和异常驻留</td>
+<td>合成恶意小区可见但不驻留或不建用户面；无安全模式不得传敏感业务</td>
+</tr>
+<tr>
+<td>可用性</td>
+<td>干扰/丢包检测、注册超时、重试上限、链路冗余和安全降级</td>
+<td>在指定链路丢失时间预算内告警并切换安全备用；不能无限重试造成风暴</td>
+</tr>
+<tr>
+<td>信令</td>
+<td>每UE/源/小区/DNN限速，AMF/SMF过载保护，保护合法在航UE恢复资源</td>
+<td>本实验50次请求只分配10个上下文；合法UE仍能注册，拒绝有审计</td>
+</tr>
+<tr>
+<td>核心网</td>
+<td>DNN/S-NSSAI/UE/Cell/TEID/QFI/N3端点完整绑定，N4规则审批和回滚</td>
+<td>修改任一绑定字段均拒绝且无N6副作用；旧会话失效有明确边界</td>
+</tr>
+<tr>
+<td>N3/N6</td>
+<td>依据安全架构启用传输保护；关键业务增加端到端mTLS/消息认证和加密</td>
+<td>篡改、旧包、错误会话、错误飞机/航班标识均拒绝；应用无错误写入</td>
+</tr>
+<tr>
+<td>客舱/航电边界</td>
+<td>默认拒绝写路径；只读/单向代理、协议和命令白名单、安全关键功能独立认证</td>
+<td><code>CABIN -&gt; AVIONICS</code>所有未授权命令为0条下游交付；边界配置不可被普通OAM打开</td>
+</tr>
+<tr>
+<td>OAM/OSS</td>
+<td>独立管理面、设备证书、mTLS、RBAC、双人审批、签名配置、审计和回滚</td>
+<td>未授权、缺审批、错误签名、重放和越界路由均无配置副作用</td>
+</tr>
+<tr>
+<td>地面应用</td>
+<td>按飞机、航班、会话、消息类型和时间序列校验；拒绝数据进入隔离队列</td>
+<td>错误遥测、重复维护记录和未知命令不改变主数据库和告警状态</td>
+</tr>
+<tr>
+<td>监测与响应</td>
+<td>监测小区身份、注册失败、切换失败、TEID异常、OAM变更和边界拒绝</td>
+<td>事件具备时间、UE/飞机、Cell、DNN、会话、策略、操作者和结果字段</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62">6.2 加固优先级</h3>
+<p><strong>P0：飞行试验/运行前必须完成</strong></p>
+<ul>
+<li>关闭客舱到航电的直接写路由，建立经过安全评估的只读或单向代理；</li>
+<li>禁止未授权OAM/供应商跳板修改UPF、DNN、切片和跨域策略；</li>
+<li>关键机务和运行数据启用经批准的应用层完整性与保密保护；</li>
+<li>定义Uu丢失、注册失败、切换失败和核心网不可用时的安全降级与独立备用源。</li>
+</ul>
+<p><strong>P1：联调和安全验证前必须完成</strong></p>
+<ul>
+<li>完整绑定DNN、S-NSSAI、QFI、TEID、N3对端、UE和目标安全域；</li>
+<li>增加注册/服务请求/PDU会话限速、过载保护、重试上限和异常告警；</li>
+<li>完成UE/gNB/核心网/OAM配置基线、签名发布、证书轮换、日志和回滚测试；</li>
+<li>对伪小区状态、AKA失败、异常驻留、广播元数据和切换旧状态进行数字/屏蔽台架验证。</li>
+</ul>
+<p><strong>P2：持续运行和持续适航</strong></p>
+<ul>
+<li>维护攻击面清单、供应商SBOM/CVE跟踪和补丁影响分析；</li>
+<li>定期做边界负向测试、配置漂移检测、密钥生命周期演练和事件响应演练；</li>
+<li>对真实飞行阶段、航迹、覆盖、切换和链路恢复数据进行趋势分析，但不把运营数据复制到实验环境。</li>
+</ul>
+<h3 id="63">6.3 加固验收准则</h3>
+<p>验收应以具体项目安全目标和适航数据为准。本项目给出可复现的数字基线：</p>
+<ol>
+<li>可信UE在可信Cell上完成注册、5G-AKA、安全模式和合法PDU会话；</li>
+<li>恶意Cell的广播和初始信息可被观察，但加固UE不驻留、不建立用户面；</li>
+<li>50次同一时间注册请求中，受控模型最多分配10个合成上下文，其余被明确拒绝；</li>
+<li>合法遥测通过；修改payload而保留旧认证值时返回<code>authentication</code>，且应用状态不变；</li>
+<li>合法消息首次通过，完全重复消息返回<code>replay</code>；</li>
+<li>修改TEID/QFI返回会话绑定错误，不能仅凭DNN完成交付；</li>
+<li>客舱航电命令和试图通过OAM打开跨域路由均不能到达航电消费者；</li>
+<li>无应用TLS时报告明确显示payload可读风险，有应用TLS时传输观察点不应直接读取payload；</li>
+<li>所有测试输出记录模型版本、环境、时间、配置、输入变化、判定、业务副作用和限制。</li>
+</ol>
+<h2 id="7">7. 实验结果、局限和真实台架扩展</h2>
+<h3 id="71">7.1 已完成的数字证据</h3>
+<p>已完成并通过自动化测试的内容：可信注册、恶意小区的前置可见性和AKA失败状态、数字化干扰、注册信令限速、用户面篡改、重放、TEID/QFI会话绑定、客舱到航电边界和OAM路由策略。</p>
+<p>这些结果证明：在给定合成状态和安全策略下，弱化信任路径会把异常消息交给业务消费者，而分层网关可以在应用交付前拒绝；同时也证明了“广播可见”“N3外层可见”和“业务payload保密”是三个不同安全属性。</p>
+<h3 id="72">7.2 未完成且不能冒充已完成的验证</h3>
+<ul>
+<li>真实射频干扰、伪基站、空口监听和传播/多普勒；</li>
+<li>真实gNB、5GC网元、SIM/eSIM、N2/N3/N4/N6协议互操作；</li>
+<li>真实机载UE固件、地空基站配置、核心网补丁和供应商OAM漏洞；</li>
+<li>真实客舱网络、航电安全域、ARINC/以太网/串行物理链路和LRU；</li>
+<li>真实切换、航迹覆盖、飞行阶段降级和持续适航运行数据；</li>
+<li>任何CVE对具体民航设备的可利用性，除非已获得厂商型号、版本、公告和授权复现条件。</li>
+</ul>
+<h3 id="73">7.3 授权真实台架建议</h3>
+<p>若竞赛允许进一步搭建实体/联仿台架，建议顺序为：</p>
+<ol>
+<li>使用射频屏蔽箱或经批准的有线射频接口，部署测试UE、测试gNB/核心网和合成SIM，先验证注册、切片、N3/N6和OAM策略；</li>
+<li>用可控网络损伤器或协议状态注入器模拟丢包、延迟、重复和切换，不使用开放环境干扰；</li>
+<li>将地面应用、客舱网关和航电边界替换为合成LRU/仿真LRU，验证所有写路径默认拒绝；</li>
+<li>只有在真实设备、频谱、维护授权、适航安全评估和回退方案齐全时，才进行实体UE、gNB或接口卡的受控互操作；</li>
+<li>所有测试保留拓扑、固件、配置、密钥测试材料、抓包脱敏记录、日志、时间同步、判定和恢复记录。</li>
+</ol>
+<p>该扩展仍不能直接证明真实飞机安全，真实系统结果必须进入项目网络安全评估、系统安全评估、软件/硬件保证和适航审定证据链。</p>
+<h2 id="8">8. 结论</h2>
+<p>5G-ATG的核心风险不在于“5G没有任何安全机制”，而在于民航部署容易把空口安全、专属核心网、DNN/切片隔离、N3传输、N6应用、OAM管理和客舱/航电分域混成一个“内部可信”边界。只要其中一个边界把网络可达性当成消息授权，攻击者就可能从信号不可用、初始接入信息暴露、信令资源消耗、用户面篡改/重放、会话混淆或管理配置变更影响业务。</p>
+<p>本项目的数字证据给出可复核的整改闭环：正常合法业务仍可注册和交付；异常小区不建立用户面；信令风暴受到限速；TEID/QFI和应用消息受到绑定和认证；重放被拒绝；客舱到航电及OAM越界路径被阻断。下一步应以真实运营配置、机载ICD、飞行阶段安全目标和适航审定基础替换合成数据，完成授权的实体/协议台架验证。</p>
+<h2 id="_3">参考来源</h2>
+<p>以下标准/规章是本报告的溯源基础。实际项目应在配置管理中冻结采用的版本、修订号和适用条款；本报告不把通用标准文字替代具体设备ICD或适航批准。</p>
+<p>本报告未引用具体CVE编号。原因是当前没有真实运营商网元、机载UE、gNB/5GC型号和软件版本，不能把通用软件公告不加验证地归因于民航设备；具体型号、版本和授权复现条件冻结后，再将对应CVE/厂商公告登记为新的<code>SRC-*</code>来源并增加独立复现证据。</p>
+<ol>
+<li>3GPP TS 23.501, <em>System architecture for the 5G System (5GS)</em>，重点核对5GS架构、参考点、DNN、QoS和网络切片相关章节。官方索引：<a href="https://www.3gpp.org/DynaReport/23501.htm">https://www.3gpp.org/DynaReport/23501.htm</a></li>
+<li>3GPP TS 23.502, <em>Procedures for the 5G System (5GS)</em>，重点核对Registration、PDU Session Establishment、Service Request、移动性和切换流程。官方索引：<a href="https://www.3gpp.org/DynaReport/23502.htm">https://www.3gpp.org/DynaReport/23502.htm</a></li>
+<li>3GPP TS 24.501, <em>Non-Access-Stratum (NAS) protocol for 5G System (5GS)</em>，重点核对NAS注册、认证相关过程、安全模式和异常处理。官方索引：<a href="https://www.3gpp.org/DynaReport/24501.htm">https://www.3gpp.org/DynaReport/24501.htm</a></li>
+<li>3GPP TS 33.501, <em>Security architecture and procedures for 5G System</em>，重点核对5G-AKA、NAS/RRC安全、用户面机密性/完整性、密钥和安全上下文。官方索引：<a href="https://www.3gpp.org/DynaReport/33501.htm">https://www.3gpp.org/DynaReport/33501.htm</a></li>
+<li>3GPP TS 38.300, <em>NR; NR and NG-RAN Overall Description</em>，重点核对NR/NG-RAN架构、接入和移动性。官方索引：<a href="https://www.3gpp.org/DynaReport/38300.htm">https://www.3gpp.org/DynaReport/38300.htm</a></li>
+<li>3GPP TS 38.331, <em>NR; Radio Resource Control (RRC) protocol specification</em>，重点核对系统信息广播、RRC连接、重建和安全相关信令。官方索引：<a href="https://www.3gpp.org/DynaReport/38331.htm">https://www.3gpp.org/DynaReport/38331.htm</a></li>
+<li>3GPP TS 29.281, <em>General Packet Radio System (GPRS) Tunnelling Protocol User Plane (GTP-U) protocol</em>，重点核对GTP-U隧道、TEID和用户面承载。官方索引：<a href="https://www.3gpp.org/DynaReport/29281.htm">https://www.3gpp.org/DynaReport/29281.htm</a></li>
+<li>3GPP TS 29.244, <em>Interface between the Control Plane and the User Plane nodes</em>，重点核对PFCP/N4会话和UPF转发规则。官方索引：<a href="https://www.3gpp.org/DynaReport/29244.htm">https://www.3gpp.org/DynaReport/29244.htm</a></li>
+<li>RTCA DO-326A / EUROCAE ED-202A, <em>Airworthiness Security Process Specification</em>，用于航空器和机载系统网络安全过程、资产、威胁和安全保证活动。</li>
+<li>RTCA DO-356A / EUROCAE ED-203A, <em>Airworthiness Security Methods and Considerations</em>，用于航空器系统网络安全分析、保护措施和验证方法。</li>
+<li>RTCA DO-355 / EUROCAE ED-204, <em>Information Security Guidance for Continuing Airworthiness</em>，用于持续适航阶段的信息安全和维护活动。</li>
+<li>SAE ARP4754A, <em>Guidelines for Development of Civil Aircraft and Systems</em>，用于系统开发、功能分配和安全目标关联。</li>
+<li>SAE ARP4761A, <em>Guidelines and Methods for Conducting the Safety Assessment Process on Civil Airborne Systems and Equipment</em>，用于FHA、PSSA、SSA和安全评估方法。</li>
+<li>中国民用航空局，CCAR-25《运输类飞机适航标准》，§25.1309及相关系统安全要求；实际项目以适用修订版和审定基础为准。</li>
+<li>NIST SP 800-207, <em>Zero Trust Architecture</em>，仅作为网络分区、显式授权和持续验证的补充工程参考，不替代上述民航适航标准和规章。</li>
+</ol></body>
+</html>

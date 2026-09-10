@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>RS-422/RS-232 串行接口脆弱性分析报告</title><style>
+@page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+* { box-sizing: border-box; }
+body { color: #17202a; font-family: "Noto Serif CJK SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; font-size: 10.5pt; line-height: 1.65; margin: 0 auto; max-width: 920px; }
+h1 { border-bottom: 2px solid #123b5d; color: #123b5d; font-size: 22pt; line-height: 1.25; margin: 0 0 18px; padding-bottom: 10px; }
+h2 { border-bottom: 1px solid #7c9ab2; color: #123b5d; font-size: 15pt; margin-top: 26px; padding-bottom: 4px; }
+h3 { color: #234e70; font-size: 12.5pt; margin-top: 20px; }
+p { text-align: justify; }
+table { border-collapse: collapse; font-size: 9pt; margin: 12px 0 18px; width: 100%; }
+th { background: #eaf1f6; color: #123b5d; font-weight: 700; }
+th, td { border: 1px solid #b6c4ce; padding: 5px 6px; vertical-align: top; }
+code { background: #eef2f4; border-radius: 2px; padding: 1px 3px; }
+pre { background: #17202a; color: #f2f6f8; overflow-wrap: anywhere; padding: 10px; white-space: pre-wrap; }
+blockquote { border-left: 4px solid #7c9ab2; color: #455a64; margin-left: 0; padding-left: 12px; }
+li { margin-bottom: 4px; }
+hr { border: 0; border-top: 1px solid #c8d1d8; }
+@media print { a { color: inherit; text-decoration: none; } h2, h3 { break-after: avoid; } table { break-inside: avoid; } }
+</style></head>
+<body><h1 id="6rs-422rs-232">第6题：RS-422、RS-232 等串行接口脆弱性深度分析</h1>
+<p><strong>作答场景：</strong> 民用航空机载航电系统与地面维护系统的全双工串行通信场景<br>
+<strong>验证对象：</strong> 合成的 RS-422 机载 LRU-LRU 链路、合成的 RS-232 GSE-LRU 维护链路<br>
+<strong>报告版本：</strong> 1.0<br>
+<strong>验证日期：</strong> 2026-08-24<br>
+<strong>危害分级：</strong> 极高、高、中、低四级<br>
+<strong>结论性质：</strong> 研究台架与竞赛验证结论，不构成具体机型适航批准、运行放行或真实飞机安全结论</p>
+<h2 id="_1">摘要</h2>
+<p>RS-232 和 RS-422 解决的是串行电气接口和信号传输问题，不提供原生的消息来源认证、访问控制、加密、抗重放或业务语义校验。差分传输可以改善 RS-422 的抗共模干扰能力，全双工可以让两个方向同时传输，但这两个属性都不能证明“报文来自合法 LRU”或“维护命令已经被授权”。RS-232 的信号接地和维护连接器还会扩大地面保障设备、USB/串口转换器和线束接入的暴露面。</p>
+<p>本报告建立两个严格限定的民航场景：</p>
+<ol>
+<li><code>RS422-AVIONICS-LRU</code>：合成 ADC LRU 向 FMS/显示 LRU 发送 <code>AIR_DATA_UPDATE</code>，反向方向发送导航参考数据；两对独立差分线代表全双工方向。</li>
+<li><code>RS232-GSE-MAINT</code>：合成批准地面保障设备向 Air Data LRU 发送 <code>LOAD_CONFIGURATION</code>、<code>CLEAR_BITE_LOG</code> 等维护命令；链路使用单独的 TX/RX 方向。</li>
+</ol>
+<p>实验中的帧格式、命令码、LRU 名称、数据范围和业务状态均为合成项目 ICD，不代表某个真实飞机的接口控制文件。实验结果如下：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>原生/直接接收端</th>
+<th>加固网关</th>
+<th>证据结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RS-422 正常航电数据</td>
+<td>接受</td>
+<td>接受</td>
+<td>合法帧能够进入合成 LRU</td>
+</tr>
+<tr>
+<td>物理监听</td>
+<td>可解析 <code>AIR_DATA_UPDATE</code> 和数据字段</td>
+<td>原生链路不提供保密</td>
+<td>差分不等于加密</td>
+</tr>
+<tr>
+<td>未授权注入</td>
+<td>接受，合成高度变为 <code>500 ft</code></td>
+<td><code>unauthorized_source</code> 拒绝</td>
+<td>CRC 有效不等于来源可信</td>
+</tr>
+<tr>
+<td>修改数据并重算 CRC</td>
+<td>接受，<code>crc_valid_after_tamper=True</code></td>
+<td><code>authentication</code> 拒绝</td>
+<td>CRC 不是消息认证码</td>
+</tr>
+<tr>
+<td>重放</td>
+<td>接受</td>
+<td><code>replay</code> 拒绝</td>
+<td>原生帧没有受控新鲜度</td>
+</tr>
+<tr>
+<td>RS-232 维护命令</td>
+<td>直接端口接受并改变配置/日志状态</td>
+<td>地面会话接受；空中状态 <code>maintenance_not_available</code> 拒绝</td>
+<td>端口隔离和地面互锁是必要控制</td>
+</tr>
+<tr>
+<td>9,600/115,200 bit/s 配置失配</td>
+<td><code>rate_mismatch</code> 拒绝</td>
+<td>由配置管理和端口监测处理</td>
+<td>配置错误造成数据不可用</td>
+</tr>
+<tr>
+<td>64 帧突发占线</td>
+<td>接受 64 帧，合法帧延迟 <code>72.22 ms</code></td>
+<td>拒绝 64 帧，合法帧从 <code>0 ms</code> 输出</td>
+<td>无入口限速会违反时间预算</td>
+</tr>
+</tbody>
+</table>
+<p>机器可读证据见 <a href="../artifacts/serial_interface_results.json"><code>artifacts/serial_interface_results.json</code></a>，归档记录见 <a href="../artifacts/serial_interface_experiment_log.md"><code>artifacts/serial_interface_experiment_log.md</code></a>。</p>
+<h2 id="1">1. 场景、架构与安全边界</h2>
+<h3 id="11-rs-422">1.1 机载航电 RS-422 场景</h3>
+<p>本实验将一条机载设备互连抽象为：</p>
+<pre><code class="language-text">合成 ADC_LRU                         合成 FMS_DISPLAY_LRU
+     |                                          |
+     |  TX+/TX-: AIR_DATA_UPDATE               |
+     +-----------------------------------------&gt;|
+     |                                          |
+     |  RX+/RX-: NAV_REFERENCE_UPDATE           |
+     |&lt;-----------------------------------------+
+</code></pre>
+<p>配置为 <code>TIA-422-B</code> 研究 profile、<code>115200 bit/s</code>、UART <code>8N1</code>、两对独立信号对、全双工。这里的“RS-422”只表示差分电气接口边界；上层合成帧不是 TIA-422-B 原生定义，也不是任何真实飞机 ICD 的替代品。</p>
+<p>典型攻击前提不是“任意无线网络即可注入”，而是攻击者已经满足以下至少一项：</p>
+<ul>
+<li>获得目标 LRU 的发送侧控制权；</li>
+<li>在设备互连、维护适配器、串行转换器或连接器处接入能够驱动该方向的接口；</li>
+<li>攻陷一个把以太网、USB 或其他维护协议桥接到该串行方向的设备；</li>
+<li>对差分线对进行被动高阻监听，并且另有主动发送路径可用于注入或重放。</li>
+</ul>
+<h3 id="12-rs-232">1.2 地面维护 RS-232 场景</h3>
+<p>本实验将维护路径抽象为：</p>
+<pre><code class="language-text">批准 GSE / 维护笔记本
+          |
+          | RS-232 TX/RX，TIA-232-F，8N1
+          v
+     Air Data LRU 维护端口
+</code></pre>
+<p>该端口位于合成 <code>ground_maintenance_connector</code>，全双工但不是差分链路。真实飞机是否允许该端口在装机状态、通电状态或空中状态使用，必须由 AMM、WDM、设备安装图、维护配置和安全评估确认。本实验专门对比“端口直接暴露且原生接收”和“安全网关 + 地面会话 + 空中互锁”。</p>
+<h3 id="13">1.3 资产与安全属性</h3>
+<table>
+<thead>
+<tr>
+<th>资产</th>
+<th>安全属性</th>
+<th>民航业务后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LRU-LRU 航电数据</td>
+<td>真实性、完整性、新鲜度、可用性</td>
+<td>FMS/显示/告警计算使用错误或陈旧数据，触发错误状态或备用源切换</td>
+</tr>
+<tr>
+<td>维护配置与校准数据</td>
+<td>授权性、完整性、可追溯性</td>
+<td>装机配置偏移、维护测试结果不可信、后续计算使用错误参数</td>
+</tr>
+<tr>
+<td>BITE/维护日志</td>
+<td>完整性、可用性、审计性</td>
+<td>故障证据被清除或伪造，影响故障定位和持续适航记录</td>
+</tr>
+<tr>
+<td>串行链路内容</td>
+<td>机密性</td>
+<td>暴露设备状态、维护命令、校准信息和可重放的原始帧</td>
+</tr>
+<tr>
+<td>端口和方向控制</td>
+<td>访问控制、故障隔离</td>
+<td>未授权 GSE、USB 转换器或桥接设备成为串行发送源</td>
+</tr>
+</tbody>
+</table>
+<h3 id="14">1.4 威胁主体与验证范围</h3>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>场景主体</th>
+<th>具备能力</th>
+<th>本报告验证</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>被攻陷的机载 LRU/串行桥</td>
+<td>产生目标波特率和帧格式的字节流</td>
+<td>是，直接提交合法 CRC 帧</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>被替换、误配置或被攻陷的维护适配器</td>
+<td>连接维护连接器，向 TX/RX 方向发送字节</td>
+<td>是，抽象为 GSE 直连和未知来源</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>具备线束/连接器接触条件的人员</td>
+<td>被动监听或插入串行转换器</td>
+<td>是，数字监听、注入和重放</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>配置/维护流程错误</td>
+<td>改变波特率、端口启用状态或地面互锁状态</td>
+<td>是，9,600/115,200 失配和空中维护命令</td>
+</tr>
+</tbody>
+</table>
+<p><strong>排除项：</strong> 本报告没有假定客舱网络、互联网或无线链路天然可以直达该串行线；没有把合成命令码套用到真实机型；没有进行物理电压、共模、端接、EMI/ESD、连接器或真实 LRU 试验。</p>
+<h2 id="2">2. 串行接口原理与原生安全边界</h2>
+<h3 id="21-rs-232-rs-422">2.1 RS-232 与 RS-422 的区别</h3>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>RS-232 维护链路</th>
+<th>RS-422 机载链路</th>
+<th>安全含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>电气表达</td>
+<td>单端信号与参考地</td>
+<td>平衡差分信号</td>
+<td>差分改善抗干扰，不提供身份或加密</td>
+</tr>
+<tr>
+<td>本实验方向</td>
+<td>GSE↔LRU 一对 TX/RX</td>
+<td>两对独立 TX/RX 差分对</td>
+<td>全双工允许两个方向独立观察和发送</td>
+</tr>
+<tr>
+<td>典型接入点</td>
+<td>维护连接器、串口转换器、GSE</td>
+<td>LRU 连接器、线束、桥接器</td>
+<td>接入路径必须由安装和维护架构控制</td>
+</tr>
+<tr>
+<td>传输组织</td>
+<td>点到点</td>
+<td>本实验按点到点全双工建模</td>
+<td>物理点到点不等于来源认证</td>
+</tr>
+<tr>
+<td>原生认证</td>
+<td>无</td>
+<td>无</td>
+<td>任何能产生合法电平/字节的发送端都可能被接收</td>
+</tr>
+<tr>
+<td>原生加密</td>
+<td>无</td>
+<td>无</td>
+<td>监听者可获取应用层明文</td>
+</tr>
+<tr>
+<td>原生抗重放</td>
+<td>无</td>
+<td>无</td>
+<td>UART 序号若存在也不是自动安全状态</td>
+</tr>
+<tr>
+<td>原生访问控制</td>
+<td>无</td>
+<td>无</td>
+<td>端口启用、GSE 授权和地面互锁属于系统设计</td>
+</tr>
+</tbody>
+</table>
+<p>RS-422 的差分接收器通常根据两条信号线的电压差判定逻辑状态；这不意味着接收器知道“哪个 LRU”驱动了该差分对。RS-232 的电平和参考地解决收发器互连问题，也不包含用户、角色或命令授权。两者都只提供承载边界，安全属性必须由上层协议、网关、物理隔离和系统架构提供。[1][2]</p>
+<h3 id="22">2.2 合成应用帧格式</h3>
+<p>为便于复测，本项目定义了独立于 RS-232/RS-422 电气标准的应用帧：</p>
+<pre><code class="language-text">SYNC(1) | VERSION(1) | TYPE(1) | SEQUENCE(4) | LENGTH(2)
+        | JSON_PAYLOAD(N) | CRC16(2)
+</code></pre>
+<p>本实验命令码为：</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>方向/消费者</th>
+<th>合成业务含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AIR_DATA_UPDATE</code></td>
+<td>ADC_LRU→FMS_DISPLAY_LRU</td>
+<td>高度、空速等合成航电状态</td>
+</tr>
+<tr>
+<td><code>NAV_REFERENCE_UPDATE</code></td>
+<td>FMS_DISPLAY_LRU→ADC_LRU</td>
+<td>合成导航参考</td>
+</tr>
+<tr>
+<td><code>BITE_LOG_READ</code></td>
+<td>GSE→Air Data LRU</td>
+<td>读取维护故障记录</td>
+</tr>
+<tr>
+<td><code>LOAD_CONFIGURATION</code></td>
+<td>GSE→Air Data LRU</td>
+<td>装载合成校准/配置参数</td>
+</tr>
+<tr>
+<td><code>CLEAR_BITE_LOG</code></td>
+<td>GSE→Air Data LRU</td>
+<td>清除合成维护日志</td>
+</tr>
+<tr>
+<td><code>SET_MAINTENANCE_MODE</code></td>
+<td>GSE→Air Data LRU</td>
+<td>切换合成维护状态</td>
+</tr>
+</tbody>
+</table>
+<p><code>SEQUENCE</code> 在原生接收器中只作为普通字段解析，不被用作防重放状态；<code>CRC16</code> 是 <code>CRC-16/CCITT-FALSE</code>，只检测部分传输错误。帧没有 source ID、role、channel binding、时间戳 MAC、密钥标识或加密字段。因此“帧格式有效”不能推出“来源合法”或“命令当前有效”。</p>
+<h3 id="23">2.3 全双工的安全边界</h3>
+<p>全双工在数字模型中为每个方向维护独立的发送时钟。实验中 <code>ADC_LRU-&gt;FMS_DISPLAY_LRU</code> 和 <code>FMS_DISPLAY_LRU-&gt;ADC_LRU</code> 都从 <code>t=0</code> 开始发送，说明方向之间没有共享半双工仲裁。安全含义是：</p>
+<ol>
+<li>攻击者若能接入一条方向对应的 TX/RX 线对，可以只影响该方向；</li>
+<li>反向响应可能被监听、篡改或伪造；</li>
+<li>“能够双向同时传输”不等于“每个方向有独立认证”；</li>
+<li>真实物理驱动器的争用、电平破坏和故障遏制必须另做电气台架验证。</li>
+</ol>
+<h2 id="3">3. 部署场景脆弱性</h2>
+<h3 id="31-lru">3.1 航电 LRU 互连配置</h3>
+<p><strong>脆弱点 D-01：串行端口默认信任任何合法字节流。</strong> 设备按波特率、UART 格式、帧头、长度和 CRC 接收后直接把 payload 交给航电应用。若没有独立的来源、通道和会话绑定，替换的串行桥或被攻陷 LRU 可以复用同一帧格式。</p>
+<p><strong>脆弱点 D-02：串行桥接器扩大信任边界。</strong> USB-UART、以太网-串口、维护测试适配器或记录设备可能把外部数据桥接到 LRU TX 方向。桥接器如果没有端口白名单、命令 allowlist、身份认证和日志，物理隔离的串行链路会被上游接口绕过。</p>
+<p><strong>脆弱点 D-03：方向和端口配置缺少变更控制。</strong> 发送方向、波特率、8N1/奇偶、端口启用状态、终端匹配和 LRU 地址/设备选择如果由维护装载决定，错误配置或未经授权的配置更新可能造成持续数据不可用或把维护端口暴露到装机状态。</p>
+<p><strong>脆弱点 D-04：差分线的抗干扰属性被误当成抗攻击属性。</strong> 监听者只需使用适当的高阻差分接收前端即可观察两条线的逻辑差；这与改变共模电压或制造电气故障不同。差分信号不隐藏 payload，也不阻止主动桥接器产生新的合法波形。</p>
+<h3 id="32">3.2 地面维护系统</h3>
+<p><strong>脆弱点 D-05：维护连接器和 USB/串口转换器成为可驱动入口。</strong> GSE、便携维护电脑、转接线和测试盒只要获得连接器访问权，就可能发送原生维护帧。若 LRU 只检查 CRC 和命令码，未知设备也能发出 <code>LOAD_CONFIGURATION</code> 或 <code>CLEAR_BITE_LOG</code>。</p>
+<p><strong>脆弱点 D-06：空中/地面状态没有在安全边界强制执行。</strong> “维护人员应只在地面操作”是运行程序约束，不能替代 LRU 或网关中的硬件/逻辑互锁。实验中直接接收端在 <code>AIRBORNE</code> 抽象状态下仍接受合成维护命令，而安全网关拒绝 <code>maintenance_not_available</code>。</p>
+<p><strong>脆弱点 D-07：维护日志与配置操作缺少不可抵赖关联。</strong> 原生帧没有用户、设备证书、会话、序号持久化或签名；攻击者可以清除日志、重放旧配置或制造看似合法的维护操作记录。</p>
+<h3 id="33">3.3 物理与时序配置</h3>
+<p><strong>脆弱点 D-08：波特率/格式/端接配置失配。</strong> 本实验发送端为 <code>9,600 bit/s</code>、接收端按 <code>115,200 bit/s</code> 配置，数字接收器拒绝为 <code>rate_mismatch</code>。真实设备还可能表现为丢字、帧错误、间歇性工作或故障告警，必须用目标 LRU 和波形记录确认，不能把某个软件结果推广为所有设备行为。</p>
+<p><strong>脆弱点 D-09：无发送配额和入口限速。</strong> 全双工不提供安全调度。实验中 64 个 <code>BITE_LOG_READ</code> 直接排队，合法维护帧从 <code>72.22 ms</code> 才开始；若消费者的更新时间限为 <code>20 ms</code>，则时间预算被违反。</p>
+<h2 id="4">4. 攻击路径与深度脆弱性分析</h2>
+<p>危害分级按“当前合成场景能证明的结果”给出；若真实 ICD 显示数据进入更高等级功能，应依据该功能的 FHA/SSA 重新升级，不把本实验直接写成极高后果。</p>
+<h3 id="41-si-01">4.1 SI-01：物理监听造成航电/维护明文泄露</h3>
+<p><strong>协议层级：</strong> RS-232/RS-422 电气承载 + UART 字节流 + 合成应用帧解码。<br>
+<strong>触发条件：</strong> 攻击者能接触 RS-422 差分线对、RS-232 TX/RX/参考地、设备连接器或已连接的串行桥；链路处于工作状态。<br>
+<strong>适配设备：</strong> RS-422 的 LRU 互连线束、串行桥接器、记录设备；RS-232 的 GSE 维护连接器和 USB-UART 适配器。<br>
+<strong>利用前提：</strong> 仅被动读取不需要驱动线；主动注入另需目标方向的发送路径。<br>
+<strong>攻击路径：</strong> 线束/连接器高阻探测 → 按已知 baud/UART 格式采样 → 查找 <code>0x7e</code> 帧头 → 解析长度、类型、payload 和 CRC → 保存可重放帧。<br>
+<strong>具体影响：</strong> 暴露合成航电数据、LRU 状态、维护命令和配置参数；监听本身不改变飞行状态，但为后续重放和针对性篡改提供素材。<br>
+<strong>危害分级：中。</strong> 若真实维护数据包含敏感配置或监听结果可直接支持关键命令，按系统安全评估升级。<br>
+<strong>仿真证据：</strong> RS-422 捕获 <code>63</code> 字节，解码出 <code>AIR_DATA_UPDATE</code>、<code>altitude_ft=30000</code>、<code>airspeed_kt=440</code>，<code>confidentiality=False</code>。<br>
+<strong>整改：</strong> 对外部/维护边界使用经批准的加密封装或在系统架构上做物理/区域隔离；密钥由安全架构管理。不能把 RS-422 差分、RS-232 电平或 CRC 当作保密措施。</p>
+<h3 id="42-si-02-crc-rs-422">4.2 SI-02：合法 CRC 的未授权 RS-422 数据注入</h3>
+<p><strong>协议层级：</strong> RS-422 接收方向 + UART 应用帧 + LRU 业务状态更新。<br>
+<strong>触发条件：</strong> 攻击者在 <code>ADC_LRU-&gt;FMS_DISPLAY_LRU</code> 方向提交合法帧头、合法长度和重新计算的 CRC；接收器无密码学来源认证。<br>
+<strong>适配设备：</strong> 消费 <code>AIR_DATA_UPDATE</code> 的 FMS/显示类合成 LRU；真实对象必须以 ICD 和数据流图为准。<br>
+<strong>利用前提：</strong> 需要已攻陷发射 LRU、串行桥、线束接入点或能驱动该 TX 方向的测试适配器；仅拥有远程网络权限不自动满足该前提。<br>
+<strong>攻击路径：</strong> 串行适配器/受损桥 → 115200 bit/s、8N1 字节流 → RS-422 TX 方向 → LRU 校验 CRC → 应用更新数据。<br>
+<strong>具体影响：</strong> 合成 LRU 将 <code>altitude_ft=500</code>、<code>airspeed_kt=80</code> 写入最后航电数据状态；真实系统可能出现错误显示、错误告警、错误计算、备用源切换或降级。是否进入飞控或导致失控必须依真实 ICD/FHA/SSA 证明。<br>
+<strong>危害分级：高。</strong> 当前实验只证明关键数据真实性边界被突破，不证明真实运输机具体功能后果；若目标数据进入关键安全功能，应按真实安全分析评估是否升级为极高。<br>
+<strong>仿真证据：</strong> 原生接收 <code>accepted=True</code>，effect 为 <code>air_data_updated:500ft@100ms</code>；相同 raw frame 经网关因 <code>unauthorized_source</code> 拒绝，<code>no_physical_output</code>。<br>
+<strong>整改：</strong> 在 LRU 消费者前设置单一安全终止点；认证数据绑定 source、role、channel、message type、sequence、timestamp 和 native raw；输出侧禁止未授权第二发送路径。</p>
+<h3 id="43-si-03-crc">4.3 SI-03：报文篡改后重算 CRC 绕过完整性误区</h3>
+<p><strong>协议层级：</strong> 应用帧 payload + CRC16 传输错误检测。<br>
+<strong>触发条件：</strong> 攻击者修改 <code>AIR_DATA_UPDATE</code> payload 后重新编码 CRC，或直接在桥接器中替换整帧；接收器没有 MAC/签名。<br>
+<strong>适配设备：</strong> 仅以 CRC 判定有效性的机载 LRU、维护 LRU 和串行桥。<br>
+<strong>利用前提：</strong> 能捕获原始帧并在发送侧重发修改后的帧；不需要获取安全密钥，因为 native frame 没有密钥。<br>
+<strong>攻击路径：</strong> 捕获合法 frame → 修改高度/空速 → 重新计算 CRC16 → 通过 RS-422/RS-232 发送 → 原生接收器接受。<br>
+<strong>具体影响：</strong> 伪造值通过传输错误检查，进入后续应用逻辑；维护场景下可装载错误校准或清除 BITE 记录。<br>
+<strong>危害分级：高。</strong> 关键航电数据和校准参数需按真实功能后果评估；只读非关键诊断数据可降为中。<br>
+<strong>仿真证据：</strong> <code>1000</code> 修改为 <code>500</code>/<code>90</code> 等 payload 后，<code>crc_valid_after_tamper=True</code>，原生端 <code>accepted=True</code>；网关返回 <code>authentication</code>。<br>
+<strong>整改：</strong> 保留 CRC 作为线路错误检测，同时在安全边界对完整 native raw 和上下文计算经批准的认证标签。CRC、UART parity、帧头和长度检查都不能替代密码学认证。</p>
+<h3 id="44-si-04">4.4 SI-04：捕获帧重放导致陈旧航电状态或重复维护动作</h3>
+<p><strong>协议层级：</strong> 应用消息时序和业务状态机。<br>
+<strong>触发条件：</strong> 攻击者捕获一帧以前合法的 raw bytes，在序号未被原生接收器检查的情况下再次发送；目标应用缺少时间窗和持久化新鲜度状态。<br>
+<strong>适配设备：</strong> 周期性空速/高度/导航数据消费者，以及 <code>LOAD_CONFIGURATION</code>、<code>CLEAR_BITE_LOG</code> 等维护命令消费者。<br>
+<strong>利用前提：</strong> 先具备被动读取能力，再具备目标方向发送能力；单纯监听只造成信息泄露。<br>
+<strong>攻击路径：</strong> 监听 → 保存 raw frame → 延迟/重复发送 → native LRU 按 CRC 和命令码接受。<br>
+<strong>具体影响：</strong> 陈旧航电数据继续被使用，或维护操作被重复执行；日志和配置的时间关联被破坏。实际超时和冗余动作由机型 ICD 和系统安全设计决定。<br>
+<strong>危害分级：高（关键周期数据/维护配置条件性）。</strong> 非关键状态可评为中。<br>
+<strong>仿真证据：</strong> 安全网关首次接受同一 <code>AIR_DATA_UPDATE</code> envelope，第二次在时间窗内返回 <code>replay</code>；native 接收器在 <code>t=300 ms</code> 仍 <code>accepted=True</code>。<br>
+<strong>整改：</strong> 使用每来源/通道/消息类型单调序列、受控时间窗和持久化启动计数；覆盖掉电、回滚、LRU 更换、双通道切换、维护会话重建和时钟异常。</p>
+<h3 id="45-si-05rs-232">4.5 SI-05：RS-232 维护端口暴露导致配置篡改和日志破坏</h3>
+<p><strong>协议层级：</strong> RS-232 维护连接器 + 维护应用命令 + LRU 配置/日志状态。<br>
+<strong>触发条件：</strong> 维护端口在设备可接入状态下启用，只依赖帧格式、命令码和 CRC，不要求 GSE 身份、授权角色、地面状态或维护会话。<br>
+<strong>适配设备：</strong> 合成 Air Data LRU 的 GSE 维护端口、USB-UART 转换器和维护笔记本；真实适配性需由 AMM/WDM/ICD 确认。<br>
+<strong>利用前提：</strong> 能接触地面维护连接器，或控制连接到该端口的 GSE/桥接器。<br>
+<strong>攻击路径：</strong> 未授权串口设备 → <code>LOAD_CONFIGURATION</code>/<code>CLEAR_BITE_LOG</code> → LRU 原生接收 → 校准状态或 BITE 日志改变。<br>
+<strong>具体影响：</strong> 仿真中直接 RS-232 接收器接受 <code>LOAD_CONFIGURATION</code>，把 <code>calibration_id</code> 设为 <code>CAL-ATTACK</code>、<code>offset_ft=500</code>；直接接收 <code>CLEAR_BITE_LOG</code> 后 BITE 条目变为 <code>0</code>。真实系统可能影响维护放行、故障定位和后续数据计算。<br>
+<strong>危害分级：高。</strong> 配置和日志是安全相关维护资产；若真实命令可改变关键系统配置，应按审定基础和 FHA/SSA 评估是否升级。<br>
+<strong>整改：</strong> 维护端口默认关闭；使用物理钥匙/继电器或受控 GSE 使能；仅在 <code>ON_GROUND</code>、授权维护会话和正确设备身份同时满足时开放；每个命令实施角色 allowlist、双人/审批策略、MAC、序列和审计；空中状态 fail-closed。</p>
+<h3 id="46-si-06">4.6 SI-06：全双工反向方向伪造和响应混淆</h3>
+<p><strong>协议层级：</strong> 全双工方向控制 + 请求/响应应用状态机。<br>
+<strong>触发条件：</strong> 攻击者能接入反向 TX/RX 方向，并伪造 <code>BITE_LOG_RESPONSE</code>、导航参考或设备状态响应；请求方未绑定响应与请求序列、来源和会话。<br>
+<strong>适配设备：</strong> RS-422 双向 LRU 互连、RS-232 GSE 请求/响应维护会话。<br>
+<strong>利用前提：</strong> 必须控制对应反向线对、设备 TX 端或串行桥；不是只监听正向数据即可完成。<br>
+<strong>攻击路径：</strong> 监听请求 → 在独立反向方向发送格式正确响应 → 消费者按 message type/CRC 接受 → 错误状态被当作真实结果。<br>
+<strong>具体影响：</strong> 维护人员看到伪造的 BITE 结果，或 LRU 对错误状态做出错误切换/告警；可能破坏审计和故障定位。<br>
+<strong>危害分级：中到高，取决于响应是否参与安全相关决策。</strong> 本报告验证了独立方向时钟和帧承载，但未把该项伪造响应写成真实 LRU 业务后果。<br>
+<strong>整改：</strong> 请求/响应绑定同一 session、request ID、source、role、nonce/sequence 和 MAC；拒绝没有对应请求或已过期的响应；维护界面显示设备身份和会话审计结果。</p>
+<h3 id="47-si-07">4.7 SI-07：波特率失配造成航电数据不可用</h3>
+<p><strong>协议层级：</strong> UART 时序/接口配置层。<br>
+<strong>触发条件：</strong> 发送端为 <code>9,600 bit/s</code>，接收端按 <code>115,200 bit/s</code>、<code>8N1</code> 解码；或者维护配置被错误装载。<br>
+<strong>适配设备：</strong> 维修更换后的 LRU、串口转换器、GSE 配置文件、测试盒和桥接网关。<br>
+<strong>利用前提：</strong> 能改变端口配置、替换设备或在桥接器上选择错误 profile；也可能由维护错误造成。<br>
+<strong>攻击路径：</strong> 配置边界 → 修改 baud/UART 参数 → RX 帧采样失配 → CRC/帧格式错误或静默丢帧 → 应用超时/备用源切换。<br>
+<strong>具体影响：</strong> 数据不可用、维护操作失败、故障告警和备用模式；真实 LRU 表现必须通过目标台架和波形确认。<br>
+<strong>危害分级：中。</strong> 若失配切断关键周期输入，应按实际时限和失效后果升级。<br>
+<strong>仿真证据：</strong> 数字接收器对 <code>9,600</code> 发送、<code>115,200</code> 期望的帧返回 <code>rate_mismatch</code>，发送帧的数字线时长为 <code>13.541667 ms</code>。<br>
+<strong>整改：</strong> 配置签名/版本控制、端口白名单、启动自检、baud lock 监测、帧错误计数、速率告警和安全降级；维护变更纳入持续适航和配置审计。</p>
+<h3 id="48-si-08">4.8 SI-08：突发发送造成串行链路时延和业务超时</h3>
+<p><strong>协议层级：</strong> 串行 FIFO、发送调度和应用更新时间预算。<br>
+<strong>触发条件：</strong> 能驱动维护 TX 方向的设备连续发送 64 个格式有效的 <code>BITE_LOG_READ</code>，原生链路没有发送配额、入口限速或可信调度。<br>
+<strong>适配设备：</strong> RS-232 GSE 维护端口、串行转换器和处理周期受限的 LRU。<br>
+<strong>利用前提：</strong> 活跃发送能力；被动监听不能产生占线。<br>
+<strong>攻击路径：</strong> 攻击适配器 → 连续合法帧 → 单方向发送 FIFO → 合法维护帧排队 → 20 ms 业务期限违约。<br>
+<strong>具体影响：</strong> 维护操作延迟、响应超时、状态机重试、日志混乱；对于时间关键航电数据，可能触发备用源或降级。<br>
+<strong>危害分级：高（时间预算条件性）。</strong> 若有独立链路和快速超时可降为中。<br>
+<strong>仿真证据：</strong> 原生端接受 <code>64</code> 个攻击帧，合法帧在 <code>72.22 ms</code> 开始，超过 <code>20 ms</code> 期限；网关拒绝 <code>64</code> 个攻击封装，授权合法帧从 <code>0 ms</code> 输出。<br>
+<strong>整改：</strong> 入口按来源/命令限速，合法优先级和配额，异常占用告警；使用物理发送使能、隔离继电器或 bus guardian 类设计阻断绕过网关的第二发送路径；对所有控制做误拒绝和故障遏制分析。</p>
+<h2 id="5">5. 组合实验与可复现步骤</h2>
+<h3 id="51">5.1 运行命令</h3>
+<pre><code class="language-bash">python3 scripts/run_serial_experiments.py
+</code></pre>
+<p>输出：</p>
+<ul>
+<li><a href="../artifacts/serial_interface_results.json"><code>artifacts/serial_interface_results.json</code></a>：结构化接口、帧、攻击和业务状态证据；</li>
+<li><a href="../artifacts/serial_interface_experiment_log.md"><code>artifacts/serial_interface_experiment_log.md</code></a>：归档摘要；</li>
+<li><a href="../sim/serial_lab.py"><code>sim/serial_lab.py</code></a>：仿真器和安全网关实现。</li>
+</ul>
+<h3 id="52">5.2 正常链路</h3>
+<ol>
+<li>生成 <code>AIR_DATA_UPDATE</code> 合成帧，内容为 <code>altitude_ft=30000</code>、<code>airspeed_kt=440</code>。</li>
+<li>由 <code>adc_lru</code> 以 <code>avionics_lru</code> 角色生成安全封装。</li>
+<li>网关验证 source/role/channel/type/MAC/时间/sequence/语义。</li>
+<li>认证通过后输出 native raw frame 到 RS-422 数字链路。</li>
+<li><code>FMS_DISPLAY_LRU</code> 按帧头、长度和 CRC 接收并更新合成状态。</li>
+</ol>
+<p>RS-232 正常维护场景使用 <code>approved_gse</code> 角色，在 <code>ON_GROUND</code> 且 maintenance session 有效时允许配置和 BITE 命令。</p>
+<h3 id="53">5.3 攻击与加固前后对照</h3>
+<table>
+<thead>
+<tr>
+<th>用例</th>
+<th>利用输入</th>
+<th>原生接收器</th>
+<th>加固边界</th>
+<th>通过标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V-S01</td>
+<td>高阻监听 raw bytes</td>
+<td>可解码</td>
+<td>需要分区/加密保护</td>
+<td>敏感字段不以明文暴露，或有批准的隔离依据</td>
+</tr>
+<tr>
+<td>V-S02</td>
+<td>未知 source 的合法 CRC frame</td>
+<td>接受</td>
+<td><code>unauthorized_source</code></td>
+<td>不产生物理安全输出</td>
+</tr>
+<tr>
+<td>V-S03</td>
+<td>修改 payload 并重算 CRC</td>
+<td>接受</td>
+<td><code>authentication</code></td>
+<td>修改任一受保护字段均失败</td>
+</tr>
+<tr>
+<td>V-S04</td>
+<td>同一 secure envelope 重复提交</td>
+<td>接受</td>
+<td><code>replay</code></td>
+<td>不重复更新状态</td>
+</tr>
+<tr>
+<td>V-S05</td>
+<td>RS-232 <code>LOAD_CONFIGURATION</code>/<code>CLEAR_BITE_LOG</code></td>
+<td>接受</td>
+<td>角色/地面会话/MAC</td>
+<td>空中或未知设备不可执行</td>
+</tr>
+<tr>
+<td>V-S06</td>
+<td>9,600/115,200 失配</td>
+<td><code>rate_mismatch</code>/实现相关</td>
+<td>配置告警和安全降级</td>
+<td>不静默接受错误配置</td>
+</tr>
+<tr>
+<td>V-S07</td>
+<td>64 帧突发</td>
+<td>合法帧延迟 72.22 ms</td>
+<td>64 帧在网关拒绝</td>
+<td>20 ms 期限内合法帧可发送</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6">6. 整改与加固方案</h2>
+<h3 id="61">6.1 架构级边界</h3>
+<ol>
+<li><strong>单一安全终止点：</strong> RS-232 GSE 和任何跨域 RS-422 桥接在进入安全相关 LRU 前经过受控网关。网关只输出批准的 native 帧，输出侧不提供可被第二设备并联驱动的旁路。</li>
+<li><strong>物理隔离与端口使能：</strong> 维护连接器默认关闭；使用飞机地面状态、维护钥匙/继电器、GSE 身份和会话同时控制。端口状态应有独立监测和审计。</li>
+<li><strong>分区与方向策略：</strong> RS-422 两个方向分别定义来源、消费者和允许消息；反向响应不能因为“同一根串行电缆”自动获得信任。</li>
+<li><strong>桥接器最小化：</strong> USB-UART、以太网-串口、记录器和测试盒只允许批准 profile、波特率、命令集合和方向；禁止透明任意字节转发。</li>
+</ol>
+<h3 id="62">6.2 报文级保护</h3>
+<p>建议采用系统级安全封装，而不是修改 RS-232/RS-422 电气标准：</p>
+<pre><code class="language-text">source | role | channel | message_type | native_raw
+       | sequence | timestamp | session_id | approved MAC
+</code></pre>
+<ul>
+<li>MAC 覆盖完整 native raw 和所有上下文，防止跨通道、跨角色和跨命令搬运；</li>
+<li>每个 source/channel/message type 维护单调 sequence，处理掉电、回绕、双机更换和维护会话恢复；</li>
+<li>timestamp 只作为窗口控制的一部分，不替代持久化序列和会话状态；</li>
+<li>role 与命令 allowlist 分开校验，GSE 不应自动获得机载 LRU 数据发布权限；</li>
+<li>语义策略来自真实 ICD：范围、变化率、更新周期、状态转移和失效动作；</li>
+<li>CRC/UART parity 保留用于随机线路错误检测，但不作为认证依据；</li>
+<li>算法、密钥生命周期、硬件保护和失效策略必须由项目安全架构和适航审查确定。本项目 HMAC 仅用于可重复实验，不是直接装机方案。</li>
+</ul>
+<h3 id="63">6.3 业务和运维控制</h3>
+<ul>
+<li><code>LOAD_CONFIGURATION</code> 采用签名配置包、版本回滚保护、双人复核和装载后读回校验；</li>
+<li><code>CLEAR_BITE_LOG</code> 只允许经授权的维护会话，必须形成不可抵赖审计事件，不能作为普通无状态命令；</li>
+<li>GSE 设备证书、固件版本、配置 profile 和串口转换器序列号进入白名单；</li>
+<li>记录认证失败、未知 source、CRC 错误、波特率失配、重放、速率超限和端口启停事件；</li>
+<li>监测到异常时采取经安全分析批准的 fail-safe/fail-silent 或备用源切换，不因安全过滤器故障产生新的危险输出。</li>
+</ul>
+<h3 id="64">6.4 物理与电气验证</h3>
+<p>软件模型不能替代以下台架项目：</p>
+<ul>
+<li>RS-232 电平、参考地、隔离、短路和串口转换器行为；</li>
+<li>RS-422 差分幅度、共模范围、端接、线缆长度、开路/短路、驱动争用和接收阈值；</li>
+<li>8N1/其他 UART 格式、波特率容差、字节间隔、FIFO 溢出和时延分布；</li>
+<li>监听探头的负载、主动注入器的故障遏制、EMI/ESD 和接地路径；</li>
+<li>真实 LRU ICD、维护程序、地面互锁、配置装载和 BITE 日志响应。</li>
+</ul>
+<h2 id="7">7. 风险分级与符合性闭环</h2>
+<table>
+<thead>
+<tr>
+<th>分级</th>
+<th>本题适用判据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>极高</td>
+<td>真实机型证据证明未授权串行数据可直接导致灾难性功能后果，且攻击路径可在相关运行状态使用；本报告没有达到该证据条件</td>
+</tr>
+<tr>
+<td>高</td>
+<td>可影响安全相关航电数据真实性、维护配置完整性、关键时间预算或故障证据，路径已明确但真实功能后果仍需 ICD/FHA/SSA 确认</td>
+</tr>
+<tr>
+<td>中</td>
+<td>造成维护、显示、非关键数据或可恢复可用性影响，具有明确业务后果但不直接破坏关键功能</td>
+</tr>
+<tr>
+<td>低</td>
+<td>影响受限、易发现且不进入安全相关消费者，或仅为缺乏安全属性但无可利用接入路径的理论缺陷</td>
+</tr>
+</tbody>
+</table>
+<p>本报告的高、中等级均是条件性场景分级。正式型号分析需要将每条串行消息映射到系统功能、DAL/安全目标、更新时间和失效状态，再由 FHA/SSA 和航空器信息安全过程确认最终分级。</p>
+<h2 id="8">8. 结论</h2>
+<p>RS-232/RS-422 的差分、全双工和点到点特征解决的是信号传输与方向组织，不提供密码学信任。只要攻击者满足物理接入、被攻陷 LRU、串行桥接器或维护设备这一明确前提，就可能监听明文、发送合法 CRC 帧、篡改并重算 CRC、重放历史帧，或利用维护端口执行配置/日志操作。实验还证明，错误波特率会使输入不可用，连续发送会使合法帧突破业务时限。</p>
+<p>可落地的整改不是简单增加 CRC 或“更换差分线”，而是物理端口隔离、方向控制、GSE 身份与地面互锁、认证/抗重放封装、ICD 语义校验、速率和占用监测、配置生命周期及审计的组合。当前实验完成的是数字协议和业务状态边界验证；形成民航型号级结论还必须补充真实 ICD、真实 LRU、实体接口卡、线束/波形/EMI、维护程序和适航过程证据。</p>
+<h2 id="_2">参考来源</h2>
+<blockquote>
+<p>正式参赛材料应以队伍持有的正式版本为准，记录标准版本、修订号和对应章节/页码；以下来源用于溯源类别，实验数字来自 [E1]。</p>
+</blockquote>
+<p><strong>[1]</strong> TIA-232-F, <em>Interface Between Data Terminal Equipment and Data Circuit-Terminating Equipment Employing Serial Binary Data Interchange</em>, Telecommunications Industry Association。用于 RS-232 串行电气接口、信号方向和接口边界说明。</p>
+<p><strong>[2]</strong> TIA-422-B, <em>Electrical Characteristics of Balanced Voltage Digital Interface Circuits</em>, Telecommunications Industry Association。用于 RS-422 平衡差分电气接口特性说明；全双工两对线是本项目部署 profile，不是所有设备安装的自动结论。</p>
+<p><strong>[3]</strong> RTCA DO-326A / EUROCAE ED-202A, <em>Airworthiness Security Process Specification</em>。用于航空器信息安全资产、威胁、脆弱性、风险和安全需求闭环。</p>
+<p><strong>[4]</strong> RTCA DO-356A / EUROCAE ED-203A, <em>Airworthiness Security Methods and Considerations</em>。用于安全架构、保护措施、验证和残余风险分析。</p>
+<p><strong>[5]</strong> RTCA DO-355 / EUROCAE ED-204A, <em>Information Security Guidance for Continuing Airworthiness</em>。用于维护、配置、GSE、日志、漏洞和持续适航活动。</p>
+<p><strong>[6]</strong> SAE ARP4754A, <em>Guidelines for Development of Civil Aircraft and Systems</em>。用于功能、需求、架构和开发保证活动接口。</p>
+<p><strong>[7]</strong> SAE ARP4761A, <em>Guidelines and Methods for Conducting the Safety Assessment Process on Civil Airborne Systems and Equipment</em>。用于把串行数据异常、丢失、延迟和错误输入映射到 FHA/SSA；不把其当作网络安全标准。</p>
+<p><strong>[8]</strong> 中国民用航空适用的运输类飞机适航标准 CCAR-25（项目适用修订版）第 25.1309 条“设备、系统及安装”。用于说明真实设备系统安全后果必须按型号审定基础确认。</p>
+<p><strong>[9]</strong> RFC 2104, <em>HMAC: Keyed-Hashing for Message Authentication</em>, IETF，https://www.rfc-editor.org/rfc/rfc2104 。仅作为实验认证封装的公开密码学来源。</p>
+<p><strong>[10]</strong> NIST FIPS 180-4, <em>Secure Hash Standard</em>，https://csrc.nist.gov/pubs/fips/180-4/upd1/final 。用于实验所使用 SHA-256 的公开算法来源；不表示实验配置可直接装机。</p>
+<p><strong>[E1]</strong> 本项目本地证据：<code>sim/serial_lab.py</code>、<code>tests/test_serial_lab.py</code>、<code>scripts/run_serial_experiments.py</code>、<code>artifacts/serial_interface_results.json</code> 和 <code>artifacts/serial_interface_experiment_log.md</code>。当前回归测试为 <code>37 passed</code>；实验未打开真实串口或外部航电接口。</p></body>
+</html>
