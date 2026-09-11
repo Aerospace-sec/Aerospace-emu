@@ -161,6 +161,8 @@ AFDX 第一版虚拟链路模型已加入：`sim/afdx_lab.py`，覆盖 VL、BAG�
 
 ARINC 825 第一版 CAN 模型已加入：`sim/arinc825_lab.py`，覆盖节点授权、标准仲裁、载荷长度、重放、错误被动化和总线负载。一键运行会自动执行 `scripts/run_arinc825_experiments.py`。
 
+维护网络第一版模型已加入：`sim/maintenance_network_lab.py`，覆盖 Ethernet 分区、FTP/ARINC 615A 合成装载、UDP 新鲜度、SNMP 管理授权和客舱/维护/航电边界；装载结果默认只进入 `staged_not_activated`，不激活真实设备。一键运行会自动执行 `scripts/run_maintenance_network_experiments.py`。
+
 ## 仿真和安全边界
 
 - ARINC 429 奇偶校验、CRC、TEID/QFI、认证成功均不等于来源授权或业务授权；

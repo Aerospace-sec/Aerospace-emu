@@ -1,0 +1,67 @@
+{
+  "attacks": {
+    "cabin_boundary": {
+      "accepted": false,
+      "action": "blocked",
+      "reason": "cross_domain_policy"
+    },
+    "snmp_legacy_version": {
+      "accepted": false,
+      "action": "blocked",
+      "reason": "management_authentication"
+    },
+    "snmp_unauthorized_write": {
+      "accepted": false,
+      "action": "blocked",
+      "reason": "management_write_authorization"
+    },
+    "udp_replay": {
+      "accepted": false,
+      "action": "drop",
+      "reason": "replay"
+    },
+    "unsigned_load": {
+      "accepted": false,
+      "action": "rollback",
+      "reason": "package_signature"
+    }
+  },
+  "limitations": [
+    "Zones, VLANs, roles, package metadata and protocol behavior are synthetic.",
+    "No Ethernet socket, FTP server, SNMP agent or ARINC 615A loader is opened.",
+    "Real data loading requires approved package signing, ICD, aircraft configuration and authorized bench evidence."
+  ],
+  "model": {
+    "name": "synthetic-maintenance-network",
+    "protocols": [
+      "ethernet",
+      "ftp",
+      "udp",
+      "snmp",
+      "arinc615a"
+    ],
+    "simulation_only": true
+  },
+  "normal": {
+    "boundary": {
+      "accepted": true,
+      "action": "route_allowed",
+      "reason": "zone_policy_pass"
+    },
+    "load": {
+      "accepted": true,
+      "action": "staged_not_activated",
+      "reason": "arinc615a_package_accepted"
+    },
+    "snmp_read": {
+      "accepted": true,
+      "action": "read_only",
+      "reason": "management_policy_pass"
+    },
+    "udp": {
+      "accepted": true,
+      "action": "deliver_semantic_data",
+      "reason": "fresh_sequence"
+    }
+  }
+}
