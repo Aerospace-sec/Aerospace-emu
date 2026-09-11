@@ -36,6 +36,7 @@ def commands(profile: str) -> list[tuple[str, list[str]]]:
     civil_duration = "10" if profile == "quick" else "180"
     return [
         ("arinc429", ["scripts/run_experiments.py"]),
+        ("afdx", ["scripts/run_afdx_experiments.py"]),
         ("serial", ["scripts/run_serial_experiments.py"]),
         ("atg5g", ["scripts/run_atg5g_experiments.py"]),
         ("civil-platform", ["scripts/run_civil_platform.py", "--engine", "kinematic", "--duration-s", civil_duration]),

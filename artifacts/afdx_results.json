@@ -1,0 +1,125 @@
+{
+  "attacks": {
+    "bag_violation": {
+      "decision": {
+        "accepted": false,
+        "frame": {
+          "network": "A",
+          "payload_bytes": 128,
+          "sequence": 2,
+          "timestamp_ms": 0,
+          "vl_id": 1001
+        },
+        "reason": "bag_violation"
+      }
+    },
+    "oversize": {
+      "decision": {
+        "accepted": false,
+        "frame": {
+          "network": "A",
+          "payload_bytes": 513,
+          "sequence": 3,
+          "timestamp_ms": 4,
+          "vl_id": 1001
+        },
+        "reason": "frame_too_large"
+      }
+    },
+    "redundant_duplicate": {
+      "copies": 2,
+      "results": [
+        {
+          "accepted": true,
+          "frame": {
+            "network": "A",
+            "payload_bytes": 128,
+            "sequence": 1,
+            "timestamp_ms": 0,
+            "vl_id": 1001
+          },
+          "reason": "delivered"
+        },
+        {
+          "accepted": false,
+          "frame": {
+            "network": "B",
+            "payload_bytes": 128,
+            "sequence": 1,
+            "timestamp_ms": 0,
+            "vl_id": 1001
+          },
+          "reason": "redundant_duplicate"
+        }
+      ]
+    },
+    "unknown_vl": {
+      "decision": {
+        "accepted": false,
+        "frame": {
+          "network": "A",
+          "payload_bytes": 128,
+          "sequence": 1,
+          "timestamp_ms": 0,
+          "vl_id": 9999
+        },
+        "reason": "unknown_vl"
+      }
+    }
+  },
+  "configuration": {
+    "vl": {
+      "bag_ms": 4,
+      "destinations": [
+        "IOM-FCC",
+        "IOM-DISPLAY"
+      ],
+      "max_frame_bytes": 512,
+      "name": "VL-AIR-DATA",
+      "redundant": true,
+      "source": "ES-ADC",
+      "vl_id": 1001
+    }
+  },
+  "limitations": [
+    "AFDX frames, VL IDs, BAG and endpoints are synthetic project data.",
+    "The model does not open Ethernet sockets or validate physical AFDX waveforms.",
+    "Configuration and implementation conclusions require an approved ICD, ES/switch versions and authorized bench evidence."
+  ],
+  "model": {
+    "name": "synthetic-afdx",
+    "networks": [
+      "A",
+      "B"
+    ],
+    "vl_count": 1
+  },
+  "normal": {
+    "copies": 2,
+    "deliveries": [
+      {
+        "accepted": true,
+        "frame": {
+          "network": "A",
+          "payload_bytes": 128,
+          "sequence": 1,
+          "timestamp_ms": 0,
+          "vl_id": 1001
+        },
+        "reason": "delivered"
+      },
+      {
+        "accepted": false,
+        "frame": {
+          "network": "B",
+          "payload_bytes": 128,
+          "sequence": 1,
+          "timestamp_ms": 0,
+          "vl_id": 1001
+        },
+        "reason": "redundant_duplicate"
+      }
+    ],
+    "scheduled": true
+  }
+}

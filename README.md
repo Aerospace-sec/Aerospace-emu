@@ -157,6 +157,8 @@ CI 不连接真实网络、设备、串口或无线接口。部署阶段只发�
 
 分层架构、统一仿真时钟、`MessageEnvelope`、协议扩展路线、故障目录、证据回放、题目覆盖矩阵和阶段验收门槛见 [`docs/simulation_architecture.md`](docs/simulation_architecture.md)。当前跨模型链已经逐跳携带语义消息摘要和策略决策；下一步按 AFDX、ARINC 825、维护以太网、USB、ADS-B/ACARS/GPS/Wi-Fi 顺序扩展独立协议适配器。
 
+AFDX 第一版虚拟链路模型已加入：`sim/afdx_lab.py`，覆盖 VL、BAG、帧长度、A/B 冗余副本、重复去重和配置/队列负向场景。一键运行会自动执行 `scripts/run_afdx_experiments.py`。
+
 ## 仿真和安全边界
 
 - ARINC 429 奇偶校验、CRC、TEID/QFI、认证成功均不等于来源授权或业务授权；

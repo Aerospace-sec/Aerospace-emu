@@ -169,7 +169,7 @@
 
 | 题目 | 主报告 | 仿真/实验入口 | 责任人 | 审查人 | 状态 |
 |---|---|---|---|---|---|
-| 类型一-1 AFDX | 待建立 | 待建立 | 待分配 | 待分配 | 待开始 |
+| 类型一-1 AFDX | 待建立 | `sim/afdx_lab.py`、`scripts/run_afdx_experiments.py` | 待分配 | 待分配 | 已有模型初稿 |
 | 类型一-2 ARINC 429 | `report/arinc429_security_report.md` | `sim/arinc429_lab.py` | 待确认 | 待确认 | 已有初稿 |
 | 类型一-3 Ethernet/FTP/UDP/SNMP/615A | 待建立 | 待建立 | 待分配 | 待分配 | 待开始 |
 | 类型一-4 ARINC 825 | 待建立 | 待建立 | 待分配 | 待分配 | 待开始 |
