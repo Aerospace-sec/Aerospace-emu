@@ -153,6 +153,10 @@ chore: update experiment metadata
 
 CI 不连接真实网络、设备、串口或无线接口。部署阶段只发布测试证据和报告归档，不自动向真实航空系统部署代码。任何未来部署目标必须另行经过团队批准、授权测试台架和安全评审。
 
+## 完善版仿真方案
+
+分层架构、统一仿真时钟、`MessageEnvelope`、协议扩展路线、故障目录、证据回放、题目覆盖矩阵和阶段验收门槛见 [`docs/simulation_architecture.md`](docs/simulation_architecture.md)。该方案优先把现有跨模型链从“阶段结果映射”推进到“逐跳语义消息和策略决策”，再按 AFDX、ARINC 825、维护以太网、USB、ADS-B/ACARS/GPS/Wi-Fi 顺序扩展。
+
 ## 仿真和安全边界
 
 - ARINC 429 奇偶校验、CRC、TEID/QFI、认证成功均不等于来源授权或业务授权；
