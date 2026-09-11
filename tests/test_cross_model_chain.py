@@ -23,6 +23,18 @@ def test_negative_chain_blocks_downstream_without_physical_output():
     assert all(record["source"] == "virtual_model" for record in result["evidence"])
     assert all(len(record["digest_sha256"]) == 64 for record in result["evidence"])
 
+def test_each_hop_carries_semantic_envelope_and_policy_decision():
+    result = run_cross_model_chain(scenario="injection")
+    assert len(result["decisions"]) == len(result["events"]) == 7
+    for event, decision in zip(result["events"], result["decisions"]):
+        envelope = event["payload"]["envelope"]
+        assert envelope["simulation_only"] is True
+        assert len(envelope["payload_digest"]) == 64
+        assert event["payload"]["policy_decision"]["event_id"] == event["event_id"]
+        assert decision["input_digest"] == envelope["payload_digest"]
+    assert result["decisions"][2]["decision"] == "denied"
+    assert result["decisions"][3]["decision"] == "blocked"
+
 
 def test_chain_json_is_stable_and_replayable():
     first = run_cross_model_chain()
