@@ -39,6 +39,7 @@ def commands(profile: str) -> list[tuple[str, list[str]]]:
         ("afdx", ["scripts/run_afdx_experiments.py"]),
         ("arinc825", ["scripts/run_arinc825_experiments.py"]),
         ("maintenance-network", ["scripts/run_maintenance_network_experiments.py"]),
+        ("usb", ["scripts/run_usb_experiments.py"]),
         ("serial", ["scripts/run_serial_experiments.py"]),
         ("atg5g", ["scripts/run_atg5g_experiments.py"]),
         ("civil-platform", ["scripts/run_civil_platform.py", "--engine", "kinematic", "--duration-s", civil_duration]),

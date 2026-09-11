@@ -1,0 +1,54 @@
+{
+  "attacks": {
+    "cabin_data": {
+      "accepted": true,
+      "action": "charge_only",
+      "reason": "cabin_data_disabled"
+    },
+    "class_spoof": {
+      "accepted": false,
+      "action": "isolate",
+      "reason": "device_class_policy"
+    },
+    "oversize_transfer": {
+      "accepted": false,
+      "action": "drop",
+      "reason": "transfer_limit"
+    },
+    "unknown_device": {
+      "accepted": false,
+      "action": "isolate",
+      "reason": "device_not_approved"
+    },
+    "unsigned_firmware": {
+      "accepted": false,
+      "action": "isolate",
+      "reason": "firmware_signature"
+    }
+  },
+  "limitations": [
+    "USB identifiers, classes, ports and firmware metadata are synthetic.",
+    "No USB host controller, HID injection, storage device or aircraft computer is opened.",
+    "Real maintenance USB validation requires approved device-control policy, signed firmware and authorized bench evidence."
+  ],
+  "model": {
+    "name": "synthetic-aviation-usb",
+    "simulation_only": true,
+    "zones": [
+      "MAINTENANCE",
+      "CABIN"
+    ]
+  },
+  "normal": {
+    "maintenance_enumeration": {
+      "accepted": true,
+      "action": "read_only",
+      "reason": "enumeration_allowed"
+    },
+    "maintenance_transfer": {
+      "accepted": true,
+      "action": "audit_and_scan",
+      "reason": "transfer_allowed"
+    }
+  }
+}

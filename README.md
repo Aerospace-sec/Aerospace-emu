@@ -163,6 +163,8 @@ ARINC 825 第一版 CAN 模型已加入：`sim/arinc825_lab.py`，覆盖节点�
 
 维护网络第一版模型已加入：`sim/maintenance_network_lab.py`，覆盖 Ethernet 分区、FTP/ARINC 615A 合成装载、UDP 新鲜度、SNMP 管理授权和客舱/维护/航电边界；装载结果默认只进入 `staged_not_activated`，不激活真实设备。一键运行会自动执行 `scripts/run_maintenance_network_experiments.py`。
 
+USB 第一版模型已加入：`sim/usb_lab.py`，覆盖维护/客舱端口、设备枚举、批准设备、固件签名、设备类、传输大小和隔离策略；客舱端口仅允许 `charge_only`，不进入航电域。一键运行会自动执行 `scripts/run_usb_experiments.py`。
+
 ## 仿真和安全边界
 
 - ARINC 429 奇偶校验、CRC、TEID/QFI、认证成功均不等于来源授权或业务授权；
