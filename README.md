@@ -165,6 +165,8 @@ ARINC 825 第一版 CAN 模型已加入：`sim/arinc825_lab.py`，覆盖节点�
 
 USB 第一版模型已加入：`sim/usb_lab.py`，覆盖维护/客舱端口、设备枚举、批准设备、固件签名、设备类、传输大小和隔离策略；客舱端口仅允许 `charge_only`，不进入航电域。一键运行会自动执行 `scripts/run_usb_experiments.py`。
 
+类型三第 1 题“高风险脆弱性针对性缓解方案”报告见 [`report/type3_q1_high_risk_mitigation.md`](report/type3_q1_high_risk_mitigation.md)，逐项继承类型一实验结果，说明缓解效果、部署成本、实时性/确定性影响、验证条件和合规溯源。
+
 ## 仿真和安全边界
 
 - ARINC 429 奇偶校验、CRC、TEID/QFI、认证成功均不等于来源授权或业务授权；
