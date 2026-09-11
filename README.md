@@ -169,6 +169,8 @@ USB 第一版模型已加入：`sim/usb_lab.py`，覆盖维护/客舱端口、�
 
 类型三第 2 题“跨域攻击链全链路纵深防御方案”见 [`report/type3_q2_defense_in_depth.md`](report/type3_q2_defense_in_depth.md)，针对地面网络链路逐节点给出防护、检测、响应、恢复、最小阻断点和验收条件。
 
+类型三第 3 题“航空机载与空地通信全生命周期安全管控体系”见 [`report/type3_q3_lifecycle_security.md`](report/type3_q3_lifecycle_security.md)，覆盖事前防护、事中检测、事后响应、密钥/证书、供应链、配置、补丁、持续适航和证据闭环。
+
 ## 仿真和安全边界
 
 - ARINC 429 奇偶校验、CRC、TEID/QFI、认证成功均不等于来源授权或业务授权；
