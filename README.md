@@ -167,6 +167,8 @@ USB 第一版模型已加入：`sim/usb_lab.py`，覆盖维护/客舱端口、�
 
 类型三第 1 题“高风险脆弱性针对性缓解方案”报告见 [`report/type3_q1_high_risk_mitigation.md`](report/type3_q1_high_risk_mitigation.md)，逐项继承类型一实验结果，说明缓解效果、部署成本、实时性/确定性影响、验证条件和合规溯源。
 
+类型三第 2 题“跨域攻击链全链路纵深防御方案”见 [`report/type3_q2_defense_in_depth.md`](report/type3_q2_defense_in_depth.md)，针对地面网络链路逐节点给出防护、检测、响应、恢复、最小阻断点和验收条件。
+
 ## 仿真和安全边界
 
 - ARINC 429 奇偶校验、CRC、TEID/QFI、认证成功均不等于来源授权或业务授权；

@@ -184,5 +184,5 @@
 | 类型二-2 无线空口链 | 待建立 | 待建立 | 待分配 | 待分配 | 待开始 |
 | 类型二-3 地面网络链 | `report/chain3_ground_network_attack_chain.md` | `sim/twin/chain.py` | 待确认 | 待确认 | 已有初稿 |
 | 类型三-1 漏洞缓解 | `report/type3_q1_high_risk_mitigation.md` | 现有各协议实验入口 | 待分配 | 待分配 | 已有初稿，待团队审查 |
-| 类型三-2 链路纵深防御 | 待建立 | 待建立 | 待分配 | 待分配 | 待开始 |
+| 类型三-2 链路纵深防御 | `report/type3_q2_defense_in_depth.md` | `sim/twin/chain.py`、现有协议实验入口 | 待分配 | 待分配 | 已有初稿，待团队审查 |
 | 类型三-3 生命周期管控 | 待建立 | 待建立 | 待分配 | 待分配 | 待开始 |
