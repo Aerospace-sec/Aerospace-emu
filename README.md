@@ -159,6 +159,8 @@ CI 不连接真实网络、设备、串口或无线接口。部署阶段只发�
 
 AFDX 第一版虚拟链路模型已加入：`sim/afdx_lab.py`，覆盖 VL、BAG、帧长度、A/B 冗余副本、重复去重和配置/队列负向场景。一键运行会自动执行 `scripts/run_afdx_experiments.py`。
 
+ARINC 825 第一版 CAN 模型已加入：`sim/arinc825_lab.py`，覆盖节点授权、标准仲裁、载荷长度、重放、错误被动化和总线负载。一键运行会自动执行 `scripts/run_arinc825_experiments.py`。
+
 ## 仿真和安全边界
 
 - ARINC 429 奇偶校验、CRC、TEID/QFI、认证成功均不等于来源授权或业务授权；

@@ -1,0 +1,81 @@
+{
+  "attacks": {
+    "arbitration": {
+      "accepted": true,
+      "frame": {
+        "arbitration_id": 512,
+        "extended": false,
+        "payload_bytes": 2,
+        "sequence": 2,
+        "source": "POWER-LRU",
+        "timestamp_ms": 1
+      },
+      "reason": "queued"
+    },
+    "error_injection": {
+      "errors": 3,
+      "state": "error_passive"
+    },
+    "oversize": {
+      "accepted": false,
+      "frame": {
+        "arbitration_id": 288,
+        "extended": false,
+        "payload_bytes": 9,
+        "sequence": 3,
+        "source": "POWER-LRU",
+        "timestamp_ms": 4
+      },
+      "reason": "payload_too_large"
+    },
+    "replay": {
+      "accepted": false,
+      "frame": {
+        "arbitration_id": 256,
+        "extended": false,
+        "payload_bytes": 4,
+        "sequence": 1,
+        "source": "POWER-LRU",
+        "timestamp_ms": 3
+      },
+      "reason": "replay"
+    },
+    "unauthorized_node": {
+      "accepted": false,
+      "frame": {
+        "arbitration_id": 256,
+        "extended": false,
+        "payload_bytes": 1,
+        "sequence": 1,
+        "source": "UNKNOWN",
+        "timestamp_ms": 2
+      },
+      "reason": "unauthorized_node"
+    }
+  },
+  "limitations": [
+    "CAN frames, node IDs and business semantics are synthetic.",
+    "No CAN socket, transceiver, electrical waveform or aircraft equipment is opened.",
+    "Real ARINC 825 behavior requires approved ICD, node configuration and authorized bench evidence."
+  ],
+  "model": {
+    "bitrate": 500000,
+    "name": "synthetic-arinc825-can",
+    "payload_limit_bytes": 8
+  },
+  "normal": {
+    "decision": {
+      "accepted": true,
+      "frame": {
+        "arbitration_id": 256,
+        "extended": false,
+        "payload_bytes": 4,
+        "sequence": 1,
+        "source": "POWER-LRU",
+        "timestamp_ms": 0
+      },
+      "reason": "queued"
+    },
+    "load_percent": 0.041
+  }
+}

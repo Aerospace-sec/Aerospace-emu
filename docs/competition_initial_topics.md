@@ -172,7 +172,7 @@
 | 类型一-1 AFDX | 待建立 | `sim/afdx_lab.py`、`scripts/run_afdx_experiments.py` | 待分配 | 待分配 | 已有模型初稿 |
 | 类型一-2 ARINC 429 | `report/arinc429_security_report.md` | `sim/arinc429_lab.py` | 待确认 | 待确认 | 已有初稿 |
 | 类型一-3 Ethernet/FTP/UDP/SNMP/615A | 待建立 | 待建立 | 待分配 | 待分配 | 待开始 |
-| 类型一-4 ARINC 825 | 待建立 | 待建立 | 待分配 | 待分配 | 待开始 |
+| 类型一-4 ARINC 825 | 待建立 | `sim/arinc825_lab.py`、`scripts/run_arinc825_experiments.py` | 待分配 | 待分配 | 已有模型初稿 |
 | 类型一-5 USB | 待建立 | 待建立 | 待分配 | 待分配 | 待开始 |
 | 类型一-6 RS-422/RS-232 | `report/serial_interface_security_report.md` | `sim/serial_lab.py` | 待确认 | 待确认 | 已有初稿 |
 | 类型一选答-1 ADS-B | 待建立 | 待建立 | 待分配 | 待分配 | 待开始 |
